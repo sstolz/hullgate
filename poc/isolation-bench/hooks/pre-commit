@@ -1,0 +1,4 @@
+#!/bin/sh
+# BR-003 : un balayage positif bloque le commit (installé par bench.sh : core.hooksPath).
+top="$(dirname "$0")/.."
+exec python3 "$top/runner/secrets_guard.py" scan

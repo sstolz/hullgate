@@ -1,0 +1,1031 @@
+{
+  "meta": {
+    "date_utc": "2026-10-28T00:25:58+00:00",
+    "target": "gateway",
+    "dev_mode": false,
+    "partial_run": false,
+    "images": {
+      "gateway": "isolation-bench-gateway:poc",
+      "gitea": "gitea/gitea@sha256:a664a64d7740ef0db74f090f567040d0e5b34592473aad08ed5e296ccbe00eab",
+      "upstream": "python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2"
+    },
+    "module_versions": {
+      "github.com/ory/fosite": "v0.49.0",
+      "github.com/modelcontextprotocol/go-sdk": "v1.4.0",
+      "golang.org/x/oauth2": "v0.34.0",
+      "modernc.org/sqlite": "v1.38.2"
+    },
+    "bench_commit": "bc87ce94df54487f4b8f12098da0a4401eff5565",
+    "config_dirty": false,
+    "config_sha256_start": {
+      "policy.json": "7b63caf39e3242aafddcd788f8a0062862fec5e88e0950ba877f440f2ed2f44b",
+      "gateway.compose.yaml": "057a70a47a544ba91caf1fe97e9b7b2b34e4081dbf4d6d779e7a2291c55023a9",
+      "mapping.json": "90f99387ddfa42b621ed3d4c0b57a1e7e76ad3a27b9ca6843a1db222960bdf5d",
+      "../go-gateway/Dockerfile": "8fbbc6ad714f2423247547a0091f263446ad4de780ba7fcdcd8e4b1ad136130b",
+      "../go-gateway/go.mod": "d4fe51353291ec4a7ac4371ab993c0ddbfc0f33b871638ef52d9b5d63294900e",
+      "../go-gateway/go.sum": "2bd45dc233e41254599c65c90e880ea055b82188f7b55deac9222b91b27853a3"
+    },
+    "config_unchanged_during_run": true,
+    "first_commit_of_config_files": {
+      "policy.json": "64917a5f5bb2afaf059e6eac345ac2e8ceff1412 2026-10-27T17:59:47Z",
+      "gateway.compose.yaml": "e681dd9e9d215b460a2d3df539ca4767c5a74124 2026-10-27T22:44:50Z",
+      "mapping.json": "e681dd9e9d215b460a2d3df539ca4767c5a74124 2026-10-27T22:44:50Z",
+      "../go-gateway/Dockerfile": "e681dd9e9d215b460a2d3df539ca4767c5a74124 2026-10-27T22:44:50Z",
+      "../go-gateway/go.mod": "e681dd9e9d215b460a2d3df539ca4767c5a74124 2026-10-27T22:44:50Z",
+      "../go-gateway/go.sum": "e681dd9e9d215b460a2d3df539ca4767c5a74124 2026-10-27T22:44:50Z"
+    },
+    "policy": {
+      "_comment": "Politiques de la recette fixées avant elle (F-001, BR-011 ; valeurs inchangées pour F-002). Refus des demandes ambiguës et refus par défaut en panne du coffre : politiques de la spécification de la passerelle. Délai de coupure de 60 s : choix du banc, la spécification n'en fixe aucun ; il respecte la borne de BR-011 (strictement inférieur à la durée de vie du jeton d'accès). Tout changement en cours de recette invalide la recette.",
+      "ambiguous_requests": "refuse",
+      "store_outage": "deny_protected_operations",
+      "cutoff_seconds": 60,
+      "access_token_lifetime_seconds": 86400,
+      "contextforge_config_files": [
+        "cf.env",
+        "compose.yaml"
+      ],
+      "gateway_config_files": [
+        "gateway.compose.yaml",
+        "mapping.json",
+        "../go-gateway/Dockerfile",
+        "../go-gateway/go.mod",
+        "../go-gateway/go.sum"
+      ]
+    },
+    "table_first_commit": "e681dd9e9d215b460a2d3df539ca4767c5a74124",
+    "table_commit_is_ancestor_of_bench_commit": true,
+    "hook": {
+      "previous": "/workspace/poc/isolation-bench/hooks",
+      "restored_at_teardown": true,
+      "installed": true,
+      "core.hooksPath": "poc/isolation-bench/hooks"
+    },
+    "source_dirty": false,
+    "access_token_claims": {
+      "aud": [
+        "http://localhost:18100/p/acme/app/prod/role-a/mcp"
+      ],
+      "exp": 1793233556,
+      "iat": 1793147156,
+      "iss": "http://localhost:18100",
+      "role": "role-a",
+      "scp": [
+        "mcp",
+        "offline_access"
+      ],
+      "sub": "role-a",
+      "token_use": "access"
+    },
+    "access_token_header": {
+      "alg": "RS256",
+      "typ": "at+jwt"
+    },
+    "disk": {
+      "free_gb_before": 23.5,
+      "docker_bytes_before": {
+        "Images": 122300000.0,
+        "Containers": 2129000.0,
+        "Local Volumes": 0.0,
+        "Build Cache": 0.0
+      },
+      "docker_bytes_after_run": {
+        "Images": 2201000000.0,
+        "Containers": 5434000.0,
+        "Local Volumes": 2230000.0,
+        "Build Cache": 0.0
+      },
+      "growth_gb": 2.08,
+      "ceiling_gb": 4
+    },
+    "teardown": {
+      "left": [],
+      "images_equal_to_before": true,
+      "volumes_equal_to_before": true,
+      "purged_images": true,
+      "free_gb_after": 23.5
+    }
+  },
+  "tests": [
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "http": 200,
+          "compte": "witness-1",
+          "verdict": "HTTP 200"
+        }
+      ],
+      "journal": {
+        "count": 1,
+        "by_component_account": {
+          "mcp:witness-1": 1
+        },
+        "calls": [
+          "mcp witness-1 /mcp whoami 200"
+        ]
+      },
+      "reason": "",
+      "id": "T01",
+      "title": "Access token A sur A, action autorisée",
+      "seconds": 1.0
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "jeton A sur profil B",
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-b/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n",
+          "attendu_401_invalid_token": true
+        },
+        {
+          "variante": "jeton A, tools/list sur B",
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-b/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "jeton A, point d'accès /rpc, outil de B",
+          "status": 404,
+          "www-authenticate": "",
+          "body": "404 page not found\n"
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T02",
+      "title": "Access token A sur B",
+      "seconds": 1.0
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "renouvellement du jeton de A avec resource = B",
+          "http": 400,
+          "erreur": "invalid_target",
+          "jeton_émis": false
+        },
+        {
+          "contrôle_positif": "renouvellement avec la ressource A",
+          "http": 200,
+          "jeton_émis": true
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T03",
+      "title": "Refresh token A avec ressource B",
+      "seconds": 1.1
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "renouvellement sans resource",
+          "http": 400,
+          "erreur": "invalid_target",
+          "jeton_émis": false
+        },
+        {
+          "variante": "renouvellement avec resource = A et B",
+          "http": 400,
+          "erreur": "invalid_target",
+          "jeton_émis": false
+        },
+        {
+          "contrôle_positif": "renouvellement avec la ressource A",
+          "http": 200,
+          "jeton_émis": true
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T04",
+      "title": "Refresh A sans resource ou avec A+B",
+      "seconds": 1.1
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "aud = [audience du produit, ressource B]",
+          "claims_aud": [
+            "http://localhost:18100/p/acme/app/prod/role-a/mcp",
+            "http://localhost:18100/p/acme/app/prod/role-b/mcp"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "aud = [ressource A, ressource B]",
+          "claims_aud": [
+            "http://localhost:18100/p/acme/app/prod/role-a/mcp",
+            "http://localhost:18100/p/acme/app/prod/role-b/mcp"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T05",
+      "title": "Jeton à audiences A et B",
+      "seconds": 1.1
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "signature invalide",
+          "propriétés_changées": [
+            "signature"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "émetteur invalide",
+          "propriétés_changées": [
+            "iss"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "jeton expiré",
+          "propriétés_changées": [
+            "exp"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "type = renouvellement (seule propriété token_use)",
+          "propriétés_changées": [
+            "token_use"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "type = identité (seule propriété token_use)",
+          "propriétés_changées": [
+            "token_use"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "jeton de renouvellement portant son propre jti (token_use + jti)",
+          "propriétés_changées": [
+            "jti",
+            "token_use"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "variante": "jti inconnu (seule propriété jti)",
+          "propriétés_changées": [
+            "jti"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        },
+        {
+          "contrôle_de_référence": "jeton de référence re-signé sans modification",
+          "verdict": "ok",
+          "compte": "witness-1"
+        },
+        {
+          "contrôle_hors_verdict": "jeton sans jti seul (type inchangé)",
+          "status": 401,
+          "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\", error=\"invalid_token\"",
+          "body": "{\"error\":\"invalid_token\"}\n"
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T06",
+      "title": "Signature, émetteur ou expiration invalides",
+      "seconds": 1.3
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "outil de la connexion B appelé depuis A",
+          "verdict": "refus",
+          "detail": "JSON-RPC error -32602 outil inconnu",
+          "compte": null
+        },
+        {
+          "variante": "argument connection_id = identifiant de B",
+          "verdict": "refus",
+          "detail": "JSON-RPC error -32602 argument connection_id refusé (demande ambiguë)",
+          "compte": null
+        },
+        {
+          "variante": "en-tête X-Connection-Id = identifiant de B",
+          "verdict": "refus",
+          "detail": "HTTP 400",
+          "compte": null
+        },
+        {
+          "variante": "paramètre de requête connection_id = identifiant de B",
+          "verdict": "refus",
+          "detail": "HTTP 400",
+          "compte": null
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T07",
+      "title": "Appel depuis A avec connection_id de B",
+      "seconds": 1.0
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "U1 fournit l'identifiant de connexion de U2 (argument)",
+          "verdict": "refus",
+          "detail": "JSON-RPC error -32602 argument connection_id refusé (demande ambiguë)",
+          "compte": null
+        },
+        {
+          "variante": "outil de la connexion de U2 appelé par U1",
+          "verdict": "refus",
+          "detail": "JSON-RPC error -32602 outil inconnu"
+        },
+        {
+          "variante": "U1 lit la connexion de U2 par l'API d'administration",
+          "http": 404
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T08",
+      "title": "U1 fournit un identifiant de connexion U2",
+      "seconds": 1.0
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "outil masqué présent dans tools/list",
+          "present": false,
+          "outils_génériques_listés": []
+        },
+        {
+          "variante": "appel direct de l'outil masqué",
+          "verdict": "refus",
+          "detail": "JSON-RPC error -32602 outil inconnu"
+        },
+        {
+          "variante": "appel direct par /rpc",
+          "verdict": "refus",
+          "detail": "HTTP 404"
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T09",
+      "title": "Outil masqué appelé directement",
+      "seconds": 1.0
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "outils_avant": [
+            "gitea_get_me",
+            "gitea_issue_read",
+            "gitea_issue_write",
+            "gitea_list_issues",
+            "ping",
+            "w1_flaky",
+            "w1_get_note",
+            "w1_whoami",
+            "w1_write_note"
+          ],
+          "outils_apres": [
+            "gitea_get_me",
+            "gitea_issue_read",
+            "gitea_issue_write",
+            "gitea_list_issues",
+            "ping",
+            "w1_flaky",
+            "w1_get_note",
+            "w1_whoami",
+            "w1_write_note"
+          ],
+          "compte_apres": "witness-1"
+        }
+      ],
+      "journal": {
+        "count": 1,
+        "by_component_account": {
+          "mcp:witness-1": 1
+        },
+        "calls": [
+          "mcp witness-1 /mcp whoami 200"
+        ]
+      },
+      "reason": "",
+      "id": "T10",
+      "title": "Ajout d'un compte après création du profil",
+      "seconds": 1.2
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "appels_simultanes": [
+            [
+              "ok",
+              "HTTP 200"
+            ],
+            [
+              "ok",
+              "HTTP 200"
+            ]
+          ],
+          "appel_suivant": [
+            "ok",
+            "HTTP 200"
+          ],
+          "renouvellements_émis": 3,
+          "renouvellements_refusés_invalid_grant": 0,
+          "après_nouvelle_autorisation_par_l_administrateur": null
+        }
+      ],
+      "journal": {
+        "count": 6,
+        "by_component_account": {
+          "as:witness-1": 3,
+          "mcp:witness-1": 3
+        },
+        "calls": [
+          "as witness-1 /token refresh_token issued",
+          "mcp witness-1 /mcp whoami 200",
+          "as witness-1 /token refresh_token issued",
+          "mcp witness-1 /mcp whoami 200",
+          "as witness-1 /token refresh_token issued",
+          "mcp witness-1 /mcp whoami 200"
+        ]
+      },
+      "reason": "",
+      "id": "T11",
+      "title": "Deux renouvellements simultanés",
+      "seconds": 1.3
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "révocation du jeton",
+          "action_http": 200,
+          "appel_avant": true,
+          "appel_avant_détail": "HTTP 200",
+          "délai_de_coupure_s": 0.0,
+          "borne_s": 60,
+          "refus_ensuite": [
+            "refus",
+            "refus",
+            "refus",
+            "refus"
+          ],
+          "entrées_amont_après_coupure": 0
+        },
+        {
+          "variante": "suppression du profil",
+          "action_http": 200,
+          "appel_avant": true,
+          "appel_avant_détail": "HTTP 200",
+          "délai_de_coupure_s": 0.0,
+          "borne_s": 60,
+          "refus_ensuite": [
+            "refus",
+            "refus",
+            "refus",
+            "refus"
+          ],
+          "entrées_amont_après_coupure": 0
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T12",
+      "title": "Révocation ou suppression du profil",
+      "seconds": 2.2
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "après_s": 0,
+          "verdict": "refus",
+          "detail": "HTTP 503",
+          "compte": null
+        },
+        {
+          "après_s": 5,
+          "verdict": "refus",
+          "detail": "HTTP 503",
+          "compte": null
+        },
+        {
+          "après_s": 15,
+          "verdict": "refus",
+          "detail": "HTTP 503",
+          "compte": null
+        },
+        {
+          "après_rétablissement": "ok",
+          "reprise_après_s": 0.0
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T13",
+      "title": "Coffre / contrôle de révocation indisponible",
+      "seconds": 21.1
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "profil": "A",
+          "défi_sans_jeton": {
+            "status": 401,
+            "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp\"",
+            "body": "{\"error\":\"unauthorized\"}\n"
+          },
+          "métadonnées": [
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource/p/acme/app/prod/role-a/mcp",
+              "http": 200,
+              "resource": "http://localhost:18100/p/acme/app/prod/role-a/mcp",
+              "authorization_servers": [
+                "http://localhost:18100"
+              ]
+            },
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource",
+              "http": 404,
+              "resource": null,
+              "authorization_servers": null
+            }
+          ],
+          "métadonnées_propres_à_la_ressource": true,
+          "défi_désigne_les_métadonnées_de_la_ressource": true,
+          "aucune_ressource_globale_à_la_racine": true
+        },
+        {
+          "profil": "B",
+          "défi_sans_jeton": {
+            "status": 401,
+            "www-authenticate": "Bearer resource_metadata=\"http://localhost:18100/.well-known/oauth-protected-resource/p/acme/app/prod/role-b/mcp\"",
+            "body": "{\"error\":\"unauthorized\"}\n"
+          },
+          "métadonnées": [
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource/p/acme/app/prod/role-b/mcp",
+              "http": 200,
+              "resource": "http://localhost:18100/p/acme/app/prod/role-b/mcp",
+              "authorization_servers": [
+                "http://localhost:18100"
+              ]
+            },
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource",
+              "http": 404,
+              "resource": null,
+              "authorization_servers": null
+            }
+          ],
+          "métadonnées_propres_à_la_ressource": true,
+          "défi_désigne_les_métadonnées_de_la_ressource": true,
+          "aucune_ressource_globale_à_la_racine": true
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T14",
+      "title": "Découverte OAuth sur A et B",
+      "seconds": 1.0
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2024-11-05",
+          "version_négociée": "2024-11-05",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": true
+        },
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2025-03-26",
+          "version_négociée": "2025-03-26",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": true
+        },
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2025-06-18",
+          "version_négociée": "2025-06-18",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": true
+        },
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2025-11-25",
+          "version_négociée": "2025-11-25",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": true
+        },
+        {
+          "preuve": "versions acceptées, d'après la réponse à une version inconnue",
+          "http": 400,
+          "supported": [
+            "2024-11-05",
+            "2025-03-26",
+            "2025-06-18",
+            "2025-11-25",
+            "2026-07-28"
+          ]
+        },
+        {
+          "génération": "sans session",
+          "version": "2026-07-28",
+          "server_discover": 200,
+          "supportedVersions_annoncées": [
+            "2024-11-05",
+            "2025-03-26",
+            "2025-06-18",
+            "2025-11-25",
+            "2026-07-28"
+          ],
+          "serveur": {
+            "name": "poc-go-gateway",
+            "version": "0"
+          },
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "sans_jeton": 401,
+          "en_tête_de_session_émis": false
+        }
+      ],
+      "journal": {
+        "count": null
+      },
+      "reason": "",
+      "id": "T15",
+      "title": "Deux générations de clients MCP",
+      "seconds": 0.2
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "réponse_au_client": "refus",
+          "detail": "isError: provider_error",
+          "appels_amont_flaky": 1,
+          "écritures_effectives": 1,
+          "entrées_autre_compte": 0
+        }
+      ],
+      "journal": {
+        "count": 1,
+        "by_component_account": {
+          "mcp:witness-1": 1
+        },
+        "calls": [
+          "mcp witness-1 /mcp flaky 200"
+        ]
+      },
+      "reason": "",
+      "id": "T16",
+      "title": "Reprise après erreur fournisseur",
+      "seconds": 4.1
+    }
+  ],
+  "controls": [
+    {
+      "id": "BR-013",
+      "title": "Exhaustivité des journaux amont",
+      "result": "réussi",
+      "observed": [
+        {
+          "journal": "amont du banc",
+          "requêtes_envoyées": [
+            "GET /mcp",
+            "DELETE /mcp",
+            "GET /chemin-inconnu-br013",
+            "POST /chemin-inconnu-br013"
+          ],
+          "entrées": 4,
+          "entrées_lues": [
+            "DELETE /mcp",
+            "GET /chemin-inconnu-br013",
+            "GET /mcp",
+            "POST /chemin-inconnu-br013"
+          ],
+          "manquantes": []
+        },
+        {
+          "journal": "frontale Gitea",
+          "requêtes_envoyées": [
+            "GET /mcp",
+            "DELETE /mcp",
+            "GET /chemin-inconnu-br013",
+            "POST /chemin-inconnu-br013"
+          ],
+          "entrées": 4,
+          "entrées_lues": [
+            "DELETE /mcp",
+            "GET /chemin-inconnu-br013",
+            "GET /mcp",
+            "POST /chemin-inconnu-br013"
+          ],
+          "manquantes": []
+        }
+      ]
+    },
+    {
+      "id": "BR-015/BR-022",
+      "title": "Relais Gitea de bout en bout, jeton entrant non transmis",
+      "result": "réussi",
+      "observed": [
+        {
+          "outils_A": [
+            "gitea_get_me",
+            "gitea_issue_read",
+            "gitea_issue_write",
+            "gitea_list_issues",
+            "ping",
+            "w1_flaky",
+            "w1_get_note",
+            "w1_whoami",
+            "w1_write_note"
+          ],
+          "outils_B": [
+            "gitea_get_me",
+            "gitea_issue_read",
+            "gitea_list_issues",
+            "ping",
+            "w2_flaky",
+            "w2_get_note",
+            "w2_whoami",
+            "w2_write_note"
+          ],
+          "lecture": [
+            "ok",
+            "HTTP 200"
+          ],
+          "écriture": [
+            "ok",
+            "HTTP 200"
+          ],
+          "lecture_contient_ticket_témoin": true,
+          "entrées_frontale": 2,
+          "empreinte_du_jeton_de_connexion_reçue": true,
+          "empreinte_d_un_jeton_entrant_reçue": false,
+          "B_possède_issue_write": false,
+          "B_appel_refusé": [
+            "refus",
+            "JSON-RPC error -32602 outil inconnu"
+          ],
+          "entrées_frontale_après_refus": 0
+        }
+      ],
+      "reason": ""
+    },
+    {
+      "id": "H-2",
+      "title": "OAuth entrant : PKCE S256, code unique, ressource, rotation, révocation, ping",
+      "result": "réussi",
+      "observed": [
+        {
+          "métadonnées_serveur_PKCE_S256_seul": {
+            "tenu": true,
+            "code_challenge_methods_supported": [
+              "S256"
+            ]
+          },
+          "PKCE_plain_refusé": {
+            "tenu": true,
+            "http": 303,
+            "erreur": "invalid_request"
+          },
+          "PKCE_absent_refusé": {
+            "tenu": true,
+            "http": 303,
+            "erreur": "invalid_request"
+          },
+          "vérificateur_PKCE_faux_refusé": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_grant"
+          },
+          "code_lié_à_A_échangé_pour_B_refusé": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_target"
+          },
+          "informatif_code_brûlé_après_refus_de_ressource": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_grant"
+          },
+          "échange_nominal_code_PKCE_ressource": {
+            "tenu": true,
+            "http": 200
+          },
+          "code_à_usage_unique": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_grant"
+          },
+          "réemploi_du_code_révoque_les_jetons_émis": {
+            "tenu": true,
+            "http": 401
+          },
+          "outil_ping": {
+            "tenu": true,
+            "http": 200
+          },
+          "renouvellement_vers_B_refusé_sans_consommer_le_jeton": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_target"
+          },
+          "rotation_du_jeton_de_renouvellement": {
+            "tenu": true,
+            "http": 200
+          },
+          "jeton_renouvelé_jti_et_iat_neufs_audience_unique": {
+            "tenu": true,
+            "durée_s": 86400,
+            "aud": [
+              "http://localhost:18100/p/acme/app/prod/role-a/mcp"
+            ]
+          },
+          "ancien_jeton_d_accès_invalidé_par_la_rotation": {
+            "tenu": true,
+            "http": 401
+          },
+          "réemploi_de_l_ancien_renouvellement_refusé": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_grant"
+          },
+          "informatif_réemploi_révoque_la_lignée": {
+            "tenu": true,
+            "http": 401
+          },
+          "révocation_RFC7009": {
+            "tenu": true,
+            "appel_avant": 200,
+            "revoke_http": 200,
+            "appel_après": 401,
+            "renouvellement_après": 400
+          },
+          "révocation_RFC7009_jeton_d_accès": {
+            "tenu": true,
+            "revoke_http": 200,
+            "appel_après": 401
+          },
+          "renouvellement_refusé_après_suppression_du_rôle": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_target"
+          },
+          "renouvellement_refusé_coffre_en_panne": {
+            "tenu": true,
+            "http": 400,
+            "erreur": "invalid_grant"
+          }
+        }
+      ],
+      "reason": ""
+    },
+    {
+      "id": "BR-022",
+      "title": "Jeton entrant absent des journaux amont",
+      "result": "réussi",
+      "observed": [
+        {
+          "empreintes_de_jetons_émis": 32,
+          "entrées_portant_une_telle_empreinte": 0
+        }
+      ]
+    },
+    {
+      "id": "BR-016",
+      "title": "Réseau interne de Gitea, du serveur MCP Gitea et de la frontale",
+      "observed": [
+        {
+          "internal": true,
+          "containers": [
+            "isolation-bench-front-1",
+            "isolation-bench-gateway-1",
+            "isolation-bench-gitea-1",
+            "isolation-bench-gitea-mcp-1",
+            "isolation-bench-upstream-1"
+          ]
+        }
+      ],
+      "result": "réussi"
+    },
+    {
+      "id": "BR-003",
+      "title": "Hook de pré-commit bloquant",
+      "observed": [
+        {
+          "blocked": true,
+          "file_kept": true,
+          "git_returncode": 1,
+          "head_unchanged": true,
+          "hook_run_returncode": 1
+        }
+      ],
+      "result": "réussi"
+    }
+  ]
+}

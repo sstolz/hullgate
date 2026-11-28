@@ -1,0 +1,88 @@
+[
+ {
+  "contrôle": "grant_ping",
+  "tenu": true,
+  "token_http": 200
+ },
+ {
+  "contrôle": "sans_token_400_invalid_request",
+  "tenu": true,
+  "http": 400,
+  "erreur": "invalid_request"
+ },
+ {
+  "contrôle": "client_inconnu_invalid_client",
+  "tenu": true,
+  "http": 401,
+  "erreur": "invalid_client"
+ },
+ {
+  "contrôle": "jeton_toujours_valide_apres_invalid_client",
+  "tenu": true,
+  "ping": 200
+ },
+ {
+  "contrôle": "jeton_inconnu_200",
+  "tenu": true,
+  "http": 200,
+  "erreur": null
+ },
+ {
+  "contrôle": "jeton_malforme_200",
+  "tenu": true,
+  "http": 200,
+  "erreur": null
+ },
+ {
+  "contrôle": "revoke_access_200",
+  "tenu": true,
+  "http": 200,
+  "erreur": null
+ },
+ {
+  "contrôle": "access_revoque_401",
+  "tenu": true,
+  "ping": 401
+ },
+ {
+  "info": "refresh_apres_revoke_access_meme_lignee",
+  "http": 200,
+  "erreur": null,
+  "jeton_delivre": true
+ },
+ {
+  "contrôle": "revoke_refresh_200",
+  "tenu": true,
+  "http": 200,
+  "erreur": null
+ },
+ {
+  "contrôle": "refresh_revoque_refuse",
+  "tenu": true,
+  "http": 400,
+  "erreur": "invalid_grant"
+ },
+ {
+  "contrôle": "access_lie_au_refresh_revoque_401",
+  "tenu": true,
+  "ping": 401
+ },
+ {
+  "contrôle": "revoke_deja_revoque_200",
+  "tenu": true,
+  "http": 200,
+  "erreur": null
+ },
+ {
+  "contrôle": "hint_faux_revoque_quand_meme",
+  "tenu": true,
+  "http": 200,
+  "ping": 401
+ },
+ {
+  "contrôle": "journal_sans_jeton",
+  "tenu": true,
+  "lignes": 14,
+  "jwt_trouves": 0
+ }
+]

@@ -1,0 +1,124 @@
+# Public contract: GitHub issues and pull requests for sstolz/hullgate.
+# MCP server identities and mappings belong to each contributor's local context.
+# Public Cairn contract version: see cairn.version below.
+project:
+  name: hullgate
+  description: Compartmentalized MCP gateway with a web administration console.
+  stack: Python 3.13, SQLite, Svelte, Docker
+  repository: https://github.com/sstolz/hullgate
+  visibility: public
+language: en
+internal-language: en
+references:
+  workflow: '{{ cairn.home }}/framework/engineering/conventions/workflow.md'
+  feature-template: '{{ cairn.home }}/framework/engineering/templates/feature.md'
+  business-rule-template: '{{ cairn.home }}/framework/engineering/templates/business-rule.md'
+  br-identifiers: '{{ cairn.home }}/framework/engineering/conventions/br-identifiers.md'
+  br-lifecycle: '{{ cairn.home }}/framework/engineering/conventions/br-lifecycle.md'
+  feature-identifiers: '{{ cairn.home }}/framework/engineering/conventions/feature-identifiers.md'
+  design-assets: '{{ cairn.home }}/framework/engineering/conventions/design-assets.md'
+  docker-isolation: '{{ cairn.home }}/framework/engineering/conventions/docker-isolation.md'
+  features-dir: ./features/
+  feature-index: ./features/index.md
+  design-reference: ./.cairn/learnings/design-reference.md
+  br-dir: ./business-rules/
+  learnings-budget: ''
+  adr-dir: ./architecture-decisions/
+  design-dir: ./design/
+  capability-map: ./capability-map.md
+  brief: ./brief.md
+  domain-glossary: ./domain-glossary.md
+  tickets-dir: ./.cairn/tickets/
+  reviews-dir: ./docs/reviews/
+  learnings: ./.cairn/learnings/learnings.md
+git:
+  branching-model: trunk
+  stable-branch: main
+  integration-branch: main
+  base-branch: main
+  branch-prefix: feat
+  merge-strategy: squash
+  integration-to-stable-merge: no-ff
+versioning:
+  scheme: semver
+  file: VERSION
+  field: ''
+changelogs:
+  technical:
+    file: CHANGELOG.md
+    format: keep-a-changelog
+  user-facing:
+    enabled: true
+    languages: en
+quality-gate:
+  # make gate checks the lockfile, Python formatting/lint/types, unit and integration
+  # tests, SDK guard and web checks; its final line is GATE: OK or GATE: KO <step>.
+  # Web checks use local Node at the Makefile's pinned version or its Docker image.
+  # Install the Python tools with uv sync --locked; Docker is needed for image tests.
+  # make qa runs separate analysis tools with roles declared in Makefile's QA_TOOLS;
+  # include its QA verdict lines in the pull request. Run make sonar on main only
+  # with the operator's approval after merging.
+  full: make gate
+  static-analysis: make typecheck
+  code-style: make lint
+  code-style-fix: make fmt
+  test: make test
+  tools:
+    - name: make
+      version: make --version
+    - name: uv
+      version: uv --version
+    - name: docker
+      version: docker --version
+    - name: docker buildx
+      version: docker buildx version
+# Unit and integration tests run in make gate (tests/unit/ and tests/integration/).
+# Container tests use Docker (make test-container); required for changes to the
+# Dockerfile, Compose files, deploy/ or Makefile.
+# Browser tests use Playwright and Chromium against the application image
+# (make test-browser); required for changes to web/ or src/hullgate/admin/.
+test-categories:
+  - unit
+  - integration
+  - container
+  - browser
+tracker:
+  project-id: sstolz/hullgate
+  ticket-prefix: HULL
+  statuses:
+    - Backlog
+    - To Do
+    - In Progress
+    - In Review
+    - Done
+  types:
+    - feature
+    - bug
+    - improvement
+    - tech-debt
+    - poc
+    - design
+  domain-labels: []
+  priorities:
+    P0: urgent
+    P1: medium
+    P2: low
+design:
+  capture-method: ''
+cairn:
+  version: 0.60.0
+drivers:
+  ticketing:
+    type: mcp
+  docs:
+    type: filesystem
+  git:
+    type: mcp
+  pull-request:
+    type: mcp
+  design:
+    type: none
+  quality:
+    type: local-command
+access:
+  forge-reserves-merge: ''

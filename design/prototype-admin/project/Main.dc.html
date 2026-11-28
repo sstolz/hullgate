@@ -1,0 +1,1963 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>HULLGATE — console</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@200;300&amp;family=Space+Grotesk:wght@500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#19366c}a:hover{color:#1b2978}
+.app{--color-cosmic-violet:#1b2978;--color-twilight-indigo:#19366c;--color-aurora-teal:#75cdd6;--color-cyan-glow:#84cdee;--color-silver-slate:#7488a5;--color-cerulean-mist:#579dc0;--color-storm-shadow:#466187;--gradient-cyan-glow:radial-gradient(at 5.62% 33.12%,rgba(255,255,255,0) 30%,rgba(132,205,238,.30) 100%);--surface-0:#ffffff;--surface-1:#ffffff;--surface-2:#f4f6fb;--bg:var(--surface-0);--panel:var(--surface-1);--panel2:var(--surface-2);--hover:#eef1f8;--rule:#d7dee9;--rule2:#b7c2d4;--text:#0b1020;--title:var(--color-cosmic-violet);--muted:#4a5a78;--faint:#56657f;--primary:var(--color-cosmic-violet);--primary-h:var(--color-twilight-indigo);--on-primary:#ffffff;--primary-bd:var(--color-cosmic-violet);--cyan:#2f93bd;--glow:rgba(132,205,238,.38);--sel-bg:#eaf6fc;--sel-text:var(--color-twilight-indigo);--focus:var(--color-storm-shadow);--r-fg:var(--color-twilight-indigo);--r-bg:#e9edf8;--warn:#8a4b00;--warn-bg:#fff4e0;--warn-bd:#eccb8f;--danger:#b42318;--danger-bg:#fdeceb;--danger-bd:#f0b6b0;--ok:#146c43;--ok-bg:#e4f4ea;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--label:'Space Grotesk',Inter,system-ui,sans-serif;--display:'Inter Tight',Inter,system-ui,sans-serif;--scrim:rgba(11,16,32,.35);
+height:100vh;min-height:620px;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font:13px/1.45 Inter,system-ui,-apple-system,'Segoe UI',sans-serif;position:relative;overflow:hidden}
+.app.dark{--surface-0:#0a1a2a;--surface-1:#0d2033;--surface-2:#11283e;--bg:var(--surface-0);--panel:var(--surface-1);--panel2:var(--surface-2);--hover:#15304a;--rule:rgba(116,136,165,.24);--rule2:rgba(116,136,165,.46);--text:#e6edf6;--title:#e8efff;--muted:#a3b2c8;--faint:#8e9db4;--primary:var(--color-cosmic-violet);--primary-h:#24359a;--on-primary:#ffffff;--primary-bd:var(--color-storm-shadow);--cyan:var(--color-cyan-glow);--glow:rgba(132,205,238,.18);--sel-bg:rgba(132,205,238,.10);--sel-text:var(--color-cyan-glow);--r-fg:#b0c2e6;--r-bg:rgba(70,97,135,.30);--warn:#f2b866;--warn-bg:rgba(242,184,102,.10);--warn-bd:rgba(242,184,102,.35);--danger:#f4a29b;--danger-bg:rgba(244,162,155,.10);--danger-bd:rgba(244,162,155,.35);--ok:#75d6a5;--ok-bg:rgba(117,214,165,.10);--scrim:rgba(2,6,12,.6);color-scheme:dark}
+.app *{box-sizing:border-box}
+.app :focus-visible{outline:1px solid var(--cyan);outline-offset:1px;box-shadow:0 0 0 3px rgba(70,97,135,.45)}
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic.s{width:14px;height:14px}
+.cap{font-family:var(--label);font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}
+.top{display:flex;align-items:center;gap:16px;height:50px;padding:0 14px;border-bottom:1px solid var(--rule);background:var(--panel);flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.wordmark{font-family:var(--label);font-weight:500;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--title)}
+.logo{width:22px;height:22px;color:var(--title)}
+.brand b{font-weight:500;color:var(--title)}
+.brand span.sub{color:var(--muted);font-size:12px;padding-left:10px;border-left:1px solid var(--rule2)}
+.tabs{display:flex;gap:2px;flex-wrap:wrap}
+.tab{height:30px;padding:0 10px;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:6px;font:inherit;font-family:var(--label);font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.16em;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text);border-color:var(--focus)}
+.tab.on{color:var(--sel-text);background:var(--sel-bg);border-color:var(--cyan)}
+.tbadge{font-size:10px;letter-spacing:0;padding:1px 6px;border-radius:20px;background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-bd)}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border:1px solid var(--rule2);background:var(--panel2);color:var(--text);border-radius:6px;font:inherit;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--focus);background:var(--hover)}
+.btn.primary{background:var(--primary);border-color:var(--primary-bd);color:var(--on-primary)}
+.btn.primary:hover{background:var(--primary-h)}
+.btn.danger{color:var(--danger);border-color:var(--danger-bd);background:var(--danger-bg)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--text);border-color:var(--focus)}
+.btn.sm{height:26px;padding:0 8px;font-size:12px}
+.btn:disabled,.ib:disabled{opacity:.45;cursor:not-allowed}
+.ib{width:26px;height:26px;display:inline-grid;place-items:center;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:6px;cursor:pointer;padding:0;flex-shrink:0}
+.ib:hover{color:var(--text);border-color:var(--focus);background:var(--hover)}
+.ib.xs{width:18px;height:18px;border-radius:4px}
+.in{height:30px;border:1px solid var(--rule2);background:var(--panel);color:var(--text);border-radius:6px;padding:0 8px;font:inherit;min-width:0}
+.in:hover{border-color:var(--focus)}
+.in.mono{font-family:var(--mono);font-size:12px}
+.linkbtn{border:0;background:none;color:var(--sel-text);padding:0;font:inherit;cursor:pointer;text-decoration:underline;text-decoration-color:var(--rule2);text-underline-offset:2px;text-align:left}
+.linkbtn:hover{text-decoration-color:currentColor}
+.linkbtn.strong{font-weight:500;text-decoration:none;color:var(--text)}
+.linkbtn:disabled{opacity:.5;cursor:not-allowed}
+.mono{font-family:var(--mono);font-size:12px}
+.faint{color:var(--faint)}
+.hint{font-size:12px;color:var(--muted);margin:0}
+.count{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:292px minmax(0,1fr) 420px;position:relative}
+.col{min-height:0;overflow:auto;background:var(--panel)}
+.col-left{border-right:1px solid var(--rule)}
+.col-right{border-left:1px solid var(--rule)}
+.col-mid{background:var(--bg)}
+.narrow{display:none}
+@media (max-width:1100px){
+.main{grid-template-columns:minmax(0,1fr)}
+.col-left,.col-right{display:none;position:absolute;top:0;bottom:0;z-index:20}
+.col-left{left:0;width:300px}
+.col-right{right:0;width:min(430px,94%)}
+.col-left.open,.col-right.open{display:block}
+.narrow{display:inline-flex}
+}
+.colhead{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;border-bottom:1px solid var(--rule);background:var(--panel)}
+.col-mid .colhead{background:var(--bg)}
+.pad{padding:10px 12px}
+.grp{padding:6px 10px 2px}
+.grph{display:flex;align-items:center;gap:8px;padding:4px 2px 6px;font-weight:500}
+.svc{width:20px;height:20px;border-radius:5px;color:#fff;display:inline-grid;place-items:center;font:600 9.5px/1 Inter,sans-serif;flex-shrink:0;letter-spacing:0}
+.svc.round{width:16px;height:16px;border-radius:20px;font-size:7.5px}
+.conn{display:flex;align-items:stretch;border:1px solid var(--rule);border-radius:8px;margin:0 0 6px;background:var(--panel2);cursor:grab}
+.conn:hover{border-color:var(--focus)}
+.conn.sel{border-color:var(--cyan);background:var(--sel-bg)}
+.conn.dragging{opacity:.5;border-style:dashed}
+.connmain{flex:1;min-width:0;text-align:left;border:0;background:transparent;color:inherit;font:inherit;padding:7px 9px;cursor:inherit;display:flex;flex-direction:column;gap:3px;border-radius:8px}
+.connname{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{display:flex;flex-wrap:wrap;gap:3px 9px;font-size:11.5px;color:var(--muted);align-items:center}
+.st{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.st-ok{color:var(--ok)}.st-warn{color:var(--warn)}.st-exp{color:var(--danger)}
+.connside{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;padding:0 4px;border-left:1px solid var(--rule)}
+.tree{padding:8px 10px 60px}
+.row{display:flex;align-items:center;gap:4px;min-height:34px;border-radius:7px;padding-right:6px;border:1px solid transparent}
+.row:hover{background:var(--hover)}
+.row.sel{background:var(--sel-bg);border-color:var(--cyan)}
+.row.drop-ok{border:1px dashed var(--cyan);background:radial-gradient(ellipse at 20% 50%,var(--glow),transparent 75%)}
+.row.drop-no{border:1px dashed var(--danger);background:var(--danger-bg)}
+.chev{transition:transform .12s}
+.chev.open{transform:rotate(90deg)}
+.chev-sp{width:26px;flex-shrink:0}
+.nodebtn{display:flex;align-items:baseline;gap:8px;border:0;background:transparent;color:inherit;font:inherit;padding:5px 4px;cursor:pointer;min-width:0;text-align:left;border-radius:5px}
+.nodename{font-weight:500;white-space:nowrap}
+.row.t-role .nodename{font-family:var(--mono);font-size:12.5px;font-weight:400}
+.row.sel .nodename{color:var(--sel-text)}
+.typ{font-family:var(--label);font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.16em;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:500;padding:1px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+.b-sens{color:var(--danger);background:var(--danger-bg);border-color:var(--danger-bd)}
+.b-frz{color:var(--muted);background:var(--panel2);border-color:var(--rule2)}
+.pills{display:flex;gap:4px;flex-wrap:wrap;margin-left:6px}
+.pill{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px 0 2px;border-radius:20px;background:var(--panel);border:1px solid var(--rule);font-size:11px;color:var(--muted);white-space:nowrap}
+.emptyrole{font-size:11.5px;color:var(--faint);margin-left:6px;font-style:italic}
+.acts{display:flex;gap:2px;margin-left:auto;opacity:0}
+.row:hover .acts,.row:focus-within .acts,.row.sel .acts{opacity:1}
+.rename{height:26px;width:180px}
+.insp{padding:12px 16px 48px;display:flex;flex-direction:column;gap:16px}
+.kindline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ih h3{margin:4px 0 2px;font-family:var(--display);font-size:22px;font-weight:300;color:var(--title);letter-spacing:-.01em}
+.path{font-family:var(--mono);font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.sec{display:flex;flex-direction:column;gap:8px}
+.sech{display:flex;align-items:center;gap:8px}
+.urlbox{display:flex;gap:6px}
+.urlbox .in{flex:1}
+.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:7px 10px;align-items:center}
+.kv .k{color:var(--muted)}
+.card{border:1px solid var(--rule);border-radius:8px;background:var(--panel)}
+.stack{display:flex;flex-direction:column;gap:8px}
+.plc{padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--panel2)}
+.plh{display:flex;align-items:center;gap:8px;min-width:0}
+.kvrow{display:flex;align-items:flex-start;gap:8px}
+.kvrow .in{flex:1}
+.lbl{font-family:var(--label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;min-width:74px;padding-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center;flex:1;min-height:26px}
+.chip{display:inline-flex;align-items:center;gap:2px;height:22px;padding:0 3px 0 9px;border-radius:20px;font:11.5px var(--mono);background:var(--panel);border:1px solid var(--rule2)}
+.chip.deny{color:var(--danger);border-color:var(--danger-bd);background:var(--danger-bg)}
+.chip.allow{color:var(--ok);background:var(--ok-bg);border-color:transparent}
+.chip.open{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-bd)}
+.chip.static{padding-right:9px}
+.picker{border:1px solid var(--cyan);border-radius:8px;background:var(--panel)}
+.pickhead{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--rule)}
+.picklist{display:flex;flex-direction:column;max-height:220px;overflow:auto;padding:4px}
+.pick{display:flex;align-items:center;gap:8px;border:1px solid transparent;background:transparent;color:inherit;font:inherit;padding:4px 6px;border-radius:6px;cursor:pointer;text-align:left}
+.pick:hover{border-color:var(--focus)}
+.pick.on{background:var(--sel-bg);border-color:var(--cyan)}
+.pick .mono{flex:1}
+.m{display:inline-flex;align-items:center;font:500 10px/1 var(--mono);padding:4px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.m-r{color:var(--r-fg);background:var(--r-bg)}
+.m-w{color:var(--warn);background:var(--warn-bg)}
+.m-d{color:var(--danger);background:var(--danger-bg)}
+.m-u{color:var(--muted);background:var(--panel2);border:1px dashed var(--rule2)}
+.note{border:1px solid;border-radius:8px;padding:8px 10px;font-size:12px;display:flex;gap:8px;align-items:flex-start}
+.note.warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-bd)}
+.note.err{color:var(--danger);background:var(--danger-bg);border-color:var(--danger-bd)}
+.note.info{color:var(--sel-text);background:var(--sel-bg);border-color:var(--rule2)}
+.empty{border:1px dashed var(--rule2);border-radius:8px;padding:12px;color:var(--muted);font-size:12px}
+.summary{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.stat{font-weight:500}
+.stat.ok{color:var(--ok)}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer}
+.chk input{accent-color:#466187;margin:0}
+.tr{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-bottom:1px solid var(--rule)}
+.tr:last-child{border-bottom:0}
+.tn{font:12px var(--mono);overflow-wrap:anywhere;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tr.masked .tn{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--rule2)}
+.tr.masked .svc{opacity:.45}
+.why{grid-column:2/4;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.why span{display:block}
+.split{font-family:var(--label);font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);padding:8px 8px 6px;border-bottom:1px solid var(--rule);background:var(--panel2)}
+.setrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--rule)}
+.setrow:last-child{border-bottom:0}
+.setl{display:flex;flex-direction:column;gap:1px;min-width:0}
+.origin{font-size:11.5px;color:var(--muted)}
+.setc{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.userow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.userow:last-child{border-bottom:0}
+.rolerow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.rolerow:last-child{border-bottom:0}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:40;border:0;padding:0;cursor:default}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--panel);border-left:1px solid var(--rule2);z-index:41;display:flex;flex-direction:column}
+.dhead{padding:12px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:8px}
+.dhead h3{margin:0;font-family:var(--display);font-size:18px;font-weight:300;color:var(--title)}
+.dbody{padding:16px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:14px}
+.dfoot{padding:12px 16px;border-top:1px solid var(--rule);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:6px}
+.svcpick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.svcopt{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--rule);border-radius:8px;background:var(--panel2);color:inherit;font:inherit;cursor:pointer;text-align:left}
+.svcopt:hover{border-color:var(--focus)}
+.svcopt.on{border-color:var(--cyan);background:var(--sel-bg)}
+.consent{border:1px solid var(--rule2);border-radius:8px;overflow:hidden}
+.consent .ch{padding:12px;background:var(--panel2);display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--rule)}
+.consent .cb{padding:12px;display:flex;flex-direction:column;gap:8px}
+.consent ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.dlg{position:fixed;left:50%;top:12vh;transform:translateX(-50%);width:min(540px,94vw);max-height:76vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--rule2);border-radius:10px;z-index:51}
+.dlg .dbody{gap:8px}
+.cand{display:flex;gap:10px;padding:8px 10px;border:1px solid var(--rule);border-radius:8px;align-items:flex-start;background:var(--panel2)}
+.cand.dis{opacity:.7}
+.cand input{margin-top:3px;accent-color:#466187}
+.cand label{display:flex;flex-direction:column;gap:3px;flex:1;cursor:pointer}
+.cw{font-size:11.5px;color:var(--warn)}.ce{font-size:11.5px;color:var(--danger)}.ci{font-size:11.5px;color:var(--muted)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:60;padding:9px 14px;border-radius:8px;font-weight:500;max-width:min(620px,92vw);border:1px solid var(--rule2);background:var(--panel2);color:var(--text)}
+.toast.err{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+.toast.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-bd)}
+.toast.ok{border-color:var(--cyan)}
+.app.dark .toast{background:var(--surface-2)}
+.app.dark .toast.err{background:#2a1214}
+.app.dark .toast.warn{background:#2a2010}
+.page{flex:1;overflow:auto;padding:16px 16px 48px}
+.page-in{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.page h2{margin:4px 0 4px;font-family:var(--display);font-size:24px;font-weight:200;color:var(--title)}
+.page h3{margin:0;font-family:var(--display);font-size:16px;font-weight:300;color:var(--title)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.cardpad{padding:14px;display:flex;flex-direction:column;gap:12px}
+.npick{display:flex;flex-direction:column;max-height:230px;overflow:auto;border:1px solid var(--rule);border-radius:8px;padding:4px;background:var(--panel2)}
+.np{display:flex;align-items:center;gap:8px;border:1px solid transparent;background:transparent;color:inherit;font:inherit;padding:4px 6px;border-radius:6px;cursor:pointer;text-align:left}
+.np:hover{border-color:var(--focus)}
+.np.on{background:var(--sel-bg);border-color:var(--cyan);color:var(--sel-text)}
+.secret{display:flex;gap:8px;align-items:center;padding:12px;border:1px solid var(--cyan);background:var(--sel-bg);border-radius:8px;flex-wrap:wrap}
+.secret .in{flex:1;min-width:280px}
+.lst{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;background:var(--panel)}
+.lrow{display:grid;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--rule);min-width:820px}
+.lrow:last-child{border-bottom:0}
+.lrow.head{background:var(--panel2)}
+.tok{grid-template-columns:minmax(150px,1.3fr) minmax(170px,1.4fr) 90px 110px 90px 80px 90px}
+.aud{grid-template-columns:120px 70px minmax(140px,1fr) minmax(170px,1.2fr) minmax(170px,1.2fr) minmax(200px,1.8fr)}
+.res{display:inline-flex;font-size:10.5px;font-weight:500;padding:2px 8px;border-radius:20px;justify-self:start}
+.res-ok{color:var(--ok);background:var(--ok-bg)}.res-no{color:var(--danger);background:var(--danger-bg)}.res-adm{color:var(--r-fg);background:var(--r-bg)}
+.form{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolrow{display:grid;grid-template-columns:minmax(180px,240px) minmax(0,1fr) auto;gap:12px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--rule)}
+.toolrow:last-child{border-bottom:0}
+.toolrow.todo{background:var(--warn-bg)}
+.seg{display:inline-flex;border:1px solid var(--rule2);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--rule2);background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:4px 10px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--text);background:var(--hover)}
+.seg button.on{background:var(--sel-bg);color:var(--sel-text)}
+.srow{display:grid;grid-template-columns:minmax(200px,280px) minmax(0,1fr) 90px 90px;gap:12px;align-items:center;padding:6px 12px;border:0;border-bottom:1px solid var(--rule);background:transparent;color:inherit;font:inherit;text-align:left;width:100%;cursor:pointer}
+.srow:hover{background:var(--hover)}
+.bar{height:10px;border-radius:3px;background:var(--panel2);overflow:hidden;border:1px solid var(--rule)}
+.bar span{display:block;height:100%}
+.lv0{background:#466187}.lv1{background:#c98a1c}.lv2{background:#c4473b}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.colhead .cap{white-space:nowrap}
+.hdhint{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--muted)}
+.libsub{padding:8px 12px 0}
+.libsub .btn{width:100%;justify-content:center}
+.term{border-bottom:1px dotted var(--rule2);cursor:help}
+.term.plain{border-bottom:0}
+.tipbox{position:fixed;z-index:70;max-width:300px;padding:8px 10px;border-radius:6px;border:1px solid var(--color-storm-shadow);background:var(--surface-2);color:var(--text);font-size:12px;line-height:1.45;pointer-events:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:-1px;padding:0;border:0}
+.seg.sm button{padding:2px 8px;font-size:11px}
+.seg.lab button{font-family:var(--label);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.connbody{flex:1;min-width:0;display:flex;flex-direction:column;padding-bottom:7px;gap:3px}
+.connmain{padding:7px 9px 0}
+.pad2{padding:0 9px}
+.row.hl{border-color:var(--cyan);background-image:radial-gradient(ellipse at 20% 50%,var(--glow),transparent 75%)}
+.warnic{display:inline-flex;color:var(--warn)}
+.col-mid{display:flex;flex-direction:column}
+.mapvp{position:relative;overflow:hidden;flex:1;min-height:420px;cursor:grab;background-image:radial-gradient(var(--rule) 1px,transparent 1px);background-size:20px 20px}
+.mapvp.panning{cursor:grabbing}
+.mapin{position:absolute;left:0;top:0;transform-origin:0 0}
+.maplinks{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.lk{fill:none;stroke:var(--color-silver-slate);stroke-opacity:.6;stroke-width:1}
+.lk.hl{stroke:var(--cyan);stroke-opacity:1;stroke-width:1.8}
+.mnode{position:absolute;width:176px;height:40px;display:flex;align-items:center;gap:2px;border:1px solid var(--rule2);border-radius:20px;background:var(--panel);padding:0 4px 0 2px}
+.mnode:hover{border-color:var(--focus)}
+.mnode.sel{border-color:var(--cyan);background:var(--sel-bg)}
+.mnode.hl{border-color:var(--cyan);background-image:radial-gradient(ellipse at 30% 50%,var(--glow),transparent 80%)}
+.mnode.drop-ok{border:1px dashed var(--cyan);background-image:radial-gradient(ellipse at 30% 50%,var(--glow),transparent 80%)}
+.mnode.drop-no{border:1px dashed var(--danger);background:var(--danger-bg)}
+.mbtn{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;border:0;background:transparent;color:inherit;font:inherit;padding:2px 8px;cursor:pointer;border-radius:18px;text-align:left}
+.mname{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.25}
+.mnode.t-role .mname{font-family:var(--mono);font-size:12px;font-weight:400}
+.mnode.sel .mname,.mnode.hl .mname{color:var(--sel-text)}
+.mtyp{font-family:var(--label);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);line-height:1.25}
+.mpills{display:flex;gap:2px;align-items:center}
+.mnode .acts{margin-left:0}
+.mnode:hover .acts,.mnode:focus-within .acts,.mnode.sel .acts{opacity:1}
+.mbadge{position:absolute;top:-10px;right:14px;font-size:9.5px;padding:0 6px}
+.mapctl{position:absolute;right:10px;top:10px;display:flex;gap:4px;z-index:2}
+.mapctl .btn{background:var(--panel)}
+.maplegend{position:absolute;left:10px;bottom:10px;font-size:11.5px;color:var(--muted);background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:4px 8px;max-width:70%}
+.main{transition:grid-template-columns .18s ease}
+.main.lc{grid-template-columns:44px minmax(0,1fr) 420px}
+.main.rc{grid-template-columns:292px minmax(0,1fr) 44px}
+.main.lc.rc{grid-template-columns:44px minmax(0,1fr) 44px}
+@media (prefers-reduced-motion: reduce){.main{transition:none}.chev{transition:none}}
+.rail{display:none;flex-direction:column;align-items:center;gap:8px;padding:8px 0}
+.main.lc .col-left .rail,.main.rc .col-right .rail{display:flex}
+.main.lc .col-left .full,.main.rc .col-right .full{display:none}
+.main.lc .col-left,.main.rc .col-right{overflow:hidden}
+.railsvc{position:relative;border:1px solid transparent;background:transparent;border-radius:8px;padding:4px;cursor:grab;display:grid;place-items:center;color:inherit}
+.railsvc:hover{border-color:var(--focus)}
+.railn{position:absolute;right:-4px;bottom:-4px;font-size:9px;min-width:15px;height:15px;padding:0 3px;border-radius:20px;background:var(--surface-2);border:1px solid var(--rule2);display:grid;place-items:center;color:var(--muted)}
+.railsep{width:24px;border-top:1px solid var(--rule)}
+.ib.prim{background:var(--primary);border-color:var(--primary-bd);color:var(--on-primary)}
+.vlabel{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--label);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.acctpick{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:1px solid var(--rule);border-radius:8px;background:var(--panel2);color:inherit;font:inherit;cursor:pointer;text-align:left}
+.acctpick:hover{border-color:var(--focus)}
+.acctpick:disabled{opacity:.55;cursor:not-allowed}
+@media (max-width:1100px){
+.main.lc,.main.rc,.main.lc.rc{grid-template-columns:minmax(0,1fr)}
+.main .rail{display:none!important}
+.main .col-left .full,.main .col-right .full{display:block!important}
+.wideonly{display:none!important}
+}
+</style>
+</helmet>
+<div class="app {{themeCls}}" lang="{{lang}}" onKeyDown="{{appKey}}">
+<header class="top">
+<div class="brand"><svg class="logo ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"></rect><path d="M12 3.5v17M3.5 12h8.5M12 9h8.5M12 15.5h8.5"></path></svg><span class="wordmark">Hullgate</span><span class="sub">{{t.brand_sub}}</span></div>
+<nav class="tabs" aria-label="{{t.sections}}">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5"><button class="{{tb.cls}}" aria-current="{{tb.cur}}" onClick="{{tb.go}}">{{tb.label}}<sc-if value="{{tb.hasBadge}}" hint-placeholder-val="{{false}}"><span class="tbadge">{{tb.badge}}</span></sc-if></button></sc-for>
+</nav>
+<div class="spacer"></div>
+<sc-if value="{{isTree}}" hint-placeholder-val="{{true}}"><button class="btn sm narrow" onClick="{{toggleLeft}}" aria-expanded="{{leftOpen}}">{{t.lib_title}}</button><button class="btn sm narrow" onClick="{{toggleRight}}" aria-expanded="{{rightOpen}}">{{t.insp_title}}</button></sc-if>
+<div class="seg sm lab" role="group" aria-label="{{t.lang_label}}"><sc-for list="{{langs}}" as="l" hint-placeholder-count="2"><button class="{{l.cls}}" aria-pressed="{{l.on}}" onClick="{{l.pick}}" title="{{l.name}}" lang="{{l.code}}">{{l.short}}</button></sc-for></div>
+<button class="btn sm ghost" onClick="{{toggleTheme}}" aria-label="{{themeAria}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"></path></svg>{{themeLabel}}</button>
+</header>
+
+<sc-if value="{{isTree}}" hint-placeholder-val="{{true}}">
+<div class="{{mainCls}}">
+<aside class="{{leftCls}}" aria-label="{{t.lib_title}}">
+<div class="rail">
+<button class="ib" onClick="{{toggleLib}}" aria-label="{{libTipTxt}}" aria-keyshortcuts="[" aria-expanded="false" onMouseEnter="{{libTipShow}}" onFocus="{{libTipShow}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path><path d="M4 4v16" style="stroke-opacity: .5"></path></svg></button>
+<span class="railsep"></span>
+<sc-for list="{{railSvcs}}" as="s" hint-placeholder-count="5"><button class="railsvc" draggable="true" onDragStart="{{s.dragStart}}" onDragEnd="{{s.dragEnd}}" onClick="{{s.open}}" aria-label="{{s.label}}" onMouseEnter="{{s.tip}}" onFocus="{{s.tip}}" onMouseLeave="{{s.hide}}" onBlur="{{s.hide}}"><span class="svc" style="background: {{s.color}}" aria-hidden="true">{{s.ini}}</span><span class="railn" aria-hidden="true">{{s.n}}</span></button></sc-for>
+<span class="railsep"></span>
+<button class="ib prim" onClick="{{openConnect}}" aria-label="{{t.connect_long}}" onMouseEnter="{{connTipShow}}" onFocus="{{connTipShow}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+<div class="full">
+<div class="colhead"><span class="cap">{{t.lib_title}} · {{libCount}}</span><button class="btn sm primary" style="margin-left: auto" onClick="{{openConnect}}" aria-label="{{t.connect_long}}" title="{{t.connect_long}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>{{t.connect_short}}</button><button class="ib wideonly" onClick="{{toggleLib}}" aria-label="{{libTipTxt}}" aria-keyshortcuts="[" aria-expanded="true" onMouseEnter="{{libTipShow}}" onFocus="{{libTipShow}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path><path d="M20 4v16" style="stroke-opacity: .5"></path></svg></button><button class="ib narrow" onClick="{{toggleLeft}}" aria-label="{{t.close}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<p class="hint pad">{{t.lib_hint}}</p>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+<section class="grp" aria-label="{{g.label}}">
+<div class="grph"><span class="svc" style="background: {{g.color}}" aria-hidden="true">{{g.ini}}</span>{{g.label}}<span class="count" style="margin-left: auto">{{g.count}}</span></div>
+<sc-for list="{{g.conns}}" as="c" hint-placeholder-count="2">
+<div class="{{c.cls}}" draggable="true" onDragStart="{{c.dragStart}}" onDragEnd="{{c.dragEnd}}" onMouseEnter="{{c.hover}}" onMouseLeave="{{c.unhover}}">
+<div class="connbody">
+<button class="connmain" onClick="{{c.select}}" aria-label="{{c.selAria}}"><span class="connname">{{c.name}}</span><span class="meta"><span>{{c.acct}}</span></span></button>
+<span class="meta pad2"><span class="term" tabIndex="0" aria-describedby="tipd-max" onMouseEnter="{{c.tips.max}}" onFocus="{{c.tips.max}}" onMouseLeave="{{c.tips.hide}}" onBlur="{{c.tips.hide}}">{{c.max}}</span><span class="term" tabIndex="0" aria-describedby="tipd-placements" onMouseEnter="{{c.tips.placements}}" onFocus="{{c.tips.placements}}" onMouseLeave="{{c.tips.hide}}" onBlur="{{c.tips.hide}}">{{c.pl}}</span></span>
+<span class="meta pad2"><span class="term" tabIndex="0" aria-describedby="tipd-oauth" onMouseEnter="{{c.tips.oauth}}" onFocus="{{c.tips.oauth}}" onMouseLeave="{{c.tips.hide}}" onBlur="{{c.tips.hide}}"><span class="{{c.stCls}}"><span class="dot"></span>{{c.stLabel}}</span></span><span>{{c.exp}}</span></span>
+</div>
+<div class="connside"><button class="ib" onClick="{{c.placeIn}}" aria-label="{{c.aria}}" title="{{c.aria}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h12M12 8l4 4-4 4M20 4v16"></path></svg></button><svg class="ic s faint" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01" style="stroke-width: 2.6"></path></svg></div>
+</div>
+</sc-for>
+</section>
+</sc-for>
+</div>
+</aside>
+
+<section class="col col-mid" aria-label="{{t.tree_title}}">
+<div class="colhead"><span class="cap">{{t.tree_title}}</span><div class="seg sm" role="group" aria-label="{{t.view_label}}"><button class="{{vList.cls}}" aria-pressed="{{vList.on}}" onClick="{{vList.go}}">{{t.view_list}}</button><button class="{{vMap.cls}}" aria-pressed="{{vMap.on}}" onClick="{{vMap.go}}">{{t.view_map}}</button></div><span class="hdhint" title="{{viewHint}}">{{viewHint}}</span></div>
+
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+<div class="tree">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<div class="{{r.cls}}" style="padding-left: {{r.indent}}px" onDragOver="{{r.dragOver}}" onDrop="{{r.drop}}">
+<sc-if value="{{r.hasC}}" hint-placeholder-val="{{true}}"><button class="ib" onClick="{{r.toggle}}" aria-label="{{r.toggleLabel}}" aria-expanded="{{r.exp}}"><svg class="{{r.chevCls}}" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></sc-if>
+<sc-if value="{{r.noC}}" hint-placeholder-val="{{false}}"><span class="chev-sp"></span></sc-if>
+<sc-if value="{{r.notRenaming}}" hint-placeholder-val="{{true}}"><button class="nodebtn" onClick="{{r.select}}" onDoubleClick="{{r.rename}}" onKeyDown="{{r.key}}" aria-current="{{r.cur}}" title="{{r.renameTitle}}"><span class="nodename">{{r.name}}</span><span class="typ">{{r.typ}}</span></button></sc-if>
+<sc-if value="{{r.renaming}}" hint-placeholder-val="{{false}}"><input class="in rename" aria-label="{{r.renameAria}}" value="{{r.renameVal}}" autoFocus="{{true}}" onChange="{{r.renameChange}}" onKeyDown="{{r.renameKey}}" onBlur="{{r.renameBlur}}"></sc-if>
+<sc-if value="{{r.sens}}" hint-placeholder-val="{{false}}"><span class="badge b-sens term plain" tabIndex="0" aria-describedby="tipd-sens" onMouseEnter="{{r.tips.sens}}" onFocus="{{r.tips.sens}}" onMouseLeave="{{r.tips.hide}}" onBlur="{{r.tips.hide}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01"></path></svg>{{r.sensL}}</span></sc-if>
+<sc-if value="{{r.frz}}" hint-placeholder-val="{{false}}"><span class="badge b-frz term plain" tabIndex="0" aria-describedby="tipd-frozen" onMouseEnter="{{r.tips.frozen}}" onFocus="{{r.tips.frozen}}" onMouseLeave="{{r.tips.hide}}" onBlur="{{r.tips.hide}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>{{r.frzL}}</span></sc-if>
+<sc-if value="{{r.hasPills}}" hint-placeholder-val="{{false}}"><span class="pills"><sc-for list="{{r.pills}}" as="p" hint-placeholder-count="2"><span class="pill" title="{{p.title}}"><span class="svc round" style="background: {{p.color}}" aria-hidden="true">{{p.ini}}</span>{{p.label}}<sc-if value="{{p.mixed}}" hint-placeholder-val="{{false}}"><span class="warnic term plain" tabIndex="0" aria-label="{{p.mixedL}}" aria-describedby="tipd-mixed" onMouseEnter="{{p.mixedShow}}" onFocus="{{p.mixedShow}}" onMouseLeave="{{p.tips.hide}}" onBlur="{{p.tips.hide}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01"></path></svg></span></sc-if></span></sc-for></span></sc-if>
+<sc-if value="{{r.emptyRole}}" hint-placeholder-val="{{false}}"><span class="emptyrole">{{r.emptyL}}</span></sc-if>
+<span class="acts">
+<sc-if value="{{r.canAdd}}" hint-placeholder-val="{{true}}"><button class="ib" onClick="{{r.add}}" aria-label="{{r.addLabel}}" title="{{r.addLabel}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></sc-if>
+<sc-if value="{{r.canDel}}" hint-placeholder-val="{{true}}"><button class="ib" onClick="{{r.del}}" aria-label="{{r.delLabel}}" title="{{r.delLabel}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"></path></svg></button></sc-if>
+</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isMap}}" hint-placeholder-val="{{false}}">
+<div class="{{map.vpCls}}" ref="{{mapRef}}" onWheel="{{map.wheel}}" onMouseDown="{{map.down}}" onMouseMove="{{map.move}}" onMouseUp="{{map.up}}" onMouseLeave="{{map.up}}">
+<div class="mapin" style="width: {{map.w}}px; height: {{map.h}}px; transform: translate({{map.tx}}px, {{map.ty}}px) scale({{map.k}})">
+<svg class="maplinks" width="{{map.w}}" height="{{map.h}}" viewBox="0 0 {{map.w}} {{map.h}}" aria-hidden="true"><path class="lk" d="{{map.linksD}}"></path><path class="lk hl" d="{{map.hlD}}"></path></svg>
+<sc-for list="{{map.nodes}}" as="m" hint-placeholder-count="16">
+<div class="{{m.cls}}" style="left: {{m.x}}px; top: {{m.y}}px" onDragOver="{{m.dragOver}}" onDrop="{{m.drop}}">
+<button class="mbtn" onClick="{{m.select}}" aria-current="{{m.cur}}" aria-label="{{m.aria}}"><span class="mname">{{m.name}}</span><span class="mtyp">{{m.typ}}</span></button>
+<sc-if value="{{m.hasPills}}" hint-placeholder-val="{{false}}"><span class="mpills"><sc-for list="{{m.pills}}" as="p" hint-placeholder-count="2"><span class="svc round" style="background: {{p.color}}" title="{{p.title}}">{{p.ini}}</span></sc-for></span></sc-if>
+<sc-if value="{{m.mixed}}" hint-placeholder-val="{{false}}"><span class="warnic term plain" tabIndex="0" aria-label="{{m.mixedL}}" aria-describedby="tipd-mixed" onMouseEnter="{{m.mixedShow}}" onFocus="{{m.mixedShow}}" onMouseLeave="{{m.tips.hide}}" onBlur="{{m.tips.hide}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01"></path></svg></span></sc-if>
+<sc-if value="{{m.canAdd}}" hint-placeholder-val="{{false}}"><span class="acts"><button class="ib xs" onClick="{{m.add}}" aria-label="{{m.addLabel}}" title="{{m.addLabel}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></span></sc-if>
+<sc-if value="{{m.sens}}" hint-placeholder-val="{{false}}"><span class="badge b-sens mbadge term plain" tabIndex="0" aria-describedby="tipd-sens" onMouseEnter="{{m.tips.sens}}" onFocus="{{m.tips.sens}}" onMouseLeave="{{m.tips.hide}}" onBlur="{{m.tips.hide}}">{{m.sensL}}</span></sc-if>
+<sc-if value="{{m.frz}}" hint-placeholder-val="{{false}}"><span class="badge b-frz mbadge term plain" tabIndex="0" aria-describedby="tipd-frozen" onMouseEnter="{{m.tips.frozen}}" onFocus="{{m.tips.frozen}}" onMouseLeave="{{m.tips.hide}}" onBlur="{{m.tips.hide}}">{{m.frzL}}</span></sc-if>
+</div>
+</sc-for>
+</div>
+<div class="mapctl"><button class="btn sm" onClick="{{map.zoomOut}}" aria-label="{{t.zoom_out}}" title="{{t.zoom_out}}">−</button><button class="btn sm" onClick="{{map.zoomIn}}" aria-label="{{t.zoom_in}}" title="{{t.zoom_in}}">+</button><button class="btn sm" onClick="{{map.fit}}">{{t.fit}}</button></div>
+<div class="maplegend" role="status">{{map.legend}}</div>
+</div>
+</sc-if>
+</section>
+
+<aside class="{{rightCls}}" aria-label="{{t.insp_title}}">
+<div class="rail"><button class="ib" onClick="{{toggleInsp}}" aria-label="{{inspTipTxt}}" aria-keyshortcuts="]" aria-expanded="false" onMouseEnter="{{inspTipShow}}" onFocus="{{inspTipShow}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path><path d="M20 4v16" style="stroke-opacity: .5"></path></svg></button><span class="vlabel">{{t.insp_title}}</span></div>
+<div class="full">
+<div class="colhead"><button class="ib wideonly" onClick="{{toggleInsp}}" aria-label="{{inspTipTxt}}" aria-keyshortcuts="]" aria-expanded="true" onMouseEnter="{{inspTipShow}}" onFocus="{{inspTipShow}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path><path d="M4 4v16" style="stroke-opacity: .5"></path></svg></button><span class="cap">{{t.insp_title}}</span><span class="hdhint">{{inspSub}}</span><button class="ib narrow" onClick="{{toggleRight}}" aria-label="{{t.close}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+
+<sc-if value="{{noInsp}}" hint-placeholder-val="{{false}}"><div class="insp"><div class="empty">{{t.insp_empty}}</div></div></sc-if>
+
+<sc-if value="{{hasRole}}" hint-placeholder-val="{{true}}">
+<div class="insp">
+<div class="ih">
+<div class="kindline"><span class="typ">{{t.role_kind}}</span><sc-if value="{{role.sens}}" hint-placeholder-val="{{false}}"><span class="badge b-sens term plain" tabIndex="0" aria-describedby="tipd-sens" onMouseEnter="{{tips.sens}}" onFocus="{{tips.sens}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.badge_sens}}</span></sc-if><sc-if value="{{role.locked}}" hint-placeholder-val="{{false}}"><span class="badge b-frz term plain" tabIndex="0" aria-describedby="tipd-frozen" onMouseEnter="{{tips.frozen}}" onFocus="{{tips.frozen}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.badge_frozen}}</span></sc-if></div>
+<h3>{{role.name}}</h3>
+<div class="path">{{role.path}}</div>
+</div>
+<sc-if value="{{role.locked}}" hint-placeholder-val="{{false}}"><div class="note warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span>{{role.lockMsg}}</span></div></sc-if>
+<div class="sec">
+<span class="cap"><span class="term" tabIndex="0" aria-describedby="tipd-url" onMouseEnter="{{tips.url}}" onFocus="{{tips.url}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.mcp_url}}</span></span>
+<div class="urlbox"><input class="in mono" readonly value="{{role.url}}" aria-label="{{t.mcp_url}}" onFocus="{{selectAll}}"><button class="btn sm" onClick="{{role.copy}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>{{t.copy}}</button></div>
+<p class="hint">{{role.tokHint}}</p>
+</div>
+
+<div class="sec">
+<div class="sech"><span class="cap">{{t.preview}}</span><span class="count">{{t.preview_sub}}</span></div>
+<div class="summary"><span class="stat ok">{{role.nVisL}}</span><span class="stat"><span class="term" tabIndex="0" aria-describedby="tipd-masked" onMouseEnter="{{tips.masked}}" onFocus="{{tips.masked}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{role.nMaskL}}</span></span><label class="chk" style="margin-left: auto"><input type="checkbox" checked="{{showMasked}}" onChange="{{toggleMasked}}">{{t.show_masked}}</label></div>
+<div class="card">
+<sc-if value="{{role.noTools}}" hint-placeholder-val="{{false}}"><div class="pad hint">{{t.no_tools}}</div></sc-if>
+<sc-for list="{{role.vis}}" as="x" hint-placeholder-count="6">
+<div class="tr"><span class="svc round" style="background: {{x.color}}" title="{{x.conn}}" aria-hidden="true">{{x.ini}}</span><span class="tn">{{x.full}}<sc-if value="{{x.opened}}" hint-placeholder-val="{{false}}"><span class="chip open static">{{x.openedL}}</span></sc-if><sc-if value="{{x.grouped}}" hint-placeholder-val="{{false}}"><span class="chip static term plain" tabIndex="0" aria-describedby="tipd-grouped" onMouseEnter="{{x.tips.grouped}}" onFocus="{{x.tips.grouped}}" onMouseLeave="{{x.tips.hide}}" onBlur="{{x.tips.hide}}">{{x.groupedL}}</span></sc-if></span><span class="{{x.modeCls}} term plain" tabIndex="0" aria-describedby="{{x.modeTip}}" onMouseEnter="{{x.modeShow}}" onFocus="{{x.modeShow}}" onMouseLeave="{{x.tips.hide}}" onBlur="{{x.tips.hide}}">{{x.mode}}</span></div>
+</sc-for>
+<sc-if value="{{role.showMaskList}}" hint-placeholder-val="{{true}}">
+<div class="split">{{t.masked_split}}</div>
+<sc-for list="{{role.mask}}" as="x" hint-placeholder-count="4">
+<div class="tr masked"><span class="svc round" style="background: {{x.color}}" title="{{x.conn}}" aria-hidden="true">{{x.ini}}</span><span class="tn">{{x.full}}<sc-if value="{{x.grouped}}" hint-placeholder-val="{{false}}"><span class="chip static term plain" tabIndex="0" aria-describedby="tipd-grouped" onMouseEnter="{{x.tips.grouped}}" onFocus="{{x.tips.grouped}}" onMouseLeave="{{x.tips.hide}}" onBlur="{{x.tips.hide}}">{{x.groupedL}}</span></sc-if></span><span class="{{x.modeCls}}">{{x.mode}}</span>
+<div class="why"><sc-for list="{{x.reasons}}" as="w" hint-placeholder-count="1"><span>↳ {{w.x}}</span></sc-for><sc-if value="{{x.canOpen}}" hint-placeholder-val="{{false}}"><button class="btn sm" onClick="{{x.open}}" disabled="{{x.locked}}">{{x.openL}}</button></sc-if></div>
+</div>
+</sc-for>
+</sc-if>
+</div>
+</div>
+
+<div class="sec">
+<div class="sech"><span class="cap"><span class="term" tabIndex="0" aria-describedby="tipd-placements" onMouseEnter="{{tips.placements}}" onFocus="{{tips.placements}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.placed_conns}}</span></span><span class="count">{{role.nPl}}</span></div>
+<sc-if value="{{role.noPl}}" hint-placeholder-val="{{false}}"><div class="empty">{{t.no_pl}}</div></sc-if>
+<div class="stack">
+<sc-for list="{{role.pls}}" as="p" hint-placeholder-count="2">
+<div class="card plc">
+<div class="plh"><span class="svc" style="background: {{p.color}}" aria-hidden="true">{{p.ini}}</span><button class="linkbtn strong" onClick="{{p.selectConn}}">{{p.name}}</button><sc-if value="{{p.mixed}}" hint-placeholder-val="{{false}}"><span class="warnic term plain" tabIndex="0" aria-label="{{p.mixedL}}" aria-describedby="tipd-mixed" onMouseEnter="{{p.mixedShow}}" onFocus="{{p.mixedShow}}" onMouseLeave="{{p.tips.hide}}" onBlur="{{p.tips.hide}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01"></path></svg></span></sc-if><span class="mono faint term plain" tabIndex="0" aria-describedby="tipd-prefix" onMouseEnter="{{p.tips.prefix}}" onFocus="{{p.tips.prefix}}" onMouseLeave="{{p.tips.hide}}" onBlur="{{p.tips.hide}}">{{p.prefix}}</span><button class="ib" style="margin-left: auto" onClick="{{p.remove}}" disabled="{{p.locked}}" aria-label="{{p.rmAria}}" title="{{p.rmAria}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"></path></svg></button></div>
+<div class="kvrow"><label class="lbl" for="{{p.mid}}">{{p.modeLbl}}</label><select id="{{p.mid}}" class="in" value="{{p.modeVal}}" onChange="{{p.setMode}}" disabled="{{p.locked}}"><option value="">{{p.inhLabel}}</option><option value="R">{{p.optR}}</option><option value="W" disabled="{{p.disW}}">{{p.optW}}</option><option value="D" disabled="{{p.disD}}">{{p.optD}}</option></select></div>
+<sc-if value="{{p.hasClamp}}" hint-placeholder-val="{{false}}"><div class="note warn">{{p.clampNote}}</div></sc-if>
+<div class="kvrow"><span class="lbl">{{p.allowLbl}}</span><div class="chips"><sc-for list="{{p.allow}}" as="c" hint-placeholder-count="0"><span class="chip allow">{{c.t}}<button class="ib xs" onClick="{{c.rm}}" aria-label="{{c.aria}}" disabled="{{c.locked}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></span></sc-for><sc-if value="{{p.noAllow}}" hint-placeholder-val="{{true}}"><span class="faint">{{p.allL}}</span></sc-if><button class="btn sm ghost" onClick="{{p.pickAllow}}" disabled="{{p.locked}}" aria-expanded="{{p.pickingAllow}}">{{p.editL}}</button></div></div>
+<div class="kvrow"><span class="lbl">{{p.denyLbl}}</span><div class="chips"><sc-for list="{{p.deny}}" as="c" hint-placeholder-count="0"><span class="chip deny">{{c.t}}<button class="ib xs" onClick="{{c.rm}}" aria-label="{{c.aria}}" disabled="{{c.locked}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></span></sc-for><sc-if value="{{p.noDeny}}" hint-placeholder-val="{{true}}"><span class="faint">{{p.noneL}}</span></sc-if><button class="btn sm ghost" onClick="{{p.pickDeny}}" disabled="{{p.locked}}" aria-expanded="{{p.pickingDeny}}">{{p.editL}}</button></div></div>
+<sc-if value="{{p.showOpen}}" hint-placeholder-val="{{false}}"><div class="kvrow"><span class="lbl">{{p.openLbl}}</span><div class="chips"><sc-for list="{{p.open}}" as="c" hint-placeholder-count="0"><span class="chip open">{{c.t}}<button class="ib xs" onClick="{{c.rm}}" aria-label="{{c.aria}}" disabled="{{c.locked}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></span></sc-for><sc-if value="{{p.noOpen}}" hint-placeholder-val="{{true}}"><span class="faint">{{p.noOpenL}}</span></sc-if></div></div></sc-if>
+<sc-if value="{{p.picking}}" hint-placeholder-val="{{false}}">
+<div class="picker">
+<div class="pickhead"><span class="cap">{{p.pickTitle}}</span><button class="ib" style="margin-left: auto" onClick="{{p.closePick}}" aria-label="{{p.closeL}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="picklist"><sc-for list="{{p.pickItems}}" as="it" hint-placeholder-count="6"><button class="{{it.cls}}" aria-pressed="{{it.on}}" onClick="{{it.toggle}}"><span class="mono">{{it.n}}</span><span class="{{it.mcls}}">{{it.ml}}</span></button></sc-for></div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div class="sec">
+<span class="cap">{{t.inherited_settings}}</span>
+<div class="card">
+<sc-for list="{{role.settings}}" as="s" hint-placeholder-count="3">
+<div class="setrow">
+<div class="setl"><span>{{s.label}}</span><span class="origin"><span class="term plain" tabIndex="0" aria-describedby="tipd-inherited" onMouseEnter="{{s.tips.inherited}}" onFocus="{{s.tips.inherited}}" onMouseLeave="{{s.tips.hide}}" onBlur="{{s.tips.hide}}">{{s.originTxt}}</span> <sc-if value="{{s.inherited}}" hint-placeholder-val="{{true}}"><button class="linkbtn" onClick="{{s.go}}">{{s.originName}}</button></sc-if></span></div>
+<div class="setc">
+<sc-if value="{{s.isMode}}" hint-placeholder-val="{{false}}"><select class="in" value="{{s.val}}" onChange="{{s.onSel}}" disabled="{{s.dis}}" aria-label="{{s.label}}"><option value="R">{{s.oR}}</option><option value="W">{{s.oW}}</option><option value="D">{{s.oD}}</option></select></sc-if>
+<sc-if value="{{s.isTtl}}" hint-placeholder-val="{{false}}"><select class="in" value="{{s.val}}" onChange="{{s.onSel}}" disabled="{{s.dis}}" aria-label="{{s.label}}"><option value="1h">{{s.t1h}}</option><option value="24h">{{s.t24h}}</option><option value="7d">{{s.t7d}}</option><option value="30d">{{s.t30d}}</option><option value="90d">{{s.t90d}}</option></select></sc-if>
+<sc-if value="{{s.isBool}}" hint-placeholder-val="{{false}}"><label class="chk"><input type="checkbox" checked="{{s.checked}}" onChange="{{s.onChk}}" disabled="{{s.dis}}">{{s.frozenL}}</label></sc-if>
+<sc-if value="{{s.canReset}}" hint-placeholder-val="{{false}}"><button class="linkbtn" onClick="{{s.reset}}" disabled="{{s.dis}}">{{s.resetL}}</button></sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasConn}}" hint-placeholder-val="{{false}}">
+<div class="insp">
+<div class="ih">
+<div class="kindline"><span class="svc" style="background: {{conn.color}}" aria-hidden="true">{{conn.ini}}</span><span class="typ">{{conn.kind}}</span></div>
+<h3>{{conn.name}}</h3>
+<div class="path">{{conn.acctL}}</div>
+</div>
+<sc-if value="{{conn.expired}}" hint-placeholder-val="{{false}}"><div class="note err">{{t.conn_expired}}</div></sc-if>
+<sc-if value="{{conn.cross}}" hint-placeholder-val="{{false}}"><div class="note warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01"></path></svg><span>{{conn.crossMsg}}</span></div></sc-if>
+<sc-if value="{{conn.mixed}}" hint-placeholder-val="{{false}}"><div class="note warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01"></path></svg><span>{{t.tip_mixed}}</span></div></sc-if>
+<div class="btnrow"><button class="btn" onClick="{{conn.reauth}}">{{t.reauth}}</button><button class="btn" onClick="{{conn.placeIn}}">{{t.place_in}}</button><button class="btn danger" onClick="{{conn.revoke}}">{{t.revoke}}</button></div>
+<div class="sec">
+<div class="sech"><span class="cap">{{t.where_used}}</span><span class="count">{{conn.nUses}}</span></div>
+<sc-if value="{{conn.noUses}}" hint-placeholder-val="{{false}}"><div class="empty">{{t.nowhere}}</div></sc-if>
+<sc-if value="{{conn.hasUses}}" hint-placeholder-val="{{true}}"><div class="card">
+<sc-for list="{{conn.uses}}" as="u" hint-placeholder-count="2">
+<div class="userow"><button class="linkbtn mono" onClick="{{u.go}}">{{u.path}}</button><span class="count">{{u.client}}</span><sc-if value="{{u.sens}}" hint-placeholder-val="{{false}}"><span class="badge b-sens">{{u.sensL}}</span></sc-if><span class="{{u.modeCls}}" style="margin-left: auto">{{u.mode}}</span><button class="ib" onClick="{{u.rm}}" aria-label="{{u.aria}}" title="{{u.aria}}" disabled="{{u.locked}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+</sc-for>
+</div></sc-if>
+</div>
+<div class="sec">
+<span class="cap">{{t.sheet}}</span>
+<div class="kv">
+<span class="k">{{t.k_service}}</span><span>{{conn.svcL}}</span>
+<span class="k">{{t.k_account}}</span><span class="mono">{{conn.acct}}</span>
+<span class="k"><span class="term" tabIndex="0" aria-describedby="tipd-max" onMouseEnter="{{tips.max}}" onFocus="{{tips.max}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.k_max}}</span></span><span><span class="{{conn.maxCls}}">{{conn.max}}</span></span>
+<span class="k"><span class="term" tabIndex="0" aria-describedby="tipd-prefix" onMouseEnter="{{tips.prefix}}" onFocus="{{tips.prefix}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.k_prefix}}</span></span><span class="mono">{{conn.prefix}}</span>
+<span class="k"><span class="term" tabIndex="0" aria-describedby="tipd-oauth" onMouseEnter="{{tips.oauth}}" onFocus="{{tips.oauth}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.k_auth}}</span></span><span class="{{conn.stCls}}"><span class="dot"></span>{{conn.auth}} · {{conn.stLabel}}</span>
+<span class="k">{{t.k_exp}}</span><span>{{conn.exp}}</span>
+<span class="k">{{t.k_tokens}}</span><span>{{conn.tokNote}}</span>
+</div>
+<p class="hint">{{t.restrict_note}}</p>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasNode}}" hint-placeholder-val="{{false}}">
+<div class="insp">
+<div class="ih">
+<div class="kindline"><span class="typ">{{node.typ}}</span><sc-if value="{{node.sens}}" hint-placeholder-val="{{false}}"><span class="badge b-sens term plain" tabIndex="0" aria-describedby="tipd-sens" onMouseEnter="{{tips.sens}}" onFocus="{{tips.sens}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.badge_sens}}</span></sc-if><sc-if value="{{node.frz}}" hint-placeholder-val="{{false}}"><span class="badge b-frz term plain" tabIndex="0" aria-describedby="tipd-frozen" onMouseEnter="{{tips.frozen}}" onFocus="{{tips.frozen}}" onMouseLeave="{{tips.hide}}" onBlur="{{tips.hide}}">{{t.badge_frozen}}</span></sc-if></div>
+<h3>{{node.name}}</h3>
+<div class="path">{{node.path}}</div>
+</div>
+<sc-if value="{{node.locked}}" hint-placeholder-val="{{false}}"><div class="note warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span>{{node.lockMsg}}</span></div></sc-if>
+<sc-if value="{{node.isEnv}}" hint-placeholder-val="{{false}}">
+<div class="sec">
+<span class="cap">{{t.sens_title}}</span>
+<label class="chk"><input type="checkbox" checked="{{node.sens}}" onChange="{{node.toggleSens}}" disabled="{{node.locked}}">{{t.sens_chk}}</label>
+<p class="hint">{{t.tip_sens}}</p>
+</div>
+</sc-if>
+<div class="sec">
+<span class="cap">{{t.settings_title}}</span>
+<div class="card">
+<sc-for list="{{node.settings}}" as="s" hint-placeholder-count="3">
+<div class="setrow">
+<div class="setl"><span>{{s.label}}</span><span class="origin"><span class="term plain" tabIndex="0" aria-describedby="tipd-inherited" onMouseEnter="{{s.tips.inherited}}" onFocus="{{s.tips.inherited}}" onMouseLeave="{{s.tips.hide}}" onBlur="{{s.tips.hide}}">{{s.originTxt}}</span> <sc-if value="{{s.inherited}}" hint-placeholder-val="{{true}}"><button class="linkbtn" onClick="{{s.go}}">{{s.originName}}</button></sc-if></span></div>
+<div class="setc">
+<sc-if value="{{s.isMode}}" hint-placeholder-val="{{false}}"><select class="in" value="{{s.val}}" onChange="{{s.onSel}}" disabled="{{s.dis}}" aria-label="{{s.label}}"><option value="R">{{s.oR}}</option><option value="W">{{s.oW}}</option><option value="D">{{s.oD}}</option></select></sc-if>
+<sc-if value="{{s.isTtl}}" hint-placeholder-val="{{false}}"><select class="in" value="{{s.val}}" onChange="{{s.onSel}}" disabled="{{s.dis}}" aria-label="{{s.label}}"><option value="1h">{{s.t1h}}</option><option value="24h">{{s.t24h}}</option><option value="7d">{{s.t7d}}</option><option value="30d">{{s.t30d}}</option><option value="90d">{{s.t90d}}</option></select></sc-if>
+<sc-if value="{{s.isBool}}" hint-placeholder-val="{{false}}"><label class="chk"><input type="checkbox" checked="{{s.checked}}" onChange="{{s.onChk}}" disabled="{{s.dis}}">{{s.frozenL}}</label></sc-if>
+<sc-if value="{{s.canReset}}" hint-placeholder-val="{{false}}"><button class="linkbtn" onClick="{{s.reset}}" disabled="{{s.dis}}">{{s.resetL}}</button></sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+<p class="hint">{{t.settings_hint}}</p>
+</div>
+<div class="sec">
+<div class="sech"><span class="cap">{{t.roles_below}}</span><span class="count">{{node.nRoles}}</span></div>
+<sc-if value="{{node.noRoles}}" hint-placeholder-val="{{false}}"><div class="empty">{{t.no_roles}}</div></sc-if>
+<sc-if value="{{node.hasRoles}}" hint-placeholder-val="{{true}}"><div class="card">
+<sc-for list="{{node.roles}}" as="x" hint-placeholder-count="2">
+<div class="rolerow"><button class="linkbtn mono" onClick="{{x.go}}">{{x.path}}</button><span class="pills"><sc-for list="{{x.pills}}" as="p" hint-placeholder-count="1"><span class="pill"><span class="svc round" style="background: {{p.color}}" aria-hidden="true">{{p.ini}}</span>{{p.label}}</span></sc-for></span></div>
+</sc-for>
+</div></sc-if>
+<sc-if value="{{node.canAdd}}" hint-placeholder-val="{{true}}"><div><button class="btn sm" onClick="{{node.add}}" disabled="{{node.locked}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>{{node.addLabel}}</button></div></sc-if>
+</div>
+</div>
+</sc-if>
+</div>
+</aside>
+</div>
+</sc-if>
+
+<sc-if value="{{isTokens}}" hint-placeholder-val="{{false}}">
+<main class="page"><div class="page-in">
+<div><span class="cap">{{t.tab_tokens}}</span><h2>{{t.tokens_h}}</h2><p class="hint">{{t.tokens_intro}}</p></div>
+<sc-if value="{{hasNewTok}}" hint-placeholder-val="{{false}}">
+<div class="secret" role="status">
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 200px"><strong>{{newTok.title}}</strong><span class="hint">{{newTok.sub}}</span></div>
+<input class="in mono" readonly value="{{newTok.value}}" aria-label="{{t.tok_value}}" onFocus="{{selectAll}}">
+<button class="btn sm" onClick="{{copyNewTok}}">{{t.copy}}</button><button class="btn sm primary" onClick="{{hideNewTok}}">{{t.hide_tok}}</button>
+</div>
+</sc-if>
+<div class="grid2">
+<section class="card cardpad" aria-label="{{t.emit_h}}">
+<h3>{{t.emit_h}}</h3>
+<div class="field"><label for="toklabel">{{t.label}}</label><input id="toklabel" class="in" value="{{tokLabel}}" onChange="{{setTokLabel}}" placeholder="{{t.label_ph}}"></div>
+<div class="field"><span>{{t.node}}</span><div class="npick"><sc-for list="{{tokNodes}}" as="n" hint-placeholder-count="8"><button class="{{n.cls}}" style="padding-left: {{n.indent}}px" aria-pressed="{{n.on}}" onClick="{{n.pick}}"><span class="mono">{{n.name}}</span><span class="typ">{{n.typ}}</span><sc-if value="{{n.sens}}" hint-placeholder-val="{{false}}"><span class="badge b-sens">{{n.sensL}}</span></sc-if></button></sc-for></div></div>
+<p class="hint">{{tokTtl}}</p>
+<div><button class="btn primary" onClick="{{emitToken}}">{{emitLabel}}</button></div>
+</section>
+<section class="card cardpad" aria-label="{{t.test_h}}">
+<h3>{{t.test_h}}</h3>
+<div class="field"><span>{{t.token}}</span><div class="npick"><sc-for list="{{testToks}}" as="n" hint-placeholder-count="3"><button class="{{n.cls}}" aria-pressed="{{n.on}}" onClick="{{n.pick}}"><span>{{n.label}}</span><span class="mono faint">{{n.path}}</span></button></sc-for></div></div>
+<div class="field"><span>{{t.role_called}}</span><div class="npick"><sc-for list="{{testRoles}}" as="n" hint-placeholder-count="5"><button class="{{n.cls}}" aria-pressed="{{n.on}}" onClick="{{n.pick}}"><span class="mono">{{n.path}}</span><sc-if value="{{n.sens}}" hint-placeholder-val="{{false}}"><span class="badge b-sens">{{n.sensL}}</span></sc-if></button></sc-for></div></div>
+<div class="{{testCls}}" role="status">{{testMsg}}</div>
+</section>
+</div>
+<div class="lst">
+<div class="lrow tok head"><span class="cap">{{t.label}}</span><span class="cap">{{t.node}}</span><span class="cap">{{t.col_issued}}</span><span class="cap">{{t.col_exp}}</span><span class="cap">{{t.col_value}}</span><span class="cap">{{t.col_status}}</span><span></span></div>
+<sc-for list="{{tokens}}" as="x" hint-placeholder-count="4">
+<div class="lrow tok"><span>{{x.label}}</span><span class="mono">{{x.path}}</span><span>{{x.issued}}</span><span>{{x.exp}}</span><span class="mono faint">…{{x.last4}}</span><span class="{{x.stCls}}">{{x.stLabel}}</span><span><sc-if value="{{x.active}}" hint-placeholder-val="{{true}}"><button class="btn sm danger" onClick="{{x.revoke}}">{{x.revokeL}}</button></sc-if></span></div>
+</sc-for>
+</div>
+</div></main>
+</sc-if>
+
+<sc-if value="{{isTools}}" hint-placeholder-val="{{false}}">
+<main class="page"><div class="page-in">
+<div><span class="cap">{{t.tab_tools}}</span><h2>{{t.tools_h}}</h2><p class="hint">{{t.tools_intro}}</p></div>
+<label class="chk"><input type="checkbox" checked="{{toolsAll}}" onChange="{{toggleToolsAll}}">{{t.tools_all}}</label>
+<sc-if value="{{noTodo}}" hint-placeholder-val="{{false}}"><div class="empty">{{t.tools_none}}</div></sc-if>
+<sc-for list="{{catalog}}" as="g" hint-placeholder-count="3">
+<section class="card" aria-label="{{g.label}}">
+<div class="grph pad" style="border-bottom: 1px solid var(--rule)"><span class="svc" style="background: {{g.color}}" aria-hidden="true">{{g.ini}}</span>{{g.label}}<span class="count" style="margin-left: auto">{{g.todo}}</span></div>
+<sc-for list="{{g.tools}}" as="x" hint-placeholder-count="3">
+<div class="{{x.cls}}"><span class="mono">{{x.n}}<sc-if value="{{x.grouped}}" hint-placeholder-val="{{false}}"> <span class="chip static term plain" tabIndex="0" aria-describedby="tipd-grouped" onMouseEnter="{{x.tips.grouped}}" onFocus="{{x.tips.grouped}}" onMouseLeave="{{x.tips.hide}}" onBlur="{{x.tips.hide}}">{{x.groupedL}}</span></sc-if></span><span class="hint">{{x.d}}</span>
+<div class="seg" role="group" aria-label="{{x.aria}}"><button class="{{x.cR}}" aria-pressed="{{x.pR}}" onClick="{{x.setR}}">{{x.lR}}</button><button class="{{x.cW}}" aria-pressed="{{x.pW}}" onClick="{{x.setW}}">{{x.lW}}</button><button class="{{x.cD}}" aria-pressed="{{x.pD}}" onClick="{{x.setD}}">{{x.lD}}</button></div></div>
+</sc-for>
+</section>
+</sc-for>
+</div></main>
+</sc-if>
+
+<sc-if value="{{isAudit}}" hint-placeholder-val="{{false}}">
+<main class="page"><div class="page-in">
+<div><span class="cap">{{t.tab_audit}}</span><h2>{{t.audit_h}}</h2><p class="hint">{{t.audit_intro}}</p></div>
+<div class="form">
+<label class="chk" for="audres">{{t.col_result}}</label>
+<select id="audres" class="in" value="{{auditRes}}" onChange="{{setAuditRes}}"><option value="all">{{t.f_all}}</option><option value="ok">{{t.f_ok}}</option><option value="refus">{{t.f_refus}}</option><option value="admin">{{t.f_admin}}</option></select>
+<input class="in" style="width: 280px" value="{{auditQ}}" onChange="{{setAuditQ}}" placeholder="{{t.filter_ph}}" aria-label="{{t.filter_ph}}">
+<span class="count">{{auditCount}}</span>
+</div>
+<div class="lst">
+<div class="lrow aud head"><span class="cap">{{t.col_time}}</span><span class="cap">{{t.col_result}}</span><span class="cap">{{t.col_actor}}</span><span class="cap">{{t.node}}</span><span class="cap">{{t.col_tool}}</span><span class="cap">{{t.col_reason}}</span></div>
+<sc-for list="{{auditRows}}" as="a" hint-placeholder-count="8">
+<div class="lrow aud"><span class="mono faint">{{a.t}}</span><span class="{{a.cls}}">{{a.resL}}</span><span>{{a.who}}</span><span class="mono">{{a.path}}</span><span class="mono">{{a.tool}}</span><span class="hint">{{a.why}}</span></div>
+</sc-for>
+<sc-if value="{{auditEmpty}}" hint-placeholder-val="{{false}}"><div class="pad hint">{{t.audit_none}}</div></sc-if>
+</div>
+</div></main>
+</sc-if>
+
+<sc-if value="{{isStats}}" hint-placeholder-val="{{false}}">
+<main class="page"><div class="page-in">
+<div><span class="cap">{{t.tab_stats}}</span><h2>{{t.stats_h}}</h2><p class="hint">{{t.stats_intro}}</p></div>
+<div class="legend"><span><span class="sw lv0"></span>{{t.lg0}}</span><span><span class="sw lv1"></span>{{t.lg1}}</span><span><span class="sw lv2"></span>{{t.lg2}}</span><span style="margin-left: auto">{{statTotal}}</span></div>
+<div class="card">
+<div class="srow" style="cursor: default"><span class="cap">{{t.node}}</span><span class="cap">{{t.col_calls}}</span><span class="cap num">{{t.col_calls}}</span><span class="cap num">{{t.col_refusals}}</span></div>
+<sc-for list="{{statRows}}" as="s" hint-placeholder-count="12">
+<button class="srow" onClick="{{s.go}}"><span style="padding-left: {{s.indent}}px; display: flex; gap: 8px; align-items: baseline"><span class="{{s.nameCls}}">{{s.name}}</span><span class="typ">{{s.typ}}</span></span><span class="bar"><span class="{{s.lv}}" style="width: {{s.pct}}%"></span></span><span class="num">{{s.calls}}</span><span class="num">{{s.rate}}</span></button>
+</sc-for>
+</div>
+</div></main>
+</sc-if>
+
+<sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+<button class="scrim" onClick="{{closeDrawer}}" aria-label="{{t.close}}" tabIndex="-1"></button>
+<section class="drawer" aria-label="{{t.connect_long}}" onKeyDown="{{escDrawer}}">
+<div class="dhead"><div><span class="cap">{{drw.stepLabel}}</span><h3>{{t.connect_long}}</h3></div><button class="ib" style="margin-left: auto" onClick="{{closeDrawer}}" aria-label="{{t.close}}" autoFocus="{{true}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<sc-if value="{{drw.step1}}" hint-placeholder-val="{{true}}">
+<div class="dbody">
+<div class="field"><span>{{t.service}}</span><div class="svcpick"><sc-for list="{{drw.svcs}}" as="s" hint-placeholder-count="5"><button class="{{s.cls}}" aria-pressed="{{s.on}}" onClick="{{s.pick}}"><span class="svc" style="background: {{s.color}}" aria-hidden="true">{{s.ini}}</span><span style="display: flex; flex-direction: column"><span>{{s.label}}</span><span class="count">{{s.sub}}</span></span></button></sc-for></div></div>
+<div class="field"><label for="dacct">{{t.account}}</label><input id="dacct" class="in" value="{{drw.acct}}" onChange="{{drw.setAcct}}" placeholder="{{t.account_ph}}"></div>
+<div class="field"><label for="dname">{{t.conn_name}}</label><input id="dname" class="in" value="{{drw.name}}" onChange="{{drw.setName}}" placeholder="{{drw.namePh}}"><span class="hint">{{t.multi_hint}}</span></div>
+<div class="field"><label for="dscope">{{t.scope}}</label><select id="dscope" class="in" value="{{drw.scope}}" onChange="{{drw.setScope}}"><option value="R">{{t.scope_R}}</option><option value="W">{{t.scope_W}}</option><option value="D">{{t.scope_D}}</option></select><span class="hint">{{t.scope_hint}}</span></div>
+<sc-if value="{{drw.hasErr}}" hint-placeholder-val="{{false}}"><div class="note err">{{drw.err}}</div></sc-if>
+</div>
+<div class="dfoot"><button class="btn" onClick="{{closeDrawer}}">{{t.cancel}}</button><button class="btn primary" onClick="{{drw.next}}">{{drw.nextL}}</button></div>
+</sc-if>
+<sc-if value="{{drw.step2}}" hint-placeholder-val="{{false}}">
+<div class="dbody">
+<p class="hint">{{t.consent_sim}}</p>
+<div class="consent">
+<div class="ch"><span class="svc" style="background: {{drw.color}}" aria-hidden="true">{{drw.ini}}</span><div><strong>{{drw.svcL}}</strong><div class="count">{{drw.asL}}</div></div></div>
+<div class="cb"><span>{{t.consent_app}}</span>
+<ul><sc-for list="{{drw.scopes}}" as="x" hint-placeholder-count="2"><li>{{x.t}}</li></sc-for></ul>
+<span class="hint">{{t.single_tokens}}</span></div>
+</div>
+</div>
+<div class="dfoot"><button class="btn" onClick="{{drw.back}}">{{t.back}}</button><button class="btn danger" onClick="{{drw.deny}}">{{t.refuse}}</button><button class="btn primary" onClick="{{drw.authorize}}">{{t.authorize}}</button></div>
+</sc-if>
+</section>
+</sc-if>
+
+<sc-if value="{{dlgPlace}}" hint-placeholder-val="{{false}}">
+<button class="scrim" onClick="{{closeDialog}}" aria-label="{{t.close}}" tabIndex="-1"></button>
+<section class="dlg" aria-label="{{pd.title}}" onKeyDown="{{escDialog}}">
+<div class="dhead"><div><span class="cap">{{pd.cap}}</span><h3>{{pd.title}}</h3></div></div>
+<div class="dbody">
+<sc-if value="{{pd.hasSub}}" hint-placeholder-val="{{false}}"><p class="hint">{{pd.sub}}</p></sc-if>
+<sc-for list="{{pd.cands}}" as="c" hint-placeholder-count="3">
+<div class="{{c.cls}}"><input type="checkbox" id="{{c.id}}" checked="{{c.checked}}" disabled="{{c.dis}}" onChange="{{c.toggle}}"><label for="{{c.id}}"><span class="mono">{{c.path}}</span>
+<sc-if value="{{c.hasRefuse}}" hint-placeholder-val="{{false}}"><span class="ce">{{c.refuse}}</span></sc-if>
+<sc-if value="{{c.hasCross}}" hint-placeholder-val="{{false}}"><span class="cw">⚠ {{c.cross}}</span></sc-if>
+<sc-if value="{{c.hasMixed}}" hint-placeholder-val="{{false}}"><span class="cw">⚠ {{c.mixed}}</span></sc-if>
+<sc-if value="{{c.hasSens}}" hint-placeholder-val="{{false}}"><span class="ci">{{c.sens}}</span></sc-if>
+</label></div>
+</sc-for>
+<div class="kvrow" style="margin-top: 6px"><label class="lbl" for="pdmode">{{t.mode}}</label><select id="pdmode" class="in" value="{{pd.mode}}" onChange="{{pd.setMode}}"><option value="auto">{{t.mode_auto}}</option><option value="R">{{pd.optR}}</option><option value="W" disabled="{{pd.disW}}">{{pd.optW}}</option><option value="D" disabled="{{pd.disD}}">{{pd.optD}}</option></select></div>
+</div>
+<div class="dfoot"><button class="btn" onClick="{{closeDialog}}" autoFocus="{{true}}">{{t.cancel}}</button><button class="btn primary" onClick="{{pd.confirm}}" disabled="{{pd.none}}">{{pd.confirmLabel}}</button></div>
+</section>
+</sc-if>
+
+<sc-if value="{{dlgConfirm}}" hint-placeholder-val="{{false}}">
+<button class="scrim" onClick="{{closeDialog}}" aria-label="{{t.close}}" tabIndex="-1"></button>
+<section class="dlg" aria-label="{{cd.title}}" onKeyDown="{{escDialog}}">
+<div class="dhead"><h3>{{cd.title}}</h3></div>
+<div class="dbody"><p style="margin: 0">{{cd.body}}</p><sc-for list="{{cd.items}}" as="x" hint-placeholder-count="2"><span class="hint">· {{x.t}}</span></sc-for></div>
+<div class="dfoot"><button class="btn" onClick="{{closeDialog}}" autoFocus="{{true}}">{{t.cancel}}</button><button class="btn danger" onClick="{{cd.confirm}}">{{cd.label}}</button></div>
+</section>
+</sc-if>
+
+<sc-if value="{{dlgMixed}}" hint-placeholder-val="{{false}}">
+<button class="scrim" onClick="{{closeDialog}}" aria-label="{{t.cancel}}" tabIndex="-1"></button>
+<section class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="mx-title" aria-describedby="mx-desc" onKeyDown="{{mx.key}}">
+<div class="dhead"><div><span class="cap">{{t.mx_cap}}</span><h3 id="mx-title">{{t.mx_title}}</h3></div></div>
+<div class="dbody">
+<div class="note warn" id="mx-desc"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01"></path></svg><span>{{mx.explain}}</span></div>
+<p class="hint">{{mx.roles}}</p>
+<div class="sec"><span class="cap">{{t.mx_reco_h}}</span><p class="hint">{{mx.reco}}</p><div><button class="btn primary" onClick="{{mx.dedicated}}">{{mx.recoBtn}}</button></div></div>
+<label class="chk" style="color: var(--text)"><input type="checkbox" checked="{{mx.ack}}" onChange="{{mx.toggleAck}}">{{t.mx_ack}}</label>
+</div>
+<div class="dfoot"><button class="btn" onClick="{{closeDialog}}" autoFocus="{{true}}">{{t.cancel}}</button><button class="btn danger" onClick="{{mx.go}}" disabled="{{mx.notAck}}">{{t.mx_go}}</button></div>
+</section>
+</sc-if>
+<sc-if value="{{dlgAcct}}" hint-placeholder-val="{{false}}">
+<button class="scrim" onClick="{{closeDialog}}" aria-label="{{t.close}}" tabIndex="-1"></button>
+<section class="dlg" aria-label="{{pa.title}}" onKeyDown="{{escDialog}}">
+<div class="dhead"><div><span class="cap">{{pa.cap}}</span><h3>{{pa.title}}</h3></div></div>
+<div class="dbody"><sc-for list="{{pa.items}}" as="a" hint-placeholder-count="3"><button class="acctpick" onClick="{{a.pick}}" disabled="{{a.dis}}"><span class="svc" style="background: {{a.color}}" aria-hidden="true">{{a.ini}}</span><span style="display: flex; flex-direction: column; flex: 1; min-width: 0"><span>{{a.name}}</span><span class="count">{{a.sub}}</span></span><span class="{{a.maxCls}}">{{a.max}}</span></button></sc-for></div>
+<div class="dfoot"><button class="btn" onClick="{{closeDialog}}" autoFocus="{{true}}">{{t.cancel}}</button></div>
+</section>
+</sc-if>
+<div class="sr"><sc-for list="{{tipDescs}}" as="d" hint-placeholder-count="0"><span id="{{d.id}}" role="tooltip">{{d.text}}</span></sc-for></div>
+<sc-if value="{{hasTip}}" hint-placeholder-val="{{false}}"><div class="tipbox" style="left: {{tip.x}}px; top: {{tip.y}}px" aria-hidden="true">{{tip.text}}</div></sc-if>
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}"><div class="{{toastCls}}" role="status" aria-live="polite">{{toastMsg}}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startTheme":{"editor":"enum","options":["sombre","clair","système"],"default":"sombre"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(...a) {
+    super(...a);
+    this.I18N = {
+      fr: {
+        _name: 'Français', _short: 'FR',
+        brand_sub: 'Monolith · passerelle MCP', sections: 'Sections', lang_label: 'Langue',
+        tab_tree: 'Arbre', tab_tokens: 'Jetons', tab_tools: 'Outils', tab_audit: 'Audit', tab_stats: 'Statistiques',
+        theme_light: 'Clair', theme_dark: 'Sombre', theme_to_light: 'Passer au thème clair', theme_to_dark: 'Passer au thème sombre',
+        lib_title: 'Bibliothèque', insp_title: 'Inspecteur', tree_title: 'Arbre', close: 'Fermer',
+        connect_long: 'Connecter un service', connect_short: 'Connecter',
+        lib_hint: 'Glissez une connexion sur un rôle (liste ou carte) pour la placer, ou utilisez « Placer dans… ».',
+        view_label: 'Vue de l’arbre', view_list: 'Liste', view_map: 'Carte',
+        hint_list: 'Survol : + pour ajouter · double-clic ou F2 : renommer · Suppr : supprimer',
+        hint_map: 'Molette : zoom · glisser le fond : déplacer · survolez une connexion pour voir ses placements',
+        zoom_in: 'Zoom avant', zoom_out: 'Zoom arrière', fit: 'Ajuster',
+        map_legend_none: 'Survolez ou sélectionnez une connexion de la bibliothèque pour surligner ses placements.',
+        map_legend_hl: { one: '« {name} » : {n} placement surligné', other: '« {name} » : {n} placements surlignés' },
+        insp_empty: 'Sélectionnez un nœud de l’arbre ou une connexion de la bibliothèque.',
+        role_kind: 'rôle · point d’accès MCP', badge_sens: 'sensible', badge_frozen: 'figé',
+        mcp_url: 'URL MCP', copy: 'Copier',
+        preview: 'Aperçu des droits', preview_sub: 'ce que l’IA verra, en direct',
+        n_visible: { one: '{n} visible', other: '{n} visibles' }, n_masked: { one: '{n} masqué', other: '{n} masqués' },
+        show_masked: 'afficher les masqués', no_tools: 'Aucun outil : ce point d’accès est vide tant qu’aucune connexion n’y est placée.',
+        masked_split: 'Masqués — et la règle qui les masque',
+        placed_conns: 'Connexions placées', no_pl: 'Aucune connexion placée. Glissez une connexion de la bibliothèque sur ce rôle, ou utilisez « Placer dans… » sur la connexion.',
+        inherited_settings: 'Réglages hérités',
+        conn_expired: 'Authentification expirée : les outils de cette connexion sont masqués sur tous ses placements jusqu’à réauthentification.',
+        reauth: 'Réauthentifier', place_in: 'Placer dans…', revoke: 'Révoquer', where_used: 'Où est-elle utilisée',
+        nowhere: 'Placée nulle part. Glissez-la sur un rôle de l’arbre.', sheet: 'Fiche',
+        k_service: 'Service', k_account: 'Compte', k_max: 'Droits du fournisseur', k_prefix: 'Préfixe des outils', k_auth: 'Authentification', k_exp: 'Expiration', k_tokens: 'Jetons fournisseur',
+        restrict_note: 'Un placement ne peut que restreindre (mode, listes) : il ne dépasse jamais les droits du compte chez le fournisseur.',
+        sens_title: 'Sensibilité', sens_chk: 'Environnement sensible (production)',
+        settings_title: 'Réglages — hérités ou surchargés', settings_hint: 'Chaque nœud hérite de son parent et peut surcharger ; les descendants voient la valeur et son origine.',
+        roles_below: 'Rôles en dessous', no_roles: 'Aucun rôle pour l’instant.',
+        tokens_h: 'Jetons d’accès', tokens_intro: 'Un jeton est émis sur un nœud et vaut pour ce nœud et ses descendants, sauf les environnements sensibles situés en dessous : ils exigent un jeton émis sur eux-mêmes. La valeur n’est affichée qu’une seule fois.',
+        tok_value: 'Valeur du jeton', hide_tok: 'J’ai copié — masquer', emit_h: 'Émettre un jeton', label: 'Libellé', label_ph: 'ex. Claude Code — poste de Léa', node: 'Nœud',
+        test_h: 'Tester un jeton sur un rôle', token: 'Jeton', role_called: 'Rôle appelé',
+        col_issued: 'Émis', col_exp: 'Expire', col_value: 'Valeur', col_status: 'Statut',
+        tools_h: 'Outils à classer', tools_intro: 'Chaque outil du catalogue porte une annotation : lecture, écriture ou destructif. Le mode d’un placement filtre sur cette annotation. Un outil non classé est masqué sur tous les rôles jusqu’à son classement.',
+        tools_all: 'Afficher tout le catalogue (pas seulement les outils à classer)', tools_none: 'Tous les outils sont classés.',
+        audit_h: 'Journal d’audit', audit_intro: 'Appels d’outils, refus et actions d’administration (données fictives ; vos actions dans le prototype s’y ajoutent).',
+        col_result: 'Résultat', f_all: 'Tous', f_ok: 'Acceptés', f_refus: 'Refusés', f_admin: 'Administration', filter_ph: 'Filtrer : chemin, outil, jeton…',
+        col_time: 'Horodatage', col_actor: 'Jeton / acteur', col_tool: 'Outil', col_reason: 'Motif', audit_none: 'Aucune entrée ne correspond.',
+        n_entries: { one: '{n} entrée', other: '{n} entrées' },
+        stats_h: 'Volume et refus — 24 dernières heures', stats_intro: 'L’arbre coloré par taux de refus ; la longueur de barre suit le volume d’appels. Cliquez une ligne pour l’ouvrir dans l’arbre.',
+        lg0: 'refus < 2 %', lg1: '2 à 6 %', lg2: '> 6 %', col_calls: 'Appels', col_refusals: 'Refus', stats_total: 'Total : {calls} appels · {ref} refus',
+        service: 'Service', account: 'Compte chez le service', account_ph: 'ex. cairn-bot', conn_name: 'Nom de la connexion',
+        multi_hint: 'Plusieurs connexions sur un même compte sont possibles (ex. une en lecture seule pour la prod).',
+        scope: 'Portée demandée', scope_R: 'Lecture seule', scope_W: 'Lecture + écriture', scope_D: 'Complète (y compris suppression et fusion)',
+        scope_hint: 'Cette portée devient le plafond de la connexion : aucun placement ne pourra la dépasser.',
+        cancel: 'Annuler', consent_sim: 'Simulation de la page de consentement du service (aucun appel réel).',
+        consent_app: 'L’application HULLGATE (organisation Monolith) demande l’accès à votre compte :',
+        single_tokens: 'Un seul jeu de jetons sera conservé, quel que soit le nombre de placements.',
+        back: 'Retour', refuse: 'Refuser', authorize: 'Autoriser', mode: 'Mode', mode_auto: 'Automatique (lecture en sensible, sinon hérité)',
+        type_org: 'organisation', type_client: 'client', type_project: 'projet', type_env: 'environnement', type_role: 'rôle',
+        mode_R: 'lecture', mode_W: 'écriture', mode_D: 'destructif', mode_U: 'non classé',
+        n_accounts: { one: '{n} compte', other: '{n} comptes' }, n_placements: { one: '{n} placement', other: '{n} placements' },
+        n_conns: '{n}', max_x: 'max {m}', place_into: 'Placer « {name} » dans…', inspect_conn: 'Inspecter la connexion {name}',
+        st_ok: 'Authentifiée', st_warn: 'Expire bientôt', st_exp: 'Expirée',
+        rename_title: 'Double-clic ou F2 pour renommer', rename_aria: 'Nouveau nom', add_child: 'Ajouter un {type} sous {name}', add_child_short: 'Ajouter un {type}',
+        delete_x: 'Supprimer {name}', collapse_x: 'Replier {name}', expand_x: 'Déplier {name}', empty_role: 'aucune connexion', mixed_l: 'Connexion partagée avec un environnement non sensible',
+        tok_hint_sens: 'Environnement sensible : seul un jeton émis sur {env} ou en dessous est accepté.', tok_hint: 'Accepte un jeton émis sur ce rôle ou l’un de ses ancêtres.',
+        r_expired: 'Connexion « {name} » expirée : réauthentifier', r_unclassified: 'Outil non classé : masqué jusqu’à son classement (onglet Outils)',
+        r_provider: 'Droits du fournisseur : le compte {acct} est limité à « {m} »', r_deny: 'Liste interdire du placement', r_allow: 'Hors de la liste autoriser du placement',
+        r_mode: 'Mode « {m} » ({origin}) : outil {tm}', mode_set_on_pl: 'réglé sur le placement', mode_inh_from: 'hérité de {from}', r_sens: 'Environnement sensible : écritures fermées par défaut',
+        opened_sens: 'ouvert en sensible', grouped: 'regroupé', open_tool: 'Ouvrir cet outil en écriture',
+        inh_label: 'hérité : {m} ({from})', over_rights: ' — dépasse les droits du compte', clamp_note: 'Le mode hérité ({m}) dépasse les droits du compte {acct} : plafonné à {max}.',
+        allow: 'Autoriser', deny: 'Interdire', opened: 'Ouverts', all: 'tous', none: 'aucun', no_open: 'aucune écriture ouverte (sensible)', edit_list: '+ modifier', close_list: 'Fermer la liste',
+        list_allow_t: 'Liste autoriser · {name}', list_deny_t: 'Liste interdire · {name}', remove_pl: 'Retirer le placement {name}', remove_x: 'Retirer {x}',
+        set_mode: 'Mode par défaut', set_ttl: 'Durée des jetons', set_frozen: 'Figeage', def_org: 'défini sur l’organisation', overridden: 'surchargé ici', inherited_from: 'hérité de', frozen_by: 'figé par',
+        restore_inh: 'rétablir l’héritage', frozen: 'figé', not_frozen: 'non figé', origin_org: 'l’organisation Monolith', origin_node: '{type} {path}', org_short: 'organisation', root: 'racine',
+        lock_msg: 'Figé par {origin} : réglages, placements et structure en lecture seule.', lock_self: 'Ce nœud est figé : ses descendants, ses réglages et ses placements sont en lecture seule. Décochez « figé » pour dégeler.',
+        conn_kind: 'connexion {svc}', acct_l: 'compte {acct}', client_x: 'client {name}', tok_note: { one: 'un seul jeu, partagé par {n} placement', other: 'un seul jeu, partagé par {n} placements' },
+        cross_msg: 'Placée sous {n} clients différents ({names}) : ils partagent le compte {acct} et le même jeu de jetons. Envisagez une connexion distincte par client.',
+        svc_sub: '{auth} · {n} connectée(s)', auth_oauth: 'OAuth', auth_secret: 'Identifiants',
+        step: 'Étape {n} sur 2', name_ph: '{acct} (par défaut : le compte)', continue_to: 'Continuer vers {svc}', connected_as: 'Connecté en tant que {acct}', acct_default: 'compte',
+        sc_read: 'Lire les dépôts, tickets, projets et métadonnées', sc_write: 'Créer et modifier tickets, branches, fichiers et revues', sc_del: 'Supprimer des ressources et fusionner des demandes de fusion',
+        confirm_cross_t: 'Confirmer un placement entre clients', which_roles_t: 'Placer dans quels rôles ?', drop_on_sub: 'Dépôt sur {type} {path} : choisissez les rôles concernés.',
+        place_kb_sub: 'Alternative clavier au glisser-déposer : cochez un ou plusieurs rôles.', place_cap: 'Placement · {name}',
+        place_n: { zero: 'Placer', one: 'Placer dans {n} rôle', other: 'Placer dans {n} rôles' }, refused_x: 'Refusé : {r}',
+        cand_already: 'déjà placée sur ce rôle', cand_frozen: 'figé par {origin}', cand_cross: 'Déjà placée sous le client {names} : les deux clients partageraient le compte {acct} et ses jetons.',
+        cand_sens: 'Environnement sensible : mode lecture proposé, écritures à ouvrir outil par outil.',
+        del_title: 'Supprimer {type} « {name} » ?', del_body: 'Chemin {path}. Cette action est définitive :', del_desc: { one: '{n} descendant supprimé', other: '{n} descendants supprimés' },
+        del_pl: { one: '{n} placement retiré — les connexions restent dans la bibliothèque', other: '{n} placements retirés — les connexions restent dans la bibliothèque' },
+        del_tok: { one: '{n} jeton actif révoqué', other: '{n} jetons actifs révoqués' }, del_url: { one: '{n} URL MCP cessera de répondre', other: '{n} URL MCP cesseront de répondre' }, delete: 'Supprimer',
+        rev_title: 'Révoquer « {name} » ?', rev_body: 'Les jetons {svc} du compte {acct} seront supprimés de la passerelle.', rev_pl: { one: '{n} placement retiré', other: '{n} placements retirés' }, rev_lose: 'Les rôles concernés perdent immédiatement ces outils',
+        t_refused: 'Placement refusé : {msg}.', msg_org: 'déposez la connexion sur un projet, un environnement ou un rôle, pas sur l’organisation', msg_client: 'déposez la connexion sur un projet, un environnement ou un rôle, pas sur un client',
+        msg_frozen: '{path} est figé', msg_frozen_by: '{path} est figé (par {by})', msg_already: '« {name} » est déjà placée sur {path}', msg_no_roles: 'aucun rôle sous {path}', msg_unknown: 'connexion inconnue',
+        t_placed: '« {name} » placée sur {paths}.', t_placed_ro: '« {name} » placée sur {paths} — en lecture (environnement sensible).', t_mixed_warn: '« {name} » placée. Attention : cette connexion sert aussi hors prod ; ses droits chez le fournisseur valent des deux côtés. Une connexion dédiée à la prod est recommandée.',
+        t_mod_refused: 'Modification refusée : {msg}', t_removed: '« {name} » retirée de {path}.', t_opened: '« {tool} » ouvert en écriture. S’il reste masqué, une autre règle (mode, droits du fournisseur, liste) s’applique encore.',
+        t_renamed: 'Renommé. Nouvelle URL : /p/{path}', t_rename_dup: 'Renommage refusé : un nœud frère porte déjà le chemin « {slug} ».', t_rename_refused: 'Renommage refusé : {msg}', t_add_refused: 'Ajout refusé : {msg}', t_del_refused: 'Suppression refusée : {msg}',
+        t_deleted: '{path} supprimé.', t_reauth: '« {name} » réauthentifiée (consentement simulé). Les jetons du fournisseur sont renouvelés pour tous ses placements.', t_revoked: '« {name} » révoquée : jetons fournisseur supprimés, {n} placement(s) retiré(s).',
+        t_conn_added: '« {name} » ajoutée à la bibliothèque. Glissez-la sur un rôle pour la placer.', t_consent_denied: 'Consentement refusé chez {svc} : aucune connexion créée.',
+        t_copied_url: 'URL MCP copiée.', t_copied_tok: 'Jeton copié.', t_copy_blocked: 'Copie bloquée par le navigateur : sélectionnez le texte et copiez-le.', t_hidden_tok: 'Valeur masquée : elle ne sera plus jamais affichée.',
+        t_tok_revoked: 'Jeton « {label} » révoqué.', t_classified: '{tool} classé « {m} » : il apparaît désormais là où le mode le permet.', t_map_added: '{type} « {name} » ajouté. Renommez-le dans la vue Liste (double-clic ou F2).',
+        err_acct: 'Indiquez le compte à connecter.', err_dup: 'Une connexion {svc} porte déjà ce nom.',
+        tok_issued_t: 'Jeton « {label} » émis', tok_issued_sub: 'sur {path} · copiez-le maintenant, il ne sera plus affiché', tok_ttl: 'Expiration : {ttl} ({src})', ttl_here: 'surchargé sur ce nœud',
+        emit_on: 'Émettre sur {path}', tok_active: 'actif', tok_revoked: 'révoqué', revoke_btn: 'Révoquer', unlabeled: 'Jeton sans libellé', deleted_node: '(supprimé)',
+        test_choose: 'Choisissez un jeton et un rôle.', test_revoked: 'Refusé : jeton révoqué.', test_deleted: 'Refusé : le nœud du jeton a été supprimé.',
+        test_out: 'Refusé : hors périmètre. Le jeton vaut pour {path} et ses descendants.', test_sens: 'Refusé : {env} est un environnement sensible ; un jeton émis sur {path} ne le couvre pas. Émettez un jeton dédié sur {env} ou en dessous.',
+        test_ok: 'Accepté : {role} est couvert par le jeton émis sur {path}.',
+        res_ok: 'accepté', res_refus: 'refusé', res_admin: 'admin', operator: 'opérateur', lib: 'bibliothèque', cat: 'catalogue {svc}',
+        n_todo: '{todo} à classer · {n} outils', annot_of: 'Annotation de {tool}',
+        a_merge_pr: 'Fusion de la PR #{n}', a_masked_mode: 'Outil masqué sur ce rôle : mode écriture, outil destructif', a_masked_provider_sens: 'Outil masqué : droits du fournisseur (lecture) et environnement sensible',
+        a_tok_sens: 'Jeton émis sur {tok} : refusé sur l’environnement sensible {env}', a_review: 'Revue publiée sur la PR #{n}', a_expired: 'Connexion {name} expirée', a_incident: 'Ticket d’incident créé',
+        a_masked_provider: 'Outil masqué : droits du fournisseur (écriture max)', a_none: '—', a_renamed: 'Renommé (ancien chemin {old})', a_created: 'Création : {type}',
+        a_deleted: { one: 'Suppression du nœud et de {n} descendant', other: 'Suppression du nœud et de {n} descendants' }, a_placed: 'Placement de « {name} »', a_mode_changed: 'Mode de « {name} » : {m}', a_open: 'Écriture ouverte en environnement sensible : {tool}', a_close: 'Écriture refermée : {tool}',
+        a_removed: 'Retrait du placement « {name} »', a_override: 'Surcharge : {what}', a_reset: 'Héritage rétabli : {what}', a_sens_on: 'Marqué sensible', a_sens_off: 'Sensibilité retirée', a_reauth: 'Réauthentification de « {name} »',
+        a_revoked: 'Révocation de « {name} » ({n} placement(s) retiré(s))', a_new_conn: 'Nouvelle connexion {svc} « {name} »', a_tok_emit: 'Jeton émis : {label}', a_tok_revoke: 'Jeton révoqué : {label}', a_classify: 'Outil {tool} classé {m}',
+        inherited_mode: 'hérité',
+        tip_sens: 'Environnement sensible : jetons dédiés au niveau rôle, écritures fermées par défaut et ouvertes outil par outil, liste blanche et figeage activés, jetons plus courts (accès 1 h, renouvellement 7 j).',
+        tip_frozen: 'Figé : le nœud et tout son sous-arbre passent en lecture seule (réglages, placements, structure). Seul le nœud qui a figé peut dégeler.',
+        tip_mode_R: 'Lecture : seuls les outils annotés « lecture » sont visibles.', tip_mode_W: 'Écriture : outils de lecture et d’écriture ; les outils destructifs restent masqués.',
+        tip_mode_D: 'Destructif : tous les outils, y compris suppression et fusion. À réserver aux rôles de confiance.', tip_mode_U: 'Non classé : l’outil n’a pas encore d’annotation ; il reste masqué partout jusqu’à son classement.',
+        tip_inherited: 'Valeur reçue d’un ancêtre. Cliquez l’origine pour la modifier là-bas, ou changez-la ici pour la surcharger.',
+        tip_max: 'Droits accordés chez le fournisseur lors du consentement OAuth. Aucun placement ne peut les dépasser.',
+        tip_placements: 'Nombre de rôles où cette connexion est placée. Tous partagent le même jeu de jetons fournisseur.',
+        tip_oauth: 'État de l’authentification chez le fournisseur. « Expire bientôt » : réauthentifiez avant l’échéance, sinon ses outils sont masqués partout.',
+        tip_prefix: 'Les outils sont exposés à l’IA sous la forme <préfixe>__<outil>, pour distinguer deux connexions d’un même service.',
+        tip_url: 'Point d’accès MCP de ce rôle : l’IA qui s’y connecte ne voit que les connexions placées ici.',
+        tip_masked: 'Outil invisible pour l’IA sur ce rôle ; la ou les règles affichées dessous le masquent.',
+        tip_grouped: 'Outil regroupé : une même action couvre plusieurs opérations (pull_request_write crée ET fusionne). En v1 l’outil reste l’unité et prend l’annotation la plus forte.',
+        mx_cap: 'Placement partagé prod / hors prod', mx_title: 'Ce compte accéderait aussi à la prod', mx_explain: '« {name} » (compte {acct}) serait placée à la fois dans un environnement sensible et hors prod. Les droits du compte chez le fournisseur valent des deux côtés : le filtrage d’outils ne les réduit pas.',
+        mx_roles: 'Placement demandé : {paths} · déjà placée sur : {others}', mx_reco_h: 'Recommandation', mx_reco: 'Créez une connexion dédiée à la prod (même service, lecture seule) et placez-la à la place de celle-ci.', mx_reco_btn: 'Créer une connexion dédiée à la prod', mx_reco_dev: 'Créez une connexion dédiée hors prod (même service, mode de l’environnement cible) et placez-la à la place de celle-ci.', mx_reco_btn_dev: 'Créer une connexion dédiée hors prod',
+        mx_ack: 'Je comprends que ce compte accède aussi à la prod', mx_go: 'Placer quand même', mixed_ack_on: '{tip} Partage confirmé le {date}.', mixed_ack_l: '{label} — confirmé le {date}', a_mixed_ack: 'Placement partagé prod/hors prod confirmé : « {name} »',
+        collapse_lib: 'Replier la bibliothèque', expand_lib: 'Déplier la bibliothèque', collapse_insp: 'Replier l’inspecteur', expand_insp: 'Déplier l’inspecteur', shortcut: '{label} (raccourci : {key})',
+        rail_svc: '{svc} · {count} — glissez la pastille sur un rôle pour choisir un compte', pick_acct_t: 'Quel compte {svc} placer ?', pick_acct_cap: 'Dépôt sur {path}', no_acct: 'aucun compte {svc} dans la bibliothèque',
+        tip_mixed: 'Cette connexion sert aussi hors prod : ses droits chez le fournisseur valent des deux côtés ; une connexion dédiée à la prod est recommandée.',
+        desc: {
+          'gitea.list_issues': 'Lister les tickets', 'gitea.issue_read': 'Lire un ticket', 'gitea.issue_write': 'Créer ou modifier un ticket', 'gitea.list_pull_requests': 'Lister les PR', 'gitea.pull_request_read': 'Lire une PR et son diff',
+          'gitea.pull_request_review_write': 'Publier une revue de PR', 'gitea.pull_request_write': 'Créer, modifier ou fusionner une PR', 'gitea.get_file_contents': 'Lire un fichier', 'gitea.create_or_update_file': 'Écrire un fichier',
+          'gitea.create_branch': 'Créer une branche', 'gitea.delete_branch': 'Supprimer une branche', 'gitea.list_commits': 'Lister les commits', 'gitea.actions_run_write': 'Relancer ou annuler un workflow', 'gitea.wiki_write': 'Modifier le wiki',
+          'github.list_issues': 'Lister les tickets', 'github.get_issue': 'Lire un ticket', 'github.create_issue': 'Créer un ticket', 'github.create_pull_request': 'Ouvrir une PR', 'github.merge_pull_request': 'Fusionner une PR',
+          'github.get_file_contents': 'Lire un fichier', 'github.push_files': 'Pousser des fichiers', 'github.delete_branch': 'Supprimer une branche', 'github.run_workflow': 'Déclencher un workflow',
+          'sentry.list_issues': 'Lister les erreurs', 'sentry.get_issue_details': 'Détail d’une erreur', 'sentry.search_events': 'Rechercher des événements', 'sentry.update_issue': 'Résoudre ou assigner', 'sentry.delete_issue': 'Supprimer une erreur', 'sentry.analyze_issue': 'Analyse automatique',
+          'linear.list_issues': 'Lister les tickets', 'linear.get_issue': 'Lire un ticket', 'linear.create_issue': 'Créer un ticket', 'linear.update_issue': 'Modifier un ticket', 'linear.delete_issue': 'Supprimer un ticket', 'linear.list_projects': 'Lister les projets',
+          'postgres.list_tables': 'Lister les tables', 'postgres.describe_table': 'Décrire une table', 'postgres.query': 'SELECT en lecture seule', 'postgres.execute': 'INSERT, UPDATE, DELETE', 'postgres.drop_table': 'Supprimer une table', 'postgres.vacuum': 'Maintenance'
+        }
+      },
+      en: {
+        _name: 'English', _short: 'EN',
+        brand_sub: 'Monolith · MCP gateway', sections: 'Sections', lang_label: 'Language',
+        tab_tree: 'Tree', tab_tokens: 'Tokens', tab_tools: 'Tools', tab_audit: 'Audit', tab_stats: 'Statistics',
+        theme_light: 'Light', theme_dark: 'Dark', theme_to_light: 'Switch to light theme', theme_to_dark: 'Switch to dark theme',
+        lib_title: 'Library', insp_title: 'Inspector', tree_title: 'Tree', close: 'Close',
+        connect_long: 'Connect a service', connect_short: 'Connect',
+        lib_hint: 'Drag a connection onto a role (list or map) to place it, or use “Place in…”.',
+        view_label: 'Tree view', view_list: 'List', view_map: 'Map',
+        hint_list: 'Hover: + to add · double-click or F2: rename · Delete: remove',
+        hint_map: 'Wheel: zoom · drag the background: pan · hover a connection to see its placements',
+        zoom_in: 'Zoom in', zoom_out: 'Zoom out', fit: 'Fit',
+        map_legend_none: 'Hover or select a connection in the library to highlight its placements.',
+        map_legend_hl: { one: '“{name}”: {n} placement highlighted', other: '“{name}”: {n} placements highlighted' },
+        insp_empty: 'Select a tree node or a library connection.',
+        role_kind: 'role · MCP endpoint', badge_sens: 'sensitive', badge_frozen: 'frozen',
+        mcp_url: 'MCP URL', copy: 'Copy',
+        preview: 'Rights preview', preview_sub: 'what the AI will see, live',
+        n_visible: { one: '{n} visible', other: '{n} visible' }, n_masked: { one: '{n} hidden', other: '{n} hidden' },
+        show_masked: 'show hidden', no_tools: 'No tools: this endpoint stays empty until a connection is placed on it.',
+        masked_split: 'Hidden — and the rule that hides them',
+        placed_conns: 'Placed connections', no_pl: 'No connection placed. Drag a library connection onto this role, or use “Place in…” on the connection.',
+        inherited_settings: 'Inherited settings',
+        conn_expired: 'Authentication expired: this connection’s tools are hidden on all its placements until you re-authenticate.',
+        reauth: 'Re-authenticate', place_in: 'Place in…', revoke: 'Revoke', where_used: 'Where is it used',
+        nowhere: 'Not placed anywhere. Drag it onto a role in the tree.', sheet: 'Details',
+        k_service: 'Service', k_account: 'Account', k_max: 'Provider rights', k_prefix: 'Tool prefix', k_auth: 'Authentication', k_exp: 'Expiry', k_tokens: 'Provider tokens',
+        restrict_note: 'A placement can only restrict (mode, lists): it never exceeds the account’s rights at the provider.',
+        sens_title: 'Sensitivity', sens_chk: 'Sensitive environment (production)',
+        settings_title: 'Settings — inherited or overridden', settings_hint: 'Each node inherits from its parent and may override; descendants see the value and where it comes from.',
+        roles_below: 'Roles below', no_roles: 'No role yet.',
+        tokens_h: 'Access tokens', tokens_intro: 'A token is issued on a node and is valid for that node and its descendants, except sensitive environments below it: they require a token issued on themselves. The value is shown only once.',
+        tok_value: 'Token value', hide_tok: 'I copied it — hide', emit_h: 'Issue a token', label: 'Label', label_ph: 'e.g. Claude Code — Lea’s laptop', node: 'Node',
+        test_h: 'Test a token against a role', token: 'Token', role_called: 'Role called',
+        col_issued: 'Issued', col_exp: 'Expires', col_value: 'Value', col_status: 'Status',
+        tools_h: 'Tools to classify', tools_intro: 'Every catalog tool carries an annotation: read, write or destructive. A placement’s mode filters on it. An unclassified tool is hidden on every role until it is classified.',
+        tools_all: 'Show the whole catalog (not only tools to classify)', tools_none: 'All tools are classified.',
+        audit_h: 'Audit log', audit_intro: 'Tool calls, refusals and admin actions (sample data; your actions in the prototype are appended).',
+        col_result: 'Result', f_all: 'All', f_ok: 'Accepted', f_refus: 'Refused', f_admin: 'Administration', filter_ph: 'Filter: path, tool, token…',
+        col_time: 'Timestamp', col_actor: 'Token / actor', col_tool: 'Tool', col_reason: 'Reason', audit_none: 'No matching entry.',
+        n_entries: { one: '{n} entry', other: '{n} entries' },
+        stats_h: 'Volume and refusals — last 24 hours', stats_intro: 'The tree coloured by refusal rate; bar length follows call volume. Click a row to open it in the tree.',
+        lg0: 'refusals < 2%', lg1: '2 to 6%', lg2: '> 6%', col_calls: 'Calls', col_refusals: 'Refusals', stats_total: 'Total: {calls} calls · {ref} refusals',
+        service: 'Service', account: 'Account at the service', account_ph: 'e.g. cairn-bot', conn_name: 'Connection name',
+        multi_hint: 'Several connections on the same account are allowed (e.g. a read-only one for production).',
+        scope: 'Requested scope', scope_R: 'Read only', scope_W: 'Read + write', scope_D: 'Full (including deletion and merge)',
+        scope_hint: 'This scope becomes the connection’s ceiling: no placement can exceed it.',
+        cancel: 'Cancel', consent_sim: 'Simulated service consent page (no real call).',
+        consent_app: 'The HULLGATE application (Monolith organisation) requests access to your account:',
+        single_tokens: 'A single token set is kept, whatever the number of placements.',
+        back: 'Back', refuse: 'Deny', authorize: 'Authorize', mode: 'Mode', mode_auto: 'Automatic (read in sensitive, otherwise inherited)',
+        type_org: 'organisation', type_client: 'client', type_project: 'project', type_env: 'environment', type_role: 'role',
+        mode_R: 'read', mode_W: 'write', mode_D: 'destructive', mode_U: 'unclassified',
+        n_accounts: { one: '{n} account', other: '{n} accounts' }, n_placements: { one: '{n} placement', other: '{n} placements' },
+        n_conns: '{n}', max_x: 'max {m}', place_into: 'Place “{name}” in…', inspect_conn: 'Inspect connection {name}',
+        st_ok: 'Authenticated', st_warn: 'Expiring soon', st_exp: 'Expired',
+        rename_title: 'Double-click or F2 to rename', rename_aria: 'New name', add_child: 'Add a {type} under {name}', add_child_short: 'Add a {type}',
+        delete_x: 'Delete {name}', collapse_x: 'Collapse {name}', expand_x: 'Expand {name}', empty_role: 'no connection', mixed_l: 'Connection shared with a non-sensitive environment',
+        tok_hint_sens: 'Sensitive environment: only a token issued on {env} or below is accepted.', tok_hint: 'Accepts a token issued on this role or one of its ancestors.',
+        r_expired: 'Connection “{name}” expired: re-authenticate', r_unclassified: 'Unclassified tool: hidden until classified (Tools tab)',
+        r_provider: 'Provider rights: account {acct} is limited to “{m}”', r_deny: 'Placement deny list', r_allow: 'Not in the placement allow list',
+        r_mode: 'Mode “{m}” ({origin}): {tm} tool', mode_set_on_pl: 'set on the placement', mode_inh_from: 'inherited from {from}', r_sens: 'Sensitive environment: writes closed by default',
+        opened_sens: 'opened in sensitive', grouped: 'grouped', open_tool: 'Open this tool for writing',
+        inh_label: 'inherited: {m} ({from})', over_rights: ' — exceeds account rights', clamp_note: 'The inherited mode ({m}) exceeds account {acct}’s rights: capped at {max}.',
+        allow: 'Allow', deny: 'Deny', opened: 'Opened', all: 'all', none: 'none', no_open: 'no write opened (sensitive)', edit_list: '+ edit', close_list: 'Close the list',
+        list_allow_t: 'Allow list · {name}', list_deny_t: 'Deny list · {name}', remove_pl: 'Remove placement {name}', remove_x: 'Remove {x}',
+        set_mode: 'Default mode', set_ttl: 'Token lifetime', set_frozen: 'Freeze', def_org: 'set on the organisation', overridden: 'overridden here', inherited_from: 'inherited from', frozen_by: 'frozen by',
+        restore_inh: 'restore inheritance', frozen: 'frozen', not_frozen: 'not frozen', origin_org: 'the Monolith organisation', origin_node: '{type} {path}', org_short: 'organisation', root: 'root',
+        lock_msg: 'Frozen by {origin}: settings, placements and structure are read-only.', lock_self: 'This node is frozen: its descendants, settings and placements are read-only. Untick “frozen” to unfreeze.',
+        conn_kind: '{svc} connection', acct_l: 'account {acct}', client_x: 'client {name}', tok_note: { one: 'a single set, shared by {n} placement', other: 'a single set, shared by {n} placements' },
+        cross_msg: 'Placed under {n} different clients ({names}): they share account {acct} and the same token set. Consider a separate connection per client.',
+        svc_sub: '{auth} · {n} connected', auth_oauth: 'OAuth', auth_secret: 'Credentials',
+        step: 'Step {n} of 2', name_ph: '{acct} (defaults to the account)', continue_to: 'Continue to {svc}', connected_as: 'Signed in as {acct}', acct_default: 'account',
+        sc_read: 'Read repositories, issues, projects and metadata', sc_write: 'Create and edit issues, branches, files and reviews', sc_del: 'Delete resources and merge pull requests',
+        confirm_cross_t: 'Confirm a cross-client placement', which_roles_t: 'Place in which roles?', drop_on_sub: 'Dropped on {type} {path}: choose the roles concerned.',
+        place_kb_sub: 'Keyboard alternative to drag and drop: tick one or more roles.', place_cap: 'Placement · {name}',
+        place_n: { zero: 'Place', one: 'Place in {n} role', other: 'Place in {n} roles' }, refused_x: 'Refused: {r}',
+        cand_already: 'already placed on this role', cand_frozen: 'frozen by {origin}', cand_cross: 'Already placed under client {names}: both clients would share account {acct} and its tokens.',
+        cand_sens: 'Sensitive environment: read mode suggested, writes to be opened tool by tool.',
+        del_title: 'Delete {type} “{name}”?', del_body: 'Path {path}. This cannot be undone:', del_desc: { one: '{n} descendant deleted', other: '{n} descendants deleted' },
+        del_pl: { one: '{n} placement removed — connections stay in the library', other: '{n} placements removed — connections stay in the library' },
+        del_tok: { one: '{n} active token revoked', other: '{n} active tokens revoked' }, del_url: { one: '{n} MCP URL will stop answering', other: '{n} MCP URLs will stop answering' }, delete: 'Delete',
+        rev_title: 'Revoke “{name}”?', rev_body: '{svc} tokens for account {acct} will be deleted from the gateway.', rev_pl: { one: '{n} placement removed', other: '{n} placements removed' }, rev_lose: 'The roles concerned lose these tools immediately',
+        t_refused: 'Placement refused: {msg}.', msg_org: 'drop the connection on a project, an environment or a role, not on the organisation', msg_client: 'drop the connection on a project, an environment or a role, not on a client',
+        msg_frozen: '{path} is frozen', msg_frozen_by: '{path} is frozen (by {by})', msg_already: '“{name}” is already placed on {path}', msg_no_roles: 'no role under {path}', msg_unknown: 'unknown connection',
+        t_placed: '“{name}” placed on {paths}.', t_placed_ro: '“{name}” placed on {paths} — read-only (sensitive environment).', t_mixed_warn: '“{name}” placed. Note: this connection is also used outside production; its provider rights apply on both sides. A production-dedicated connection is recommended.',
+        t_mod_refused: 'Change refused: {msg}', t_removed: '“{name}” removed from {path}.', t_opened: '“{tool}” opened for writing. If it stays hidden, another rule (mode, provider rights, list) still applies.',
+        t_renamed: 'Renamed. New URL: /p/{path}', t_rename_dup: 'Rename refused: a sibling already uses the path “{slug}”.', t_rename_refused: 'Rename refused: {msg}', t_add_refused: 'Add refused: {msg}', t_del_refused: 'Deletion refused: {msg}',
+        t_deleted: '{path} deleted.', t_reauth: '“{name}” re-authenticated (simulated consent). Provider tokens are renewed for all its placements.', t_revoked: '“{name}” revoked: provider tokens deleted, {n} placement(s) removed.',
+        t_conn_added: '“{name}” added to the library. Drag it onto a role to place it.', t_consent_denied: 'Consent denied at {svc}: no connection created.',
+        t_copied_url: 'MCP URL copied.', t_copied_tok: 'Token copied.', t_copy_blocked: 'Copy blocked by the browser: select the text and copy it.', t_hidden_tok: 'Value hidden: it will never be shown again.',
+        t_tok_revoked: 'Token “{label}” revoked.', t_classified: '{tool} classified “{m}”: it now appears wherever the mode allows.', t_map_added: '{type} “{name}” added. Rename it in the List view (double-click or F2).',
+        err_acct: 'Enter the account to connect.', err_dup: 'A {svc} connection already has this name.',
+        tok_issued_t: 'Token “{label}” issued', tok_issued_sub: 'on {path} · copy it now, it will not be shown again', tok_ttl: 'Expiry: {ttl} ({src})', ttl_here: 'overridden on this node',
+        emit_on: 'Issue on {path}', tok_active: 'active', tok_revoked: 'revoked', revoke_btn: 'Revoke', unlabeled: 'Unlabelled token', deleted_node: '(deleted)',
+        test_choose: 'Choose a token and a role.', test_revoked: 'Refused: token revoked.', test_deleted: 'Refused: the token’s node was deleted.',
+        test_out: 'Refused: out of scope. The token is valid for {path} and its descendants.', test_sens: 'Refused: {env} is a sensitive environment; a token issued on {path} does not cover it. Issue a dedicated token on {env} or below.',
+        test_ok: 'Accepted: {role} is covered by the token issued on {path}.',
+        res_ok: 'accepted', res_refus: 'refused', res_admin: 'admin', operator: 'operator', lib: 'library', cat: '{svc} catalog',
+        n_todo: '{todo} to classify · {n} tools', annot_of: 'Annotation of {tool}',
+        a_merge_pr: 'Merged PR #{n}', a_masked_mode: 'Tool hidden on this role: write mode, destructive tool', a_masked_provider_sens: 'Tool hidden: provider rights (read) and sensitive environment',
+        a_tok_sens: 'Token issued on {tok}: refused on sensitive environment {env}', a_review: 'Review posted on PR #{n}', a_expired: 'Connection {name} expired', a_incident: 'Incident issue created',
+        a_masked_provider: 'Tool hidden: provider rights (write max)', a_none: '—', a_renamed: 'Renamed (former path {old})', a_created: 'Created: {type}',
+        a_deleted: { one: 'Deleted node and {n} descendant', other: 'Deleted node and {n} descendants' }, a_placed: 'Placed “{name}”', a_mode_changed: 'Mode of “{name}”: {m}', a_open: 'Write opened in sensitive environment: {tool}', a_close: 'Write closed again: {tool}',
+        a_removed: 'Removed placement “{name}”', a_override: 'Override: {what}', a_reset: 'Inheritance restored: {what}', a_sens_on: 'Marked sensitive', a_sens_off: 'Sensitivity removed', a_reauth: 'Re-authenticated “{name}”',
+        a_revoked: 'Revoked “{name}” ({n} placement(s) removed)', a_new_conn: 'New {svc} connection “{name}”', a_tok_emit: 'Token issued: {label}', a_tok_revoke: 'Token revoked: {label}', a_classify: 'Tool {tool} classified {m}',
+        inherited_mode: 'inherited',
+        tip_sens: 'Sensitive environment: role-level dedicated tokens, writes closed by default and opened tool by tool, allow list and freeze enabled, shorter tokens (1 h access, 7-day renewal).',
+        tip_frozen: 'Frozen: the node and its whole subtree become read-only (settings, placements, structure). Only the node that froze it can unfreeze.',
+        tip_mode_R: 'Read: only tools annotated “read” are visible.', tip_mode_W: 'Write: read and write tools; destructive tools stay hidden.',
+        tip_mode_D: 'Destructive: every tool, including deletion and merge. Keep it for trusted roles.', tip_mode_U: 'Unclassified: the tool has no annotation yet; it stays hidden everywhere until classified.',
+        tip_inherited: 'Value received from an ancestor. Click the origin to change it there, or change it here to override.',
+        tip_max: 'Rights granted at the provider during OAuth consent. No placement can exceed them.',
+        tip_placements: 'Number of roles this connection is placed on. They all share the same provider token set.',
+        tip_oauth: 'Authentication state at the provider. “Expiring soon”: re-authenticate before the deadline, otherwise its tools are hidden everywhere.',
+        tip_prefix: 'Tools are exposed to the AI as <prefix>__<tool>, to tell apart two connections to the same service.',
+        tip_url: 'This role’s MCP endpoint: an AI connecting to it only sees the connections placed here.',
+        tip_masked: 'Tool invisible to the AI on this role; the rule(s) shown below hide it.',
+        tip_grouped: 'Grouped tool: one action covers several operations (pull_request_write creates AND merges). In v1 the tool is the unit and takes the strongest annotation.',
+        mx_cap: 'Shared production / non-production placement', mx_title: 'This account would also reach production', mx_explain: '“{name}” (account {acct}) would be placed both in a sensitive environment and outside production. The account’s rights at the provider apply on both sides: tool filtering does not reduce them.',
+        mx_roles: 'Requested placement: {paths} · already placed on: {others}', mx_reco_h: 'Recommendation', mx_reco: 'Create a production-dedicated connection (same service, read only) and place it instead of this one.', mx_reco_btn: 'Create a production-dedicated connection', mx_reco_dev: 'Create a non-production connection (same service, target environment mode) and place it instead of this one.', mx_reco_btn_dev: 'Create a non-production connection',
+        mx_ack: 'I understand this account also reaches production', mx_go: 'Place anyway', mixed_ack_on: '{tip} Sharing confirmed on {date}.', mixed_ack_l: '{label} — confirmed on {date}', a_mixed_ack: 'Shared production/non-production placement confirmed: “{name}”',
+        collapse_lib: 'Collapse library', expand_lib: 'Expand library', collapse_insp: 'Collapse inspector', expand_insp: 'Expand inspector', shortcut: '{label} (shortcut: {key})',
+        rail_svc: '{svc} · {count} — drag the chip onto a role to choose an account', pick_acct_t: 'Which {svc} account to place?', pick_acct_cap: 'Dropped on {path}', no_acct: 'no {svc} account in the library',
+        tip_mixed: 'This connection is also used outside production: its provider rights apply on both sides; a production-dedicated connection is recommended.',
+        desc: {
+          'gitea.list_issues': 'List issues', 'gitea.issue_read': 'Read an issue', 'gitea.issue_write': 'Create or edit an issue', 'gitea.list_pull_requests': 'List PRs', 'gitea.pull_request_read': 'Read a PR and its diff',
+          'gitea.pull_request_review_write': 'Post a PR review', 'gitea.pull_request_write': 'Create, edit or merge a PR', 'gitea.get_file_contents': 'Read a file', 'gitea.create_or_update_file': 'Write a file',
+          'gitea.create_branch': 'Create a branch', 'gitea.delete_branch': 'Delete a branch', 'gitea.list_commits': 'List commits', 'gitea.actions_run_write': 'Rerun or cancel a workflow', 'gitea.wiki_write': 'Edit the wiki',
+          'github.list_issues': 'List issues', 'github.get_issue': 'Read an issue', 'github.create_issue': 'Create an issue', 'github.create_pull_request': 'Open a PR', 'github.merge_pull_request': 'Merge a PR',
+          'github.get_file_contents': 'Read a file', 'github.push_files': 'Push files', 'github.delete_branch': 'Delete a branch', 'github.run_workflow': 'Trigger a workflow',
+          'sentry.list_issues': 'List errors', 'sentry.get_issue_details': 'Error details', 'sentry.search_events': 'Search events', 'sentry.update_issue': 'Resolve or assign', 'sentry.delete_issue': 'Delete an error', 'sentry.analyze_issue': 'Automatic analysis',
+          'linear.list_issues': 'List issues', 'linear.get_issue': 'Read an issue', 'linear.create_issue': 'Create an issue', 'linear.update_issue': 'Edit an issue', 'linear.delete_issue': 'Delete an issue', 'linear.list_projects': 'List projects',
+          'postgres.list_tables': 'List tables', 'postgres.describe_table': 'Describe a table', 'postgres.query': 'Read-only SELECT', 'postgres.execute': 'INSERT, UPDATE, DELETE', 'postgres.drop_table': 'Drop a table', 'postgres.vacuum': 'Maintenance'
+        }
+      }
+    };
+
+    this.K = {
+      M: { R: { r: 1, cls: 'm m-r' }, W: { r: 2, cls: 'm m-w' }, D: { r: 3, cls: 'm m-d' } },
+      SVC: {
+        gitea: { l: 'Gitea', ini: 'Gt', c: '#2f6b4f', auth: 'auth_oauth', base: 'gitea' },
+        github: { l: 'GitHub', ini: 'GH', c: '#3a3f4b', auth: 'auth_oauth', base: 'github' },
+        sentry: { l: 'Sentry', ini: 'Se', c: '#5a3f8a', auth: 'auth_oauth', base: 'sentry' },
+        linear: { l: 'Linear', ini: 'Li', c: '#3c47a8', auth: 'auth_oauth', base: 'linear' },
+        postgres: { l: 'Postgres', ini: 'Pg', c: '#24577f', auth: 'auth_secret', base: 'pg' }
+      },
+      ORDER: ['gitea', 'github', 'sentry', 'linear', 'postgres'],
+      CHILD: { org: 'client', client: 'project', project: 'env', env: 'role' },
+      TIPS: ['sens', 'frozen', 'mode_R', 'mode_W', 'mode_D', 'mode_U', 'inherited', 'max', 'placements', 'oauth', 'prefix', 'url', 'masked', 'grouped', 'mixed'],
+      NOW: Date.parse('2026-10-28T10:45:00'), DAY: 86400000, HOUR: 3600000,
+      MW: 176, MH: 40, MCW: 224, MRH: 54, MPAD: 24
+    };
+    this.t0 = Date.now();
+    this.seq = 100;
+    this._cancel = false;
+    this._pan = null;
+    this.tipH = { hide: () => this.hideTip() };
+    this.K.TIPS.forEach((k) => { this.tipH[k] = (e) => this.showTip(e, k); });
+    this.mapRef = (el) => { this._vp = el; };
+    this.mapH = {
+      wheel: (e) => this.mapWheel(e), down: (e) => this.mapDown(e), move: (e) => this.mapMove(e), up: () => this.mapUp(),
+      zoomIn: () => this.mapZoomCenter(1.2), zoomOut: () => this.mapZoomCenter(1 / 1.2), fit: () => this.fitMap()
+    };
+    this.state = this.initState();
+  }
+
+  initState() {
+    const K = this.K;
+    const N = (id, type, name, parent, set, extra) => Object.assign({ id, type, name, parent, children: [], set: set || {} }, extra || {});
+    const list = [
+      N('org', 'org', 'Monolith', null, { mode: 'W', ttl: '30d', frozen: false }),
+      N('mpx', 'client', 'MPX', 'org'),
+      N('mpx-cairn', 'project', 'cairn', 'mpx'),
+      N('mpx-cairn-dev', 'env', 'dev', 'mpx-cairn'),
+      N('mpx-cairn-dev-dev', 'role', 'dev', 'mpx-cairn-dev'),
+      N('mpx-cairn-dev-reviewer', 'role', 'reviewer', 'mpx-cairn-dev'),
+      N('mpx-cairn-prod', 'env', 'prod', 'mpx-cairn', { mode: 'R', ttl: '1h' }, { sensitive: true }),
+      N('mpx-cairn-prod-dev', 'role', 'dev', 'mpx-cairn-prod'),
+      N('mpx-cairn-prod-reviewer', 'role', 'reviewer', 'mpx-cairn-prod'),
+      N('mpx-site', 'project', 'site', 'mpx', { frozen: true }),
+      N('mpx-site-staging', 'env', 'staging', 'mpx-site'),
+      N('mpx-site-staging-dev', 'role', 'dev', 'mpx-site-staging'),
+      N('acme', 'client', 'Acme', 'org', { ttl: '7d' }),
+      N('acme-api', 'project', 'api', 'acme'),
+      N('acme-api-prod', 'env', 'prod', 'acme-api', { mode: 'R', ttl: '1h' }, { sensitive: true }),
+      N('acme-api-prod-ops', 'role', 'ops', 'acme-api-prod')
+    ];
+    const nodes = {};
+    list.forEach((n) => { nodes[n.id] = n; if (n.parent) nodes[n.parent].children.push(n.id); });
+    const T = (n, m, g) => ({ n, m, g: !!g });
+    const P = (conn, mode, o) => Object.assign({ conn, mode, allow: [], deny: [], open: [] }, o || {});
+    const expanded = {};
+    list.forEach((n) => { expanded[n.id] = true; });
+    const d = (days) => K.NOW + days * K.DAY;
+    const ts = (s) => Date.parse('2026-' + s);
+    const A = (t, who, path, tool, res, k, p) => ({ ts: ts(t), who, path, tool, res, k, p: p || {} });
+    return {
+      theme: 'dark', lang: 'fr', tab: 'tree', view: 'list', map: { tx: 20, ty: 20, k: 1 }, panning: false, hoverConn: null, tip: null,
+      nodes, expanded,
+      conns: [
+        { id: 'c1', svc: 'gitea', name: 'cairn-ai (complet)', acct: 'cairn-ai', max: 'D', prefix: 'gitea', status: 'ok', expAt: d(52) },
+        { id: 'c2', svc: 'gitea', name: 'cairn-review (lecture+revue)', acct: 'cairn-review', max: 'W', prefix: 'gitea_rv', status: 'ok', expAt: d(52) },
+        { id: 'c3', svc: 'gitea', name: 'cairn-prod (lecture)', acct: 'cairn-prod', max: 'R', prefix: 'gitea_prod', status: 'ok', expAt: d(6) },
+        { id: 'c4', svc: 'github', name: 'acme-bot', acct: 'acme-bot', max: 'W', prefix: 'github', status: 'warn', expAt: d(3) },
+        { id: 'c5', svc: 'sentry', name: 'mpx', acct: 'mpx', max: 'W', prefix: 'sentry', status: 'ok', expAt: d(81), mixedAckAt: ts('10-27T17:40:00') },
+        { id: 'c6', svc: 'postgres', name: 'acme-ro', acct: 'acme-ro', max: 'R', prefix: 'pg', status: 'expired', expAt: d(-2) }
+      ],
+      tools: {
+        gitea: [T('list_issues', 'R'), T('issue_read', 'R'), T('issue_write', 'W'), T('list_pull_requests', 'R'), T('pull_request_read', 'R'), T('pull_request_review_write', 'W'), T('pull_request_write', 'D', true), T('get_file_contents', 'R'), T('create_or_update_file', 'W'), T('create_branch', 'W'), T('delete_branch', 'D'), T('list_commits', 'R'), T('actions_run_write', null), T('wiki_write', null)],
+        github: [T('list_issues', 'R'), T('get_issue', 'R'), T('create_issue', 'W'), T('create_pull_request', 'W'), T('merge_pull_request', 'D'), T('get_file_contents', 'R'), T('push_files', 'W'), T('delete_branch', 'D'), T('run_workflow', null)],
+        sentry: [T('list_issues', 'R'), T('get_issue_details', 'R'), T('search_events', 'R'), T('update_issue', 'W'), T('delete_issue', 'D'), T('analyze_issue', null)],
+        linear: [T('list_issues', 'R'), T('get_issue', 'R'), T('create_issue', 'W'), T('update_issue', 'W'), T('delete_issue', 'D'), T('list_projects', 'R')],
+        postgres: [T('list_tables', 'R'), T('describe_table', 'R'), T('query', 'R'), T('execute', 'W'), T('drop_table', 'D'), T('vacuum', null)]
+      },
+      placements: {
+        'mpx-cairn-dev-dev': [P('c1', 'D'), P('c5', null)],
+        'mpx-cairn-dev-reviewer': [P('c2', 'W', { deny: ['issue_write'] })],
+        'mpx-cairn-prod-dev': [P('c3', null), P('c5', 'W', { open: ['update_issue'] })],
+        'mpx-cairn-prod-reviewer': [P('c3', null)],
+        'mpx-site-staging-dev': [P('c1', 'W', { allow: ['list_issues', 'issue_read', 'issue_write', 'get_file_contents', 'create_or_update_file', 'create_branch'] })],
+        'acme-api-prod-ops': [P('c4', 'W', { open: ['create_issue'] }), P('c6', null)]
+      },
+      stats: { 'mpx-cairn-dev-dev': [1840, 12], 'mpx-cairn-dev-reviewer': [620, 41], 'mpx-cairn-prod-dev': [210, 18], 'mpx-cairn-prod-reviewer': [95, 1], 'mpx-site-staging-dev': [330, 0], 'acme-api-prod-ops': [150, 22] },
+      tokens: [
+        { id: 't1', node: 'mpx-cairn', label: 'Claude Code — poste dev', last4: '7f2a', issuedAt: ts('10-12T09:00:00'), expAt: ts('11-11T09:00:00'), status: 'active' },
+        { id: 't2', node: 'mpx-cairn-prod-reviewer', label: 'CI — revue prod', last4: 'c91e', issuedAt: ts('10-28T10:20:00'), expAt: ts('10-28T11:20:00'), status: 'active' },
+        { id: 't3', node: 'acme-api-prod-ops', label: 'Runbook astreinte', last4: '0b4d', issuedAt: ts('10-28T10:05:00'), expAt: ts('10-28T11:05:00'), status: 'active' },
+        { id: 't4', node: 'mpx-site', label: 'Ancien poste', last4: 'aa10', issuedAt: ts('09-02T09:00:00'), expAt: ts('10-02T09:00:00'), status: 'revoked' }
+      ],
+      audit: [
+        A('10-28T10:42:13', 'Claude Code — poste dev', 'mpx/cairn/dev/dev', 'gitea__pull_request_write', 'ok', 'a_merge_pr', { n: 17 }),
+        A('10-28T10:41:50', 'Claude Code — poste dev', 'mpx/cairn/dev/reviewer', 'gitea_rv__pull_request_write', 'refus', 'a_masked_mode'),
+        A('10-28T10:40:02', 'CI — revue prod', 'mpx/cairn/prod/reviewer', 'gitea_prod__issue_write', 'refus', 'a_masked_provider_sens'),
+        A('10-28T10:31:55', 'Claude Code — poste dev', 'mpx/cairn/prod/dev', '—', 'refus', 'a_tok_sens', { tok: 'mpx/cairn', env: 'mpx/cairn/prod' }),
+        A('10-28T10:30:11', 'Claude Code — poste dev', 'mpx/cairn/dev/reviewer', 'gitea_rv__pull_request_review_write', 'ok', 'a_review', { n: 17 }),
+        A('10-28T09:58:40', 'Runbook astreinte', 'acme/api/prod/ops', 'pg__query', 'refus', 'a_expired', { name: 'acme-ro' }),
+        A('10-28T09:57:12', 'Runbook astreinte', 'acme/api/prod/ops', 'github__create_issue', 'ok', 'a_incident'),
+        A('10-28T09:55:03', 'Runbook astreinte', 'acme/api/prod/ops', 'github__merge_pull_request', 'refus', 'a_masked_provider'),
+        A('10-28T09:12:44', 'Claude Code — poste dev', 'mpx/cairn/dev/dev', 'sentry__list_issues', 'ok', 'a_none'),
+        A('10-27T18:20:00', '@op', 'mpx/cairn/prod', '—', 'admin', 'a_override', { key: 'ttl', v: '1h' }),
+        A('10-27T18:02:31', '@op', 'mpx/site', '—', 'admin', 'a_override', { key: 'frozen', v: true })
+      ],
+      selected: { kind: 'node', id: 'mpx-cairn-dev-dev' },
+      renaming: null, renameVal: '',
+      drawer: null, dialog: null, dragConn: null, dropHover: null, picker: null,
+      showMasked: true, toolsAll: false,
+      tokNode: 'mpx-cairn', tokLabel: '', newTok: null, testTok: 't1', testRole: 'mpx-cairn-prod-dev',
+      auditRes: 'all', auditQ: '',
+      toast: null, leftOpen: false, rightOpen: false, libC: false, inspC: false, dragSvc: null
+    };
+  }
+
+  componentDidMount() {
+    let t = null, l = null;
+    try { t = window.localStorage.getItem('hullgate-theme'); l = window.localStorage.getItem('hullgate-lang'); } catch (e) { t = null; l = null; }
+    if (t !== 'light' && t !== 'dark') {
+      const pref = this.props.startTheme;
+      if (pref === 'clair') t = 'light';
+      else if (pref === 'système') {
+        try { t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; } catch (e) { t = 'dark'; }
+      } else t = 'dark';
+    }
+    if (!l || !this.I18N[l]) l = 'fr';
+    let cols = {};
+    try { cols = JSON.parse(window.localStorage.getItem('hullgate-cols') || '{}') || {}; } catch (e) { cols = {}; }
+    this.setState({ theme: t, lang: l, libC: !!cols.l, inspC: !!cols.r });
+  }
+
+  componentWillUnmount() { clearTimeout(this._tt); }
+
+  // ---------- i18n ----------
+  L() { return this.I18N[this.state.lang] ? this.state.lang : 'fr'; }
+  raw(key) { const d = this.I18N[this.L()]; return d[key] !== undefined ? d[key] : (this.I18N.fr[key] !== undefined ? this.I18N.fr[key] : key); }
+  fill(s, p) { return p ? String(s).replace(/\{(\w+)\}/g, (m, k) => (p[k] !== undefined ? p[k] : m)) : s; }
+  tr(key, p) { const v = this.raw(key); return this.fill(typeof v === 'object' ? (v.other || '') : v, p); }
+  tp(key, n, p) {
+    const v = this.raw(key); const q = Object.assign({}, p || {}, { n: this.num(n) });
+    if (typeof v !== 'object') return this.fill(v, q);
+    let cat = 'other';
+    try { cat = new Intl.PluralRules(this.L()).select(n); } catch (e) { cat = n === 1 ? 'one' : 'other'; }
+    if (n === 0 && v.zero) cat = 'zero';
+    return this.fill(v[cat] || v.other, q);
+  }
+  num(n) { try { return new Intl.NumberFormat(this.L()).format(n); } catch (e) { return String(n); } }
+  desc(svc, tool) { const d = this.raw('desc'); return (d && d[svc + '.' + tool]) || (this.I18N.fr.desc[svc + '.' + tool]) || ''; }
+  mode(m) { return this.tr('mode_' + (m || 'U')); }
+  typeL(t) { return this.tr('type_' + t); }
+  ttl(v) {
+    const mm = /^(\d+)([hd])$/.exec(v || ''); if (!mm) return v || '';
+    try { return new Intl.NumberFormat(this.L(), { style: 'unit', unit: mm[2] === 'h' ? 'hour' : 'day', unitDisplay: 'long' }).format(+mm[1]); } catch (e) { return v; }
+  }
+  ttlMs(v) { const mm = /^(\d+)([hd])$/.exec(v || '30d'); return +mm[1] * (mm[2] === 'h' ? this.K.HOUR : this.K.DAY); }
+  now() { return this.K.NOW + (Date.now() - this.t0); }
+  rel(ts) {
+    const diff = ts - this.K.NOW; const ad = Math.abs(diff);
+    try {
+      const f = new Intl.RelativeTimeFormat(this.L(), { numeric: 'auto' });
+      if (ad < 36 * this.K.HOUR) return f.format(Math.round(diff / this.K.HOUR), 'hour');
+      return f.format(Math.round(diff / this.K.DAY), 'day');
+    } catch (e) { return ''; }
+  }
+  dShort(ts) { try { return new Intl.DateTimeFormat(this.L(), { dateStyle: 'short' }).format(new Date(ts)); } catch (e) { return ''; } }
+  dStamp(ts) { try { return new Intl.DateTimeFormat(this.L(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(ts)); } catch (e) { return ''; } }
+  setLang(l) { try { window.localStorage.setItem('hullgate-lang', l); } catch (e) { } this.setState({ lang: l, tip: null }); }
+
+  // ---------- tooltips ----------
+  showTip(e, key, text) {
+    let r = { left: 20, bottom: 20, top: 0 };
+    try { r = e.currentTarget.getBoundingClientRect(); } catch (x) { }
+    let vw = 1200, vh = 800;
+    try { vw = window.innerWidth; vh = window.innerHeight; } catch (x) { }
+    const x = Math.max(8, Math.min(r.left, vw - 316));
+    let y = r.bottom + 6; if (y > vh - 110) y = Math.max(8, r.top - 96);
+    this.setState({ tip: { key, text: text || null, x: Math.round(x), y: Math.round(y) } });
+  }
+  hideTip() { if (this.state.tip) this.setState({ tip: null }); }
+
+  // ---------- helpers ----------
+  clone(o) { return JSON.parse(JSON.stringify(o)); }
+  slug(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'x'; }
+  path(nodes, id) {
+    const out = []; let n = nodes[id];
+    while (n && n.type !== 'org') { out.unshift(this.slug(n.name)); n = nodes[n.parent]; }
+    return out.length ? out.join('/') : this.tr('org_short');
+  }
+  eff(nodes, id, key) {
+    let n = nodes[id];
+    while (n) { if (n.set && n.set[key] !== undefined) return { v: n.set[key], from: n.id }; n = nodes[n.parent]; }
+    return { v: null, from: 'org' };
+  }
+  isSens(nodes, id) { let n = nodes[id]; while (n) { if (n.type === 'env' && n.sensitive) return true; n = nodes[n.parent]; } return false; }
+  frozenBy(nodes, id) { let n = nodes[id]; while (n) { if (n.set && n.set.frozen === true) return n.id; n = nodes[n.parent]; } return null; }
+  clientOf(nodes, id) { let n = nodes[id]; while (n) { if (n.type === 'client') return n.id; n = nodes[n.parent]; } return null; }
+  rolesUnder(nodes, id) { const out = []; const w = (x) => { const n = nodes[x]; if (!n) return; if (n.type === 'role') out.push(x); n.children.forEach(w); }; w(id); return out; }
+  desc2(nodes, id) { const out = []; const w = (x) => { out.push(x); nodes[x].children.forEach(w); }; w(id); return out; }
+  conn(id) { return this.state.conns.find((c) => c.id === id); }
+  originName(nodes, id) { return id === 'org' ? this.tr('origin_org') : this.tr('origin_node', { type: this.typeL(nodes[id].type), path: this.path(nodes, id) }); }
+  statusOf(c) { return c.status === 'ok' ? { l: this.tr('st_ok'), cls: 'st st-ok' } : c.status === 'warn' ? { l: this.tr('st_warn'), cls: 'st st-warn' } : { l: this.tr('st_exp'), cls: 'st st-exp' }; }
+  usesOf(S, connId) { const out = []; Object.keys(S.placements).forEach((r) => { if (S.nodes[r] && S.placements[r].some((p) => p.conn === connId)) out.push(r); }); return out; }
+  isMixed(S, roleId, connId) {
+    if (!this.isSens(S.nodes, roleId)) return false;
+    return this.usesOf(S, connId).some((r) => r !== roleId && !this.isSens(S.nodes, r));
+  }
+  withLog(path, k, p) { return [{ ts: this.now(), who: '@op', path, tool: '—', res: 'admin', k, p: p || {} }].concat(this.state.audit); }
+  auditWhy(a) {
+    const p = Object.assign({}, a.p);
+    if (a.k === 'a_override' || a.k === 'a_reset') {
+      const lbl = { mode: 'set_mode', ttl: 'set_ttl', frozen: 'set_frozen' }[p.key];
+      let v = '';
+      if (a.k === 'a_override') v = p.key === 'mode' ? ' ' + this.mode(p.v) : p.key === 'ttl' ? ' ' + this.ttl(p.v) : ' : ' + this.tr(p.v ? 'frozen' : 'not_frozen');
+      p.what = this.tr(lbl) + v;
+    }
+    if (a.k === 'a_created') p.type = this.typeL(p.type);
+    if (a.k === 'a_mode_changed' || a.k === 'a_classify') p.m = p.m ? this.mode(p.m) : this.tr('inherited_mode');
+    if (a.k === 'a_deleted') return this.tp('a_deleted', p.n);
+    return this.tr(a.k, p);
+  }
+  auditPath(path) { if (path === '@lib') return this.tr('lib'); if (String(path).indexOf('@cat:') === 0) return this.tr('cat', { svc: this.K.SVC[path.slice(5)].l }); return path; }
+  toast(msg, kind) {
+    const id = ++this.seq; clearTimeout(this._tt);
+    this.setState({ toast: { msg, kind: kind || 'info', id } });
+    this._tt = setTimeout(() => { if (this.state.toast && this.state.toast.id === id) this.setState({ toast: null }); }, 5200);
+  }
+  copy(text, okKey) {
+    const blocked = () => this.toast(this.tr('t_copy_blocked'), 'warn');
+    try { navigator.clipboard.writeText(text).then(() => this.toast(this.tr(okKey), 'ok'), blocked); } catch (e) { blocked(); }
+  }
+  narrow() { try { return window.innerWidth <= 1100; } catch (e) { return false; } }
+
+  // ---------- selection / tree ----------
+  select(kind, id) {
+    const S = this.state; const exp = Object.assign({}, S.expanded);
+    if (kind === 'node' && S.nodes[id]) { let n = S.nodes[S.nodes[id].parent]; while (n) { exp[n.id] = true; n = S.nodes[n.parent]; } }
+    this.setState({ selected: { kind, id }, expanded: exp, picker: null, tab: 'tree', tip: null, rightOpen: this.narrow() ? true : S.rightOpen });
+  }
+  toggleNode(id) { const e = Object.assign({}, this.state.expanded); e[id] = !e[id]; this.setState({ expanded: e }); }
+  lockMsg(nodes, id) { const fz = this.frozenBy(nodes, id); return fz ? this.tr('lock_msg', { origin: this.originName(nodes, fz) }) : ''; }
+  setView(v) { this.setState({ view: v, tip: null }); if (v === 'map') setTimeout(() => this.fitMap(), 40); }
+
+  startRename(id) {
+    const S = this.state; const fz = this.frozenBy(S.nodes, id);
+    if (fz && fz !== id) { this.toast(this.tr('t_rename_refused', { msg: this.lockMsg(S.nodes, id) }), 'err'); return; }
+    this._cancel = false;
+    this.setState({ renaming: id, renameVal: S.nodes[id].name });
+  }
+  commitRename() {
+    const S = this.state; const id = S.renaming;
+    if (!id || this._cancel) { this._cancel = false; return; }
+    const v = S.renameVal.trim(); const n = S.nodes[id];
+    if (!n || !v || v === n.name) { this.setState({ renaming: null }); return; }
+    if (n.parent && S.nodes[n.parent].children.some((c) => c !== id && this.slug(S.nodes[c].name) === this.slug(v))) {
+      this.setState({ renaming: null }); this.toast(this.tr('t_rename_dup', { slug: this.slug(v) }), 'err'); return;
+    }
+    const nodes = this.clone(S.nodes); const old = this.path(S.nodes, id); nodes[id].name = v;
+    this.setState({ nodes, renaming: null, audit: this.withLog(this.path(nodes, id), 'a_renamed', { old }) });
+    this.toast(this.tr('t_renamed', { path: this.path(nodes, id) + (n.type === 'role' ? '/mcp' : '/…') }), 'ok');
+  }
+  renameKey(e) {
+    if (e.key === 'Enter') { e.preventDefault(); this.commitRename(); }
+    else if (e.key === 'Escape') { e.preventDefault(); this._cancel = true; this.setState({ renaming: null }); }
+  }
+  rowKey(e, id) {
+    const n = this.state.nodes[id];
+    if (e.key === 'F2') { e.preventDefault(); this.startRename(id); }
+    else if (e.key === 'Delete' || e.key === 'Backspace') { if (n.type !== 'org') { e.preventDefault(); this.askDelete(id); } }
+    else if (e.key === 'ArrowRight' && n.children.length && !this.state.expanded[id]) { e.preventDefault(); this.toggleNode(id); }
+    else if (e.key === 'ArrowLeft' && n.children.length && this.state.expanded[id]) { e.preventDefault(); this.toggleNode(id); }
+  }
+  addChild(pid, fromMap) {
+    const S = this.state;
+    if (this.frozenBy(S.nodes, pid)) { this.toast(this.tr('t_add_refused', { msg: this.lockMsg(S.nodes, pid) }), 'err'); return; }
+    const nodes = this.clone(S.nodes); const p = nodes[pid]; const type = this.K.CHILD[p.type];
+    const base = { client: 'nouveau-client', project: 'nouveau-projet', env: 'nouvel-env', role: 'nouveau-role' }[type];
+    const baseEn = { client: 'new-client', project: 'new-project', env: 'new-env', role: 'new-role' }[type];
+    const b = this.L() === 'fr' ? base : baseEn;
+    let name = b, i = 2; while (p.children.some((c) => nodes[c].name === name)) name = b + '-' + (i++);
+    const id = 'n' + (++this.seq);
+    nodes[id] = { id, type, name, parent: pid, children: [], set: {} }; p.children.push(id);
+    const exp = Object.assign({}, S.expanded); exp[pid] = true; exp[id] = true;
+    this._cancel = false;
+    const upd = { nodes, expanded: exp, selected: { kind: 'node', id }, audit: this.withLog(this.path(nodes, id), 'a_created', { type }) };
+    if (!fromMap) { upd.renaming = id; upd.renameVal = name; }
+    this.setState(upd);
+    if (fromMap) this.toast(this.tr('t_map_added', { type: this.typeL(type), name }), 'ok');
+  }
+  askDelete(id) {
+    const S = this.state;
+    if (this.frozenBy(S.nodes, id)) { this.toast(this.tr('t_del_refused', { msg: this.lockMsg(S.nodes, id) }), 'err'); return; }
+    this.setState({ dialog: { type: 'delete', id } });
+  }
+  doDelete(id) {
+    const S = this.state; const ids = this.desc2(S.nodes, id); const n = S.nodes[id]; const pth = this.path(S.nodes, id);
+    const nodes = this.clone(S.nodes); ids.forEach((x) => { delete nodes[x]; });
+    nodes[n.parent].children = nodes[n.parent].children.filter((c) => c !== id);
+    const placements = this.clone(S.placements); ids.forEach((x) => { delete placements[x]; });
+    const tokens = S.tokens.map((t) => ids.includes(t.node) && t.status === 'active' ? Object.assign({}, t, { status: 'revoked' }) : t);
+    this.setState({ nodes, placements, tokens, dialog: null, selected: { kind: 'node', id: n.parent }, audit: this.withLog(pth, 'a_deleted', { n: ids.length - 1 }) });
+    this.toast(this.tr('t_deleted', { path: pth }), 'ok');
+  }
+
+  // ---------- placements ----------
+  dragStart(e, id) {
+    try { e.dataTransfer.setData('text/plain', id); e.dataTransfer.effectAllowed = 'copy'; } catch (x) { }
+    this.setState({ dragConn: id, tip: null });
+  }
+  dropCheck(connId, id) {
+    const S = this.state; const n = S.nodes[id]; const c = this.conn(connId); const nodes = S.nodes;
+    if (!c || !n) return { ok: false, msg: this.tr('msg_unknown') };
+    if (n.type === 'org') return { ok: false, msg: this.tr('msg_org') };
+    if (n.type === 'client') return { ok: false, msg: this.tr('msg_client') };
+    const fz = this.frozenBy(nodes, id);
+    if (fz) return { ok: false, msg: fz !== id ? this.tr('msg_frozen_by', { path: this.path(nodes, id), by: this.path(nodes, fz) }) : this.tr('msg_frozen', { path: this.path(nodes, id) }) };
+    if (n.type === 'role') { if ((S.placements[id] || []).some((p) => p.conn === connId)) return { ok: false, msg: this.tr('msg_already', { name: c.name, path: this.path(nodes, id) }) }; }
+    else if (!this.rolesUnder(nodes, id).length) return { ok: false, msg: this.tr('msg_no_roles', { path: this.path(nodes, id) }) };
+    return { ok: true };
+  }
+  dragOver(e, id) {
+    e.preventDefault();
+    const c = this.state.dragConn; const sv = this.state.dragSvc; if (!c && !sv) return;
+    const ok = c ? this.dropCheck(c, id).ok : this.state.conns.some((x) => x.svc === sv && this.dropCheck(x.id, id).ok); const dh = this.state.dropHover;
+    if (!dh || dh.id !== id || dh.ok !== ok) this.setState({ dropHover: { id, ok } });
+  }
+  drop(e, id) {
+    e.preventDefault();
+    let c = this.state.dragConn; let sv = this.state.dragSvc;
+    if (!c && !sv) { let d = null; try { d = e.dataTransfer.getData('text/plain'); } catch (x) { d = null; } if (d && d.indexOf('svc:') === 0) sv = d.slice(4); else c = d; }
+    this.setState({ dragConn: null, dragSvc: null, dropHover: null });
+    if (sv) { this.svcDrop(sv, id); return; }
+    if (c && this.conn(c)) this.tryPlace(c, id);
+  }
+  candInfo(connId, roleId) {
+    const S = this.state; const nodes = S.nodes; const c = this.conn(connId);
+    const already = (S.placements[roleId] || []).some((p) => p.conn === connId);
+    const fz = this.frozenBy(nodes, roleId); const mine = this.clientOf(nodes, roleId); const others = [];
+    const uses = this.usesOf(S, connId);
+    uses.forEach((r) => { const cl = this.clientOf(nodes, r); if (cl && cl !== mine && !others.includes(cl)) others.push(cl); });
+    const sens = this.isSens(nodes, roleId);
+    const mixed = uses.some((r) => r !== roleId && this.isSens(nodes, r) !== sens);
+    return {
+      refuse: already ? this.tr('cand_already') : (fz ? this.tr('cand_frozen', { origin: this.originName(nodes, fz) }) : null),
+      cross: others.length ? this.tr('cand_cross', { names: others.map((o) => nodes[o].name).join(', '), acct: c.acct }) : null,
+      mixed: mixed ? this.tr('tip_mixed') : null,
+      sens: sens ? this.tr('cand_sens') : null
+    };
+  }
+  tryPlace(connId, id) {
+    const S = this.state; const n = S.nodes[id]; const chk = this.dropCheck(connId, id);
+    if (!chk.ok) { this.toast(this.tr('t_refused', { msg: chk.msg }), 'err'); return; }
+    if (n.type === 'role') {
+      const info = this.candInfo(connId, id); const ck = {}; ck[id] = true;
+      if (info.cross) { this.setState({ dialog: { type: 'place', connId, cands: [id], checked: ck, mode: 'auto', titleK: 'confirm_cross_t' } }); return; }
+      this.doPlace(connId, [id], 'auto'); return;
+    }
+    const roles = this.rolesUnder(S.nodes, id); const checked = {};
+    roles.forEach((r) => { if (!this.candInfo(connId, r).refuse) checked[r] = true; });
+    this.setState({ dialog: { type: 'place', connId, cands: roles, checked, mode: 'auto', titleK: 'which_roles_t', subK: 'drop_on_sub', subP: { node: id } } });
+  }
+  openPlaceAll(connId) {
+    this.setState({ dialog: { type: 'place', connId, cands: this.rolesUnder(this.state.nodes, 'org'), checked: {}, mode: 'auto', titleK: 'place_into', subK: 'place_kb_sub' } });
+  }
+  doPlace(connId, roleIds, modeChoice, confirmed) {
+    const S = this.state; const M = this.K.M; const c = this.conn(connId); const nodes = S.nodes;
+    const anyMixed = roleIds.some((r) => !!this.candInfo(connId, r).mixed);
+    if (anyMixed && !confirmed) { this.setState({ dialog: { type: 'mixed', connId, roles: roleIds, mode: modeChoice, ack: false } }); return; }
+    const placements = this.clone(S.placements); let anySens = false;
+    roleIds.forEach((r) => {
+      const sens = this.isSens(nodes, r); if (sens) anySens = true;
+      let m = modeChoice === 'auto' ? (sens ? 'R' : null) : modeChoice;
+      if (m && M[m].r > M[c.max].r) m = c.max;
+      placements[r] = placements[r] || [];
+      if (!placements[r].some((p) => p.conn === connId)) placements[r].push({ conn: connId, mode: m, allow: [], deny: [], open: [] });
+    });
+    const paths = roleIds.map((r) => this.path(nodes, r)).join(', ');
+    const exp = Object.assign({}, S.expanded);
+    roleIds.forEach((r) => { let n = nodes[nodes[r].parent]; while (n) { exp[n.id] = true; n = nodes[n.parent]; } });
+    let audit = this.withLog(paths, 'a_placed', { name: c.name });
+    let conns = S.conns;
+    if (anyMixed) { const at = this.now(); audit = [{ ts: at, who: '@op', path: paths, tool: '—', res: 'admin', k: 'a_mixed_ack', p: { name: c.name } }].concat(audit); conns = S.conns.map((x) => x.id === connId ? Object.assign({}, x, { mixedAckAt: at }) : x); }
+    this.setState({ placements, conns, dialog: null, expanded: exp, selected: roleIds.length === 1 ? { kind: 'node', id: roleIds[0] } : S.selected, audit });
+    this.toast(this.tr(anySens && modeChoice === 'auto' ? 't_placed_ro' : 't_placed', { name: c.name, paths }), 'ok');
+  }
+  setPl(roleId, connId, fn, logK, logP) {
+    const S = this.state;
+    if (this.frozenBy(S.nodes, roleId)) { this.toast(this.tr('t_mod_refused', { msg: this.lockMsg(S.nodes, roleId) }), 'err'); return false; }
+    const placements = this.clone(S.placements); const pl = (placements[roleId] || []).find((p) => p.conn === connId);
+    if (!pl) return false; fn(pl);
+    const upd = { placements }; if (logK) upd.audit = this.withLog(this.path(S.nodes, roleId), logK, logP);
+    this.setState(upd); return true;
+  }
+  removePl(roleId, connId) {
+    const S = this.state; const c = this.conn(connId);
+    if (this.frozenBy(S.nodes, roleId)) { this.toast(this.tr('t_mod_refused', { msg: this.lockMsg(S.nodes, roleId) }), 'err'); return; }
+    const placements = this.clone(S.placements); placements[roleId] = (placements[roleId] || []).filter((p) => p.conn !== connId);
+    this.setState({ placements, picker: null, audit: this.withLog(this.path(S.nodes, roleId), 'a_removed', { name: c.name }) });
+    this.toast(this.tr('t_removed', { name: c.name, path: this.path(S.nodes, roleId) }), 'ok');
+  }
+  openTool(roleId, connId, tool) {
+    if (this.setPl(roleId, connId, (x) => { if (!x.open.includes(tool)) x.open.push(tool); }, 'a_open', { tool })) this.toast(this.tr('t_opened', { tool }), 'warn');
+  }
+  pickToggle(roleId, connId, list, tool) {
+    this.setPl(roleId, connId, (x) => {
+      const i = x[list].indexOf(tool);
+      if (i >= 0) x[list].splice(i, 1);
+      else { x[list].push(tool); const o = list === 'allow' ? 'deny' : 'allow'; x[o] = x[o].filter((y) => y !== tool); }
+    });
+  }
+
+  // ---------- settings ----------
+  setSetting(id, key, val) {
+    const S = this.state; const fz = this.frozenBy(S.nodes, id);
+    const blocked = key === 'frozen' ? (fz && fz !== id) : !!fz;
+    if (blocked) { this.toast(this.tr('t_mod_refused', { msg: this.lockMsg(S.nodes, id) }), 'err'); return; }
+    const nodes = this.clone(S.nodes); nodes[id].set[key] = val;
+    this.setState({ nodes, audit: this.withLog(this.path(nodes, id), 'a_override', { key, v: val }) });
+  }
+  resetSetting(id, key) {
+    const S = this.state; const fz = this.frozenBy(S.nodes, id);
+    const blocked = key === 'frozen' ? (fz && fz !== id) : !!fz;
+    if (blocked) { this.toast(this.tr('t_mod_refused', { msg: this.lockMsg(S.nodes, id) }), 'err'); return; }
+    const nodes = this.clone(S.nodes); delete nodes[id].set[key];
+    this.setState({ nodes, audit: this.withLog(this.path(nodes, id), 'a_reset', { key }) });
+  }
+  toggleSens(id) {
+    const S = this.state;
+    if (this.frozenBy(S.nodes, id)) { this.toast(this.tr('t_mod_refused', { msg: this.lockMsg(S.nodes, id) }), 'err'); return; }
+    const nodes = this.clone(S.nodes); nodes[id].sensitive = !nodes[id].sensitive;
+    this.setState({ nodes, audit: this.withLog(this.path(nodes, id), nodes[id].sensitive ? 'a_sens_on' : 'a_sens_off') });
+  }
+  buildSettings(nodes, id) {
+    const n = nodes[id]; const fz = this.frozenBy(nodes, id);
+    return ['mode', 'ttl', 'frozen'].map((key) => {
+      const isF = key === 'frozen';
+      const e = isF ? { v: !!fz, from: fz || this.eff(nodes, id, 'frozen').from } : this.eff(nodes, id, key);
+      const here = isF ? (n.set.frozen !== undefined) : e.from === id;
+      const dis = isF ? !!(fz && fz !== id) : !!fz;
+      const originTxt = here ? this.tr(n.type === 'org' ? 'def_org' : 'overridden') : this.tr(isF && fz ? 'frozen_by' : 'inherited_from');
+      return {
+        label: this.tr(key === 'mode' ? 'set_mode' : key === 'ttl' ? 'set_ttl' : 'set_frozen'),
+        originTxt, inherited: !here, originName: this.originName(nodes, e.from), go: () => this.select('node', e.from), tips: this.tipH,
+        isMode: key === 'mode', isTtl: key === 'ttl', isBool: isF,
+        val: isF ? '' : e.v, checked: !!e.v, dis,
+        oR: this.mode('R'), oW: this.mode('W'), oD: this.mode('D'),
+        t1h: this.ttl('1h'), t24h: this.ttl('24h'), t7d: this.ttl('7d'), t30d: this.ttl('30d'), t90d: this.ttl('90d'),
+        frozenL: this.tr('frozen'), resetL: this.tr('restore_inh'),
+        onSel: (ev) => this.setSetting(id, key, ev.target.value),
+        onChk: (ev) => this.setSetting(id, key, ev.target.checked),
+        canReset: here && n.type !== 'org', reset: () => this.resetSetting(id, key)
+      };
+    });
+  }
+
+  // ---------- tools preview ----------
+  computeTools(S, roleId) {
+    const K = this.K, M = K.M, nodes = S.nodes;
+    const sens = this.isSens(nodes, roleId); const dm = this.eff(nodes, roleId, 'mode'); const locked = !!this.frozenBy(nodes, roleId);
+    const vis = [], mask = [];
+    (S.placements[roleId] || []).forEach((p) => {
+      const c = S.conns.find((x) => x.id === p.conn); if (!c) return;
+      const em = p.mode || dm.v;
+      const modeOrigin = p.mode ? this.tr('mode_set_on_pl') : this.tr('mode_inh_from', { from: this.originName(nodes, dm.from) });
+      (S.tools[c.svc] || []).forEach((t) => {
+        const R = []; let canOpen = false;
+        if (c.status === 'expired') R.push(this.tr('r_expired', { name: c.name }));
+        if (!t.m) R.push(this.tr('r_unclassified'));
+        else {
+          if (M[t.m].r > M[c.max].r) R.push(this.tr('r_provider', { acct: c.acct, m: this.mode(c.max) }));
+          if (p.deny.includes(t.n)) R.push(this.tr('r_deny'));
+          if (p.allow.length && !p.allow.includes(t.n)) R.push(this.tr('r_allow'));
+          if (M[t.m].r > M[em].r) R.push(this.tr('r_mode', { m: this.mode(em), origin: modeOrigin, tm: this.mode(t.m) }));
+          if (sens && M[t.m].r >= 2 && !p.open.includes(t.n)) { R.push(this.tr('r_sens')); canOpen = true; }
+        }
+        const mk = t.m || 'U';
+        const row = {
+          full: c.prefix + '__' + t.n, mode: this.mode(t.m), modeCls: t.m ? M[t.m].cls : 'm m-u', modeTip: 'tipd-mode_' + mk, modeShow: this.tipH['mode_' + mk],
+          ini: K.SVC[c.svc].ini, color: K.SVC[c.svc].c, conn: c.name, opened: sens && !!t.m && M[t.m].r >= 2 && p.open.includes(t.n), openedL: this.tr('opened_sens'),
+          grouped: t.g, groupedL: this.tr('grouped'), tips: this.tipH, locked
+        };
+        if (R.length) { row.reasons = R.map((x) => ({ x })); row.canOpen = canOpen; row.openL = this.tr('open_tool'); row.open = () => this.openTool(roleId, c.id, t.n); mask.push(row); }
+        else vis.push(row);
+      });
+    });
+    return { vis, mask };
+  }
+
+  // ---------- connections ----------
+  reauth(id) {
+    const S = this.state; const c = this.conn(id);
+    const conns = S.conns.map((x) => x.id === id ? Object.assign({}, x, { status: 'ok', expAt: this.K.NOW + 90 * this.K.DAY }) : x);
+    this.setState({ conns, audit: this.withLog('@lib', 'a_reauth', { name: c.name }) });
+    this.toast(this.tr('t_reauth', { name: c.name }), 'ok');
+  }
+  doRevoke(id) {
+    const S = this.state; const c = this.conn(id);
+    const placements = this.clone(S.placements); let n = 0;
+    Object.keys(placements).forEach((r) => { const b = placements[r].length; placements[r] = placements[r].filter((p) => p.conn !== id); n += b - placements[r].length; });
+    this.setState({ conns: S.conns.filter((x) => x.id !== id), placements, dialog: null, hoverConn: null, selected: { kind: 'none', id: null }, audit: this.withLog('@lib', 'a_revoked', { name: c.name, n }) });
+    this.toast(this.tr('t_revoked', { name: c.name, n }), 'ok');
+  }
+  openConnect() { this.setState({ drawer: { step: 1, svc: 'gitea', acct: '', name: '', scope: 'W', err: '' } }); }
+  setDrawer(o) { this.setState({ drawer: Object.assign({}, this.state.drawer, o) }); }
+  drawerNext() {
+    const d = this.state.drawer; const acct = d.acct.trim();
+    if (!acct) { this.setDrawer({ err: this.tr('err_acct') }); return; }
+    const name = (d.name.trim() || acct);
+    if (this.state.conns.some((c) => c.svc === d.svc && c.name === name)) { this.setDrawer({ err: this.tr('err_dup', { svc: this.K.SVC[d.svc].l }) }); return; }
+    this.setDrawer({ step: 2, err: '' });
+  }
+  drawerAuthorize() {
+    const S = this.state; const d = S.drawer; const acct = d.acct.trim(); const name = d.name.trim() || acct;
+    const base = this.K.SVC[d.svc].base; let prefix = base;
+    if (S.conns.some((c) => c.prefix === prefix)) prefix = base + '_' + this.slug(acct).replace(/-/g, '_').slice(0, 10);
+    let k = 2; while (S.conns.some((c) => c.prefix === prefix)) prefix = base + '_' + (k++);
+    const id = 'c' + (++this.seq);
+    const c = { id, svc: d.svc, name, acct, max: d.scope, prefix, status: 'ok', expAt: this.K.NOW + 90 * this.K.DAY };
+    this.setState({ conns: S.conns.concat([c]), drawer: null, selected: { kind: 'conn', id }, audit: this.withLog('@lib', 'a_new_conn', { svc: this.K.SVC[d.svc].l, name }) });
+    this.toast(this.tr('t_conn_added', { name }), 'ok');
+  }
+
+  // ---------- tokens ----------
+  gen() { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'; let s = 'mgw_'; for (let i = 0; i < 40; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
+  emitToken() {
+    const S = this.state; const node = S.nodes[S.tokNode] ? S.tokNode : 'mpx';
+    const v = this.gen(); const label = S.tokLabel.trim() || this.tr('unlabeled'); const ttl = this.eff(S.nodes, node, 'ttl').v;
+    const now = this.now();
+    const t = { id: 't' + (++this.seq), node, label, last4: v.slice(-4), issuedAt: now, expAt: now + this.ttlMs(ttl), status: 'active' };
+    this.setState({ tokens: [t].concat(S.tokens), newTok: { value: v, label, node }, tokLabel: '', testTok: t.id, audit: this.withLog(this.path(S.nodes, node), 'a_tok_emit', { label }) });
+  }
+  revokeToken(id) {
+    const S = this.state; const t = S.tokens.find((x) => x.id === id);
+    this.setState({ tokens: S.tokens.map((x) => x.id === id ? Object.assign({}, x, { status: 'revoked' }) : x), audit: this.withLog(S.nodes[t.node] ? this.path(S.nodes, t.node) : '—', 'a_tok_revoke', { label: t.label }) });
+    this.toast(this.tr('t_tok_revoked', { label: t.label }), 'ok');
+  }
+  tokenCheck(S, t, roleId) {
+    const nodes = S.nodes;
+    if (!t || !nodes[roleId]) return { ok: false, msg: this.tr('test_choose') };
+    if (t.status !== 'active') return { ok: false, msg: this.tr('test_revoked') };
+    if (!nodes[t.node]) return { ok: false, msg: this.tr('test_deleted') };
+    let n = nodes[roleId]; const chain = [];
+    while (n) { chain.push(n.id); if (n.id === t.node) break; n = nodes[n.parent]; }
+    if (!n) return { ok: false, msg: this.tr('test_out', { path: this.path(nodes, t.node) }) };
+    const sb = chain.slice(0, -1).map((x) => nodes[x]).find((x) => x.type === 'env' && x.sensitive);
+    if (sb) return { ok: false, msg: this.tr('test_sens', { env: this.path(nodes, sb.id), path: this.path(nodes, t.node) }) };
+    return { ok: true, msg: this.tr('test_ok', { role: this.path(nodes, roleId), path: this.path(nodes, t.node) }) };
+  }
+  classify(svc, name, m) {
+    const S = this.state; const tools = this.clone(S.tools); const t = tools[svc].find((x) => x.n === name); const was = t.m; t.m = m;
+    this.setState({ tools, audit: this.withLog('@cat:' + svc, 'a_classify', { tool: name, m }) });
+    if (!was) this.toast(this.tr('t_classified', { tool: name, m: this.mode(m) }), 'ok');
+  }
+
+  mixedInfo(c) {
+    const tip = this.tr('tip_mixed');
+    if (!c.mixedAckAt) return { text: tip, label: this.tr('mixed_l') };
+    let date = ''; try { date = new Intl.DateTimeFormat(this.L(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(c.mixedAckAt)); } catch (e) { date = ''; }
+    return { text: this.tr('mixed_ack_on', { tip, date }), label: this.tr('mixed_ack_l', { label: this.tr('mixed_l'), date }) };
+  }
+  suffixed(name, suf) {
+    let base = String(name).trim();
+    for (let i = 0; i < 4; i++) { const b = base.replace(/\s*\([^)]*\)\s*$/, '').replace(/[-_ ](prod|dev)$/i, '').trim(); if (b === base) break; base = b; }
+    return (base || String(name).trim()) + suf;
+  }
+  trapKey(e) {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); this.setState({ dialog: null }); return; }
+    if (e.key !== 'Tab') return;
+    let f = [];
+    try { f = Array.prototype.slice.call(e.currentTarget.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])')); } catch (x) { f = []; }
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1]; const a = document.activeElement;
+    if (e.shiftKey && (a === first || !e.currentTarget.contains(a))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && a === last) { e.preventDefault(); first.focus(); }
+  }
+
+  // ---------- collapsible columns ----------
+  saveCols(l, r) { try { window.localStorage.setItem('hullgate-cols', JSON.stringify({ l, r })); } catch (e) { } }
+  refitSoon() { if (this.state.view === 'map') setTimeout(() => this.fitMap(), 230); }
+  toggleLib() { const v = !this.state.libC; this.saveCols(v, this.state.inspC); this.setState({ libC: v, tip: null, hoverConn: null }); this.refitSoon(); }
+  toggleInsp() { const v = !this.state.inspC; this.saveCols(this.state.libC, v); this.setState({ inspC: v, tip: null }); this.refitSoon(); }
+  appKey(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey || this.state.tab !== 'tree') return;
+    const tg = e.target; const tag = tg && tg.tagName ? tg.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'select' || tag === 'textarea' || (tg && tg.isContentEditable)) return;
+    if (e.key === '[') { e.preventDefault(); this.toggleLib(); }
+    else if (e.key === ']') { e.preventDefault(); this.toggleInsp(); }
+  }
+  dragStartSvc(e, svc) {
+    try { e.dataTransfer.setData('text/plain', 'svc:' + svc); e.dataTransfer.effectAllowed = 'copy'; } catch (x) { }
+    this.setState({ dragSvc: svc, dragConn: null, tip: null });
+  }
+  svcDrop(svc, id) {
+    const cs = this.state.conns.filter((c) => c.svc === svc); const nodes = this.state.nodes;
+    if (!cs.length) { this.toast(this.tr('t_refused', { msg: this.tr('no_acct', { svc: this.K.SVC[svc].l }) }), 'err'); return; }
+    const n = nodes[id];
+    if (n.type === 'org' || n.type === 'client' || this.frozenBy(nodes, id)) { this.toast(this.tr('t_refused', { msg: this.dropCheck(cs[0].id, id).msg }), 'err'); return; }
+    if (cs.length === 1) { this.tryPlace(cs[0].id, id); return; }
+    this.setState({ dialog: { type: 'pickacct', svc, node: id } });
+  }
+
+  // ---------- map ----------
+  mapLayout(nodes) {
+    const K = this.K; const pos = {}; let leaf = 0, maxD = 0;
+    const lay = (id, d) => {
+      maxD = Math.max(maxD, d); const n = nodes[id];
+      if (!n.children.length) { pos[id] = { x: K.MPAD + d * K.MCW, y: K.MPAD + leaf * K.MRH }; leaf++; }
+      else { n.children.forEach((c) => lay(c, d + 1)); const ys = n.children.map((c) => pos[c].y); pos[id] = { x: K.MPAD + d * K.MCW, y: (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2 }; }
+    };
+    lay('org', 0);
+    return { pos, w: K.MPAD * 2 + maxD * K.MCW + K.MW, h: K.MPAD * 2 + Math.max(1, leaf) * K.MRH - (K.MRH - K.MH) };
+  }
+  vpSize() { const el = this._vp; return { w: (el && el.clientWidth) || 800, h: (el && el.clientHeight) || 560 }; }
+  fitMap() {
+    const L = this.mapLayout(this.state.nodes); const v = this.vpSize();
+    const k = Math.max(0.3, Math.min(1.3, (v.w - 32) / L.w, (v.h - 70) / L.h));
+    this.setState({ map: { k, tx: Math.round((v.w - L.w * k) / 2), ty: Math.round((v.h - L.h * k) / 2) } });
+  }
+  zoomAt(px, py, f) {
+    const m = this.state.map; const k = Math.max(0.3, Math.min(2.5, m.k * f)); const r = k / m.k;
+    this.setState({ map: { k, tx: px - (px - m.tx) * r, ty: py - (py - m.ty) * r } });
+  }
+  mapZoomCenter(f) { const v = this.vpSize(); this.zoomAt(v.w / 2, v.h / 2, f); }
+  mapWheel(e) {
+    let rect = { left: 0, top: 0 };
+    try { rect = e.currentTarget.getBoundingClientRect(); } catch (x) { }
+    try { e.preventDefault(); } catch (x) { }
+    this.zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY < 0 ? 1.1 : 1 / 1.1);
+  }
+  mapDown(e) {
+    if (e.button !== 0) return;
+    const tg = e.target; if (tg && tg.closest && tg.closest('.mnode, .mapctl, .maplegend')) return;
+    this._pan = { x: e.clientX, y: e.clientY, tx: this.state.map.tx, ty: this.state.map.ty };
+    this.setState({ panning: true });
+  }
+  mapMove(e) {
+    const p = this._pan; if (!p) return;
+    this.setState({ map: { k: this.state.map.k, tx: p.tx + e.clientX - p.x, ty: p.ty + e.clientY - p.y } });
+  }
+  mapUp() { if (this._pan) { this._pan = null; this.setState({ panning: false }); } }
+
+  // ---------- render ----------
+  renderVals() {
+    const S = this.state, K = this.K, M = K.M, nodes = S.nodes, sel = S.selected;
+    const theme = S.theme === 'light' ? 'light' : 'dark';
+    const lang = this.L();
+    const t = Object.assign({}, this.I18N.fr, this.I18N[lang]);
+    const plCount = {};
+    Object.keys(S.placements).forEach((r) => { if (nodes[r]) S.placements[r].forEach((p) => { plCount[p.conn] = (plCount[p.conn] || 0) + 1; }); });
+    const todoN = Object.keys(S.tools).reduce((a, k) => a + S.tools[k].filter((x) => !x.m).length, 0);
+    const tabs = ['tree', 'tokens', 'tools', 'audit', 'stats'].map((k) => ({ label: this.tr('tab_' + k), cls: 'tab' + (S.tab === k ? ' on' : ''), cur: S.tab === k ? 'page' : 'false', go: () => this.setState({ tab: k, tip: null }), hasBadge: k === 'tools' && todoN > 0, badge: this.num(todoN) }));
+    const langs = Object.keys(this.I18N).map((code) => ({ code, short: this.I18N[code]._short, name: this.I18N[code]._name, on: code === lang, cls: code === lang ? 'on' : '', pick: () => this.setLang(code) }));
+    const hlConn = S.hoverConn && this.conn(S.hoverConn) ? S.hoverConn : (sel.kind === 'conn' && this.conn(sel.id) ? sel.id : null);
+    const hlRoles = hlConn ? this.usesOf(S, hlConn) : [];
+    const hlSet = {}; hlRoles.forEach((r) => { let n = nodes[r]; while (n) { hlSet[n.id] = true; n = nodes[n.parent]; } });
+    const pillsOf = (id) => (S.placements[id] || []).map((p) => {
+      const c = S.conns.find((x) => x.id === p.conn); if (!c) return null;
+      const mixed = this.isMixed(S, id, c.id); const mi = this.mixedInfo(c);
+      return { ini: K.SVC[c.svc].ini, color: K.SVC[c.svc].c, label: c.name.split(' ')[0], title: c.name + ' · ' + this.mode(p.mode || this.eff(nodes, id, 'mode').v), mixed, mixedL: mi.label, mixedShow: (e) => this.showTip(e, null, mi.text), tips: this.tipH };
+    }).filter(Boolean);
+
+    // library
+    const groups = K.ORDER.map((svc) => {
+      const cs = S.conns.filter((c) => c.svc === svc);
+      return {
+        label: K.SVC[svc].l, ini: K.SVC[svc].ini, color: K.SVC[svc].c, count: this.tp('n_accounts', cs.length), has: cs.length > 0,
+        conns: cs.map((c) => {
+          const n = plCount[c.id] || 0; const st = this.statusOf(c);
+          return {
+            name: c.name, acct: c.acct, max: this.tr('max_x', { m: this.mode(c.max) }), stLabel: st.l, stCls: st.cls, exp: this.rel(c.expAt), pl: this.tp('n_placements', n), tips: this.tipH,
+            cls: 'conn' + (sel.kind === 'conn' && sel.id === c.id ? ' sel' : '') + (S.dragConn === c.id ? ' dragging' : ''),
+            select: () => this.select('conn', c.id), selAria: this.tr('inspect_conn', { name: c.name }),
+            hover: () => { if (S.hoverConn !== c.id) this.setState({ hoverConn: c.id }); }, unhover: () => this.setState({ hoverConn: null }),
+            dragStart: (e) => this.dragStart(e, c.id), dragEnd: () => this.setState({ dragConn: null, dropHover: null }),
+            placeIn: () => this.openPlaceAll(c.id), aria: this.tr('place_into', { name: c.name })
+          };
+        })
+      };
+    }).filter((g) => g.has);
+
+    // tree rows
+    const rows = [];
+    const walk = (id, depth) => {
+      const n = nodes[id]; const exp = !!S.expanded[id]; const hasC = n.children.length > 0; const isSel = sel.kind === 'node' && sel.id === id;
+      const dh = S.dropHover && S.dropHover.id === id ? (S.dropHover.ok ? ' drop-ok' : ' drop-no') : '';
+      const pills = n.type === 'role' ? pillsOf(id) : [];
+      rows.push({
+        name: n.name, typ: this.typeL(n.type), indent: 2 + depth * 20, hasC, noC: !hasC, exp, chevCls: 'ic chev' + (exp ? ' open' : ''), toggleLabel: this.tr(exp ? 'collapse_x' : 'expand_x', { name: n.name }),
+        cls: 'row t-' + n.type + (isSel ? ' sel' : '') + (n.type === 'role' && hlRoles.includes(id) ? ' hl' : '') + dh, cur: isSel ? 'true' : 'false',
+        sens: n.type === 'env' && !!n.sensitive, sensL: t.badge_sens, frz: n.set.frozen === true, frzL: t.badge_frozen, tips: this.tipH,
+        pills, hasPills: pills.length > 0, emptyRole: n.type === 'role' && pills.length === 0, emptyL: t.empty_role,
+        canAdd: n.type !== 'role', addLabel: n.type !== 'role' ? this.tr('add_child', { type: this.typeL(K.CHILD[n.type]), name: n.name }) : '',
+        canDel: n.type !== 'org', delLabel: this.tr('delete_x', { name: n.name }), renameTitle: t.rename_title, renameAria: t.rename_aria,
+        renaming: S.renaming === id, notRenaming: S.renaming !== id, renameVal: S.renameVal,
+        toggle: () => this.toggleNode(id), select: () => this.select('node', id), rename: () => this.startRename(id), key: (e) => this.rowKey(e, id),
+        add: () => this.addChild(id), del: () => this.askDelete(id),
+        dragOver: (e) => this.dragOver(e, id), drop: (e) => this.drop(e, id),
+        renameChange: (e) => this.setState({ renameVal: e.target.value }), renameKey: (e) => this.renameKey(e), renameBlur: () => this.commitRename()
+      });
+      if (exp) n.children.forEach((c) => walk(c, depth + 1));
+    };
+    walk('org', 0);
+
+    // map
+    let map = {};
+    if (S.view === 'map' && S.tab === 'tree') {
+      const L = this.mapLayout(nodes); let linksD = '', hlD = '';
+      Object.keys(L.pos).forEach((id) => {
+        const n = nodes[id]; if (!n.parent) return;
+        const a = L.pos[n.parent], b = L.pos[id];
+        const x1 = a.x + K.MW, y1 = a.y + K.MH / 2, x2 = b.x, y2 = b.y + K.MH / 2, mx = (x1 + x2) / 2;
+        const seg = 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2 + ' ';
+        if (hlSet[id]) hlD += seg; else linksD += seg;
+      });
+      const hc = hlConn ? this.conn(hlConn) : null;
+      map = Object.assign({}, this.mapH, {
+        w: Math.round(L.w), h: Math.round(L.h), tx: Math.round(S.map.tx), ty: Math.round(S.map.ty), k: S.map.k.toFixed(3), linksD, hlD: hlD || 'M0 0',
+        vpCls: 'mapvp' + (S.panning ? ' panning' : ''),
+        legend: hc ? this.tp('map_legend_hl', hlRoles.length, { name: hc.name }) : t.map_legend_none,
+        nodes: Object.keys(L.pos).map((id) => {
+          const n = nodes[id]; const isSel = sel.kind === 'node' && sel.id === id; const pills = n.type === 'role' ? pillsOf(id) : [];
+          const dh = S.dropHover && S.dropHover.id === id ? (S.dropHover.ok ? ' drop-ok' : ' drop-no') : '';
+          return {
+            x: Math.round(L.pos[id].x), y: Math.round(L.pos[id].y), name: n.name, typ: this.typeL(n.type), aria: this.typeL(n.type) + ' ' + this.path(nodes, id),
+            cls: 'mnode t-' + n.type + (isSel ? ' sel' : '') + (hlSet[id] && n.type === 'role' ? ' hl' : '') + dh, cur: isSel ? 'true' : 'false',
+            pills, hasPills: pills.length > 0, mixed: pills.some((p) => p.mixed), mixedL: (pills.find((p) => p.mixed) || {}).mixedL || t.mixed_l, mixedShow: (pills.find((p) => p.mixed) || {}).mixedShow || this.tipH.mixed, tips: this.tipH,
+            sens: n.type === 'env' && !!n.sensitive, sensL: t.badge_sens, frz: n.set.frozen === true && !(n.type === 'env' && n.sensitive), frzL: t.badge_frozen,
+            canAdd: n.type !== 'role', addLabel: n.type !== 'role' ? this.tr('add_child', { type: this.typeL(K.CHILD[n.type]), name: n.name }) : '',
+            select: () => this.select('node', id), add: () => this.addChild(id, true),
+            dragOver: (e) => this.dragOver(e, id), drop: (e) => this.drop(e, id)
+          };
+        })
+      });
+    }
+
+    // inspector
+    let role = {}, conn = {}, node = {}; let hasRole = false, hasConn = false, hasNode = false;
+    if (sel.kind === 'node' && nodes[sel.id] && nodes[sel.id].type === 'role') {
+      hasRole = true; const id = sel.id; const n = nodes[id]; const sens = this.isSens(nodes, id); const locked = !!this.frozenBy(nodes, id);
+      const dm = this.eff(nodes, id, 'mode'); const tv = this.computeTools(S, id); const p = this.path(nodes, id);
+      let sensEnv = null; { let x = nodes[id]; while (x) { if (x.type === 'env' && x.sensitive) { sensEnv = x.id; break; } x = nodes[x.parent]; } }
+      const pls = (S.placements[id] || []).map((pl) => {
+        const c = S.conns.find((x) => x.id === pl.conn); if (!c) return null;
+        const tools = S.tools[c.svc] || []; const key = id + '|' + c.id; const pk = S.picker && S.picker.key === key ? S.picker.list : null;
+        const chips = (arr, list) => arr.map((x) => ({ t: x, locked, aria: this.tr('remove_x', { x }), rm: () => list === 'open' ? this.setPl(id, c.id, (y) => { y.open = y.open.filter((z) => z !== x); }, 'a_close', { tool: x }) : this.pickToggle(id, c.id, list, x) }));
+        const over = (m) => M[m].r > M[c.max].r;
+        return {
+          name: c.name, ini: K.SVC[c.svc].ini, color: K.SVC[c.svc].c, prefix: c.prefix + '__*', mid: 'mode-' + id + '-' + c.id, tips: this.tipH,
+          mixed: this.isMixed(S, id, c.id), mixedL: this.mixedInfo(c).label, mixedShow: (e) => this.showTip(e, null, this.mixedInfo(c).text),
+          modeLbl: t.mode, modeVal: pl.mode || '', inhLabel: this.tr('inh_label', { m: this.mode(dm.v), from: dm.from === 'org' ? t.org_short : this.path(nodes, dm.from) }),
+          optR: this.mode('R'), optW: this.mode('W') + (over('W') ? t.over_rights : ''), optD: this.mode('D') + (over('D') ? t.over_rights : ''), disW: over('W'), disD: over('D'),
+          setMode: (e) => this.setPl(id, c.id, (x) => { x.mode = e.target.value || null; }, 'a_mode_changed', { name: c.name, m: e.target.value || null }),
+          hasClamp: !pl.mode && over(dm.v), clampNote: this.tr('clamp_note', { m: this.mode(dm.v), acct: c.acct, max: this.mode(c.max) }),
+          allowLbl: t.allow, denyLbl: t.deny, openLbl: t.opened, allL: t.all, noneL: t.none, noOpenL: t.no_open, editL: t.edit_list, closeL: t.close_list,
+          allow: chips(pl.allow, 'allow'), deny: chips(pl.deny, 'deny'), open: chips(pl.open, 'open'),
+          noAllow: pl.allow.length === 0, noDeny: pl.deny.length === 0, noOpen: pl.open.length === 0, showOpen: sens,
+          pickingAllow: pk === 'allow', pickingDeny: pk === 'deny', picking: !!pk,
+          pickTitle: this.tr(pk === 'allow' ? 'list_allow_t' : 'list_deny_t', { name: c.name }),
+          pickItems: pk ? tools.map((x) => { const on = pl[pk].includes(x.n); return { n: x.n, on, cls: 'pick' + (on ? ' on' : ''), ml: this.mode(x.m), mcls: x.m ? M[x.m].cls : 'm m-u', toggle: () => this.pickToggle(id, c.id, pk, x.n) }; }) : [],
+          pickAllow: () => this.setState({ picker: pk === 'allow' ? null : { key, list: 'allow' } }),
+          pickDeny: () => this.setState({ picker: pk === 'deny' ? null : { key, list: 'deny' } }),
+          closePick: () => this.setState({ picker: null }),
+          remove: () => this.removePl(id, c.id), rmAria: this.tr('remove_pl', { name: c.name }), selectConn: () => this.select('conn', c.id), locked
+        };
+      }).filter(Boolean);
+      const url = 'https://gw.monolith.example/p/' + p + '/mcp';
+      role = {
+        name: n.name, path: p, sens, locked, lockMsg: this.lockMsg(nodes, id), url,
+        copy: () => this.copy(url, 't_copied_url'),
+        tokHint: sensEnv ? this.tr('tok_hint_sens', { env: this.path(nodes, sensEnv) }) : t.tok_hint,
+        nVisL: this.tp('n_visible', tv.vis.length), nMaskL: this.tp('n_masked', tv.mask.length), vis: tv.vis, mask: tv.mask, showMaskList: S.showMasked && tv.mask.length > 0, noTools: tv.vis.length + tv.mask.length === 0,
+        pls, nPl: this.num(pls.length), noPl: pls.length === 0,
+        settings: this.buildSettings(nodes, id)
+      };
+    } else if (sel.kind === 'node' && nodes[sel.id]) {
+      hasNode = true; const id = sel.id; const n = nodes[id]; const fz = this.frozenBy(nodes, id);
+      const roles = this.rolesUnder(nodes, id).map((r) => ({ path: this.path(nodes, r), go: () => this.select('node', r), pills: pillsOf(r) }));
+      node = {
+        typ: this.typeL(n.type), name: n.name, path: n.type === 'org' ? t.root : this.path(nodes, id), isEnv: n.type === 'env', sens: !!n.sensitive, frz: n.set.frozen === true,
+        locked: !!fz, lockMsg: fz === id ? t.lock_self : this.lockMsg(nodes, id),
+        toggleSens: () => this.toggleSens(id), settings: this.buildSettings(nodes, id),
+        roles, nRoles: this.num(roles.length), noRoles: roles.length === 0, hasRoles: roles.length > 0,
+        canAdd: n.type !== 'role', addLabel: n.type !== 'role' ? this.tr('add_child_short', { type: this.typeL(K.CHILD[n.type]) }) : '', add: () => this.addChild(id)
+      };
+    } else if (sel.kind === 'conn' && this.conn(sel.id)) {
+      hasConn = true; const c = this.conn(sel.id); const st = this.statusOf(c); const uses = [];
+      Object.keys(S.placements).forEach((r) => { if (!nodes[r]) return; S.placements[r].forEach((pl) => { if (pl.conn === c.id) uses.push({ r, pl }); }); });
+      const clients = []; uses.forEach((u) => { const cl = this.clientOf(nodes, u.r); if (cl && !clients.includes(cl)) clients.push(cl); });
+      const sensUses = uses.filter((u) => this.isSens(nodes, u.r)).length;
+      conn = {
+        name: c.name, svcL: K.SVC[c.svc].l, ini: K.SVC[c.svc].ini, color: K.SVC[c.svc].c, acct: c.acct, max: this.mode(c.max), maxCls: M[c.max].cls, prefix: c.prefix + '__<tool>',
+        kind: this.tr('conn_kind', { svc: K.SVC[c.svc].l }), acctL: this.tr('acct_l', { acct: c.acct }),
+        auth: this.tr(K.SVC[c.svc].auth), stLabel: st.l, stCls: st.cls, exp: this.dShort(c.expAt) + ' · ' + this.rel(c.expAt), expired: c.status === 'expired',
+        tokNote: this.tp('tok_note', uses.length),
+        nUses: this.num(uses.length), noUses: uses.length === 0, hasUses: uses.length > 0,
+        mixed: sensUses > 0 && sensUses < uses.length,
+        uses: uses.map((u) => { const m = u.pl.mode || this.eff(nodes, u.r, 'mode').v; return { path: this.path(nodes, u.r), client: this.tr('client_x', { name: nodes[this.clientOf(nodes, u.r)].name }), sens: this.isSens(nodes, u.r), sensL: t.badge_sens, mode: this.mode(m), modeCls: M[m].cls, go: () => this.select('node', u.r), rm: () => this.removePl(u.r, c.id), aria: this.tr('remove_x', { x: this.path(nodes, u.r) }), locked: !!this.frozenBy(nodes, u.r) }; }),
+        cross: clients.length > 1, crossMsg: this.tr('cross_msg', { n: clients.length, names: clients.map((x) => nodes[x].name).join(', '), acct: c.acct }),
+        reauth: () => this.reauth(c.id), placeIn: () => this.openPlaceAll(c.id), revoke: () => this.setState({ dialog: { type: 'revoke', id: c.id } })
+      };
+    }
+
+    // drawer
+    const d = S.drawer; let drw = {};
+    if (d) {
+      const sv = K.SVC[d.svc]; const acct = d.acct.trim() || t.acct_default;
+      const scopes = { R: ['sc_read'], W: ['sc_read', 'sc_write'], D: ['sc_read', 'sc_write', 'sc_del'] }[d.scope];
+      drw = {
+        step1: d.step === 1, step2: d.step === 2, stepLabel: this.tr('step', { n: d.step }), svcL: sv.l, ini: sv.ini, color: sv.c, acct: d.acct, name: d.name, scope: d.scope,
+        asL: this.tr('connected_as', { acct }), nextL: this.tr('continue_to', { svc: sv.l }),
+        namePh: this.tr('name_ph', { acct: d.acct.trim() || t.acct_default }), hasErr: !!d.err, err: d.err,
+        svcs: K.ORDER.map((k) => ({ label: K.SVC[k].l, ini: K.SVC[k].ini, color: K.SVC[k].c, sub: this.tr('svc_sub', { auth: this.tr(K.SVC[k].auth), n: S.conns.filter((c) => c.svc === k).length }), on: d.svc === k, cls: 'svcopt' + (d.svc === k ? ' on' : ''), pick: () => this.setDrawer({ svc: k }) })),
+        setAcct: (e) => this.setDrawer({ acct: e.target.value, err: '' }), setName: (e) => this.setDrawer({ name: e.target.value, err: '' }), setScope: (e) => this.setDrawer({ scope: e.target.value }),
+        next: () => this.drawerNext(), back: () => this.setDrawer({ step: 1 }),
+        deny: () => { this.setDrawer({ step: 1 }); this.toast(this.tr('t_consent_denied', { svc: sv.l }), 'warn'); },
+        authorize: () => this.drawerAuthorize(), scopes: scopes.map((k) => ({ t: this.tr(k) }))
+      };
+    }
+
+    // dialogs
+    const dl = S.dialog; let pd = {}, cd = {};
+    if (dl && dl.type === 'place') {
+      const c = this.conn(dl.connId);
+      if (c) {
+        const cands = dl.cands.filter((r) => nodes[r]).map((r) => {
+          const info = this.candInfo(dl.connId, r);
+          return {
+            path: this.path(nodes, r), id: 'cand-' + r, checked: !!dl.checked[r] && !info.refuse, dis: !!info.refuse, cls: 'cand' + (info.refuse ? ' dis' : ''),
+            hasRefuse: !!info.refuse, refuse: info.refuse ? this.tr('refused_x', { r: info.refuse }) : '', hasCross: !!info.cross, cross: info.cross || '',
+            hasMixed: !!info.mixed, mixed: info.mixed || '', hasSens: !!info.sens, sens: info.sens || '',
+            toggle: () => { const ck = Object.assign({}, dl.checked); ck[r] = !ck[r]; this.setState({ dialog: Object.assign({}, dl, { checked: ck }) }); }
+          };
+        });
+        const chosen = dl.cands.filter((r) => nodes[r] && dl.checked[r] && !this.candInfo(dl.connId, r).refuse);
+        const over = (m) => M[m].r > M[c.max].r;
+        const sub = dl.subK === 'drop_on_sub' && nodes[dl.subP.node] ? this.tr('drop_on_sub', { type: this.typeL(nodes[dl.subP.node].type), path: this.path(nodes, dl.subP.node) }) : (dl.subK ? this.tr(dl.subK) : '');
+        pd = {
+          title: this.tr(dl.titleK, { name: c.name }), sub, hasSub: !!sub, cap: this.tr('place_cap', { name: c.name }), cands, mode: dl.mode,
+          optR: this.mode('R'), optW: this.mode('W') + (over('W') ? t.over_rights : ''), optD: this.mode('D') + (over('D') ? t.over_rights : ''), disW: over('W'), disD: over('D'),
+          setMode: (e) => this.setState({ dialog: Object.assign({}, dl, { mode: e.target.value }) }),
+          none: chosen.length === 0, confirmLabel: this.tp('place_n', chosen.length),
+          confirm: () => { if (chosen.length) this.doPlace(dl.connId, chosen, dl.mode); }
+        };
+      }
+    }
+    if (dl && dl.type === 'delete' && nodes[dl.id]) {
+      const ids = this.desc2(nodes, dl.id); const roles = this.rolesUnder(nodes, dl.id);
+      const npl = roles.reduce((a, r) => a + (S.placements[r] || []).length, 0); const ntok = S.tokens.filter((x) => ids.includes(x.node) && x.status === 'active').length;
+      cd = {
+        title: this.tr('del_title', { type: this.typeL(nodes[dl.id].type), name: nodes[dl.id].name }), body: this.tr('del_body', { path: this.path(nodes, dl.id) }),
+        items: [{ t: this.tp('del_desc', ids.length - 1) }, { t: this.tp('del_pl', npl) }, { t: this.tp('del_tok', ntok) }, { t: this.tp('del_url', roles.length) }],
+        label: t.delete, confirm: () => this.doDelete(dl.id)
+      };
+    }
+    if (dl && dl.type === 'revoke' && this.conn(dl.id)) {
+      const c = this.conn(dl.id); const n = plCount[c.id] || 0;
+      cd = { title: this.tr('rev_title', { name: c.name }), body: this.tr('rev_body', { svc: K.SVC[c.svc].l, acct: c.acct }), items: [{ t: this.tp('rev_pl', n) }, { t: t.rev_lose }], label: t.revoke, confirm: () => this.doRevoke(dl.id) };
+    }
+
+    // tokens tab
+    const flat = []; const fw = (id, depth) => { const n = nodes[id]; if (n.type !== 'org') flat.push({ id, depth }); n.children.forEach((c) => fw(c, depth + (n.type === 'org' ? 0 : 1))); }; fw('org', 0);
+    const tokNode = nodes[S.tokNode] ? S.tokNode : 'mpx';
+    const tokTtlE = this.eff(nodes, tokNode, 'ttl');
+    const tc = this.tokenCheck(S, S.tokens.find((x) => x.id === S.testTok), S.testRole);
+    const tokens = S.tokens.map((x) => ({ label: x.label, path: nodes[x.node] ? this.path(nodes, x.node) : t.deleted_node, issued: this.dShort(x.issuedAt), exp: x.status === 'active' ? this.rel(x.expAt) : this.dShort(x.expAt), last4: x.last4, active: x.status === 'active', stLabel: this.tr(x.status === 'active' ? 'tok_active' : 'tok_revoked'), stCls: x.status === 'active' ? 'res res-ok' : 'res res-no', revoke: () => this.revokeToken(x.id), revokeL: t.revoke_btn }));
+    const nt = S.newTok;
+
+    // audit
+    const q = S.auditQ.trim().toLowerCase();
+    const auditRows = S.audit.map((a) => ({ a, why: this.auditWhy(a), who: a.who === '@op' ? t.operator : a.who, path: this.auditPath(a.path) }))
+      .filter((x) => (S.auditRes === 'all' || x.a.res === S.auditRes) && (!q || (x.path + ' ' + x.a.tool + ' ' + x.who + ' ' + x.why).toLowerCase().includes(q)))
+      .map((x) => ({ t: this.dStamp(x.a.ts), who: x.who, path: x.path, tool: x.a.tool, why: x.why || '—', resL: this.tr(x.a.res === 'ok' ? 'res_ok' : x.a.res === 'refus' ? 'res_refus' : 'res_admin'), cls: x.a.res === 'ok' ? 'res res-ok' : x.a.res === 'refus' ? 'res res-no' : 'res res-adm' }));
+
+    // stats
+    const agg = {}; const calc = (id) => { const n = nodes[id]; let c = 0, r = 0; if (n.type === 'role') { const st = S.stats[id] || [0, 0]; c = st[0]; r = st[1]; } n.children.forEach((ch) => { const x = calc(ch); c += x[0]; r += x[1]; }); agg[id] = [c, r]; return [c, r]; };
+    calc('org');
+    const maxC = Math.max.apply(null, [1].concat(flat.map((f) => agg[f.id][0])));
+    let pf = null; try { pf = new Intl.NumberFormat(lang, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }); } catch (e) { pf = null; }
+    const statRows = flat.map((f) => { const c = agg[f.id][0], r = agg[f.id][1]; const rate = c ? r / c * 100 : 0; const n = nodes[f.id]; return { name: n.name, typ: this.typeL(n.type), nameCls: n.type === 'role' ? 'mono' : '', indent: f.depth * 20, calls: this.num(c), rate: c ? (pf ? pf.format(rate / 100) : rate.toFixed(1) + ' %') : '—', pct: Math.max(c ? 1 : 0, Math.round(c / maxC * 100)), lv: rate < 2 ? 'lv0' : rate < 6 ? 'lv1' : 'lv2', go: () => this.select('node', f.id) }; });
+
+    // tools tab
+    const catalog = K.ORDER.map((svc) => {
+      const list = (S.tools[svc] || []).filter((x) => S.toolsAll || !x.m);
+      const todo = (S.tools[svc] || []).filter((x) => !x.m).length;
+      return {
+        label: K.SVC[svc].l, ini: K.SVC[svc].ini, color: K.SVC[svc].c, todo: this.tr('n_todo', { todo: this.num(todo), n: this.num(S.tools[svc].length) }), show: list.length > 0,
+        tools: list.map((x) => ({ n: x.n, d: this.desc(svc, x.n), grouped: x.g, groupedL: t.grouped, tips: this.tipH, cls: 'toolrow' + (!x.m ? ' todo' : ''), aria: this.tr('annot_of', { tool: x.n }), lR: this.mode('R'), lW: this.mode('W'), lD: this.mode('D'), cR: x.m === 'R' ? 'on' : '', cW: x.m === 'W' ? 'on' : '', cD: x.m === 'D' ? 'on' : '', pR: x.m === 'R', pW: x.m === 'W', pD: x.m === 'D', setR: () => this.classify(svc, x.n, 'R'), setW: () => this.classify(svc, x.n, 'W'), setD: () => this.classify(svc, x.n, 'D') }))
+      };
+    }).filter((g) => g.show);
+
+    let pa = {};
+    if (dl && dl.type === 'pickacct' && nodes[dl.node]) {
+      const sv = K.SVC[dl.svc];
+      pa = { title: this.tr('pick_acct_t', { svc: sv.l }), cap: this.tr('pick_acct_cap', { path: this.path(nodes, dl.node) }),
+        items: S.conns.filter((c) => c.svc === dl.svc).map((c) => { const ck = this.dropCheck(c.id, dl.node); return { name: c.name, ini: sv.ini, color: sv.c, max: this.mode(c.max), maxCls: M[c.max].cls, dis: !ck.ok, sub: ck.ok ? c.acct + ' · ' + this.tp('n_placements', plCount[c.id] || 0) : ck.msg, pick: () => { this.setState({ dialog: null }); this.tryPlace(c.id, dl.node); } }; }) };
+    }
+    let mx = {};
+    if (dl && dl.type === 'mixed' && this.conn(dl.connId)) {
+      const toProd = dl.roles.some((r) => nodes[r] && this.isSens(nodes, r));
+      const c = this.conn(dl.connId); const others = this.usesOf(S, c.id).filter((r) => !dl.roles.includes(r)).map((r) => this.path(nodes, r)).join(', ') || '—';
+      mx = {
+        explain: this.tr('mx_explain', { name: c.name, acct: c.acct }), roles: this.tr('mx_roles', { paths: dl.roles.filter((r) => nodes[r]).map((r) => this.path(nodes, r)).join(', '), others }),
+        ack: !!dl.ack, notAck: !dl.ack, toggleAck: () => this.setState({ dialog: Object.assign({}, dl, { ack: !dl.ack }) }),
+        go: () => { if (dl.ack) this.doPlace(dl.connId, dl.roles, dl.mode, true); },
+        reco: this.tr(toProd ? 'mx_reco' : 'mx_reco_dev'), recoBtn: this.tr(toProd ? 'mx_reco_btn' : 'mx_reco_btn_dev'),
+        dedicated: () => this.setState({ dialog: null, drawer: { step: 1, svc: c.svc, acct: c.acct, name: this.suffixed(c.name, toProd ? '-prod' : '-dev'), scope: toProd ? 'R' : (this.eff(nodes, dl.roles[0], 'mode').v || 'W'), err: '' } }),
+        key: (e) => this.trapKey(e)
+      };
+    }
+    const libTipTxt = this.tr('shortcut', { label: this.tr(S.libC ? 'expand_lib' : 'collapse_lib'), key: '[' });
+    const inspTipTxt = this.tr('shortcut', { label: this.tr(S.inspC ? 'expand_insp' : 'collapse_insp'), key: ']' });
+    const railSvcs = K.ORDER.map((svc) => { const n = S.conns.filter((c) => c.svc === svc).length; if (!n) return null; const label = this.tr('rail_svc', { svc: K.SVC[svc].l, count: this.tp('n_accounts', n) }); return { ini: K.SVC[svc].ini, color: K.SVC[svc].c, n: this.num(n), label, tip: (e) => this.showTip(e, null, label), hide: this.tipH.hide, open: () => this.toggleLib(), dragStart: (e) => this.dragStartSvc(e, svc), dragEnd: () => this.setState({ dragSvc: null, dropHover: null }) }; }).filter(Boolean);
+    const esc = (e) => { if (e.key === 'Escape') { e.stopPropagation(); this.setState({ dialog: null }); } };
+    const tip = S.tip ? { x: S.tip.x, y: S.tip.y, text: S.tip.text || this.tr('tip_' + S.tip.key) } : {};
+    return {
+      t, lang, langs, tips: this.tipH, mapRef: this.mapRef,
+      mainCls: 'main' + (S.libC ? ' lc' : '') + (S.inspC ? ' rc' : ''), appKey: (e) => this.appKey(e), toggleLib: () => this.toggleLib(), toggleInsp: () => this.toggleInsp(),
+      libTipTxt, inspTipTxt, libTipShow: (e) => this.showTip(e, null, libTipTxt), inspTipShow: (e) => this.showTip(e, null, inspTipTxt), connTipShow: (e) => this.showTip(e, null, this.tr('connect_long')),
+      railSvcs, dlgMixed: !!(dl && dl.type === 'mixed' && mx.explain), mx, dlgAcct: !!(dl && dl.type === 'pickacct' && pa.title), pa,
+      themeCls: theme, themeLabel: theme === 'dark' ? t.theme_light : t.theme_dark, themeAria: theme === 'dark' ? t.theme_to_light : t.theme_to_dark,
+      toggleTheme: () => { const x = theme === 'dark' ? 'light' : 'dark'; try { window.localStorage.setItem('hullgate-theme', x); } catch (e) { } this.setState({ theme: x }); },
+      tabs, isTree: S.tab === 'tree', isTokens: S.tab === 'tokens', isTools: S.tab === 'tools', isAudit: S.tab === 'audit', isStats: S.tab === 'stats',
+      leftOpen: S.leftOpen, rightOpen: S.rightOpen, leftCls: 'col col-left' + (S.leftOpen ? ' open' : ''), rightCls: 'col col-right' + (S.rightOpen ? ' open' : ''),
+      toggleLeft: () => this.setState({ leftOpen: !S.leftOpen, rightOpen: false }), toggleRight: () => this.setState({ rightOpen: !S.rightOpen, leftOpen: false }),
+      libCount: this.num(S.conns.length), groups, openConnect: () => this.openConnect(), rows,
+      isList: S.view !== 'map', isMap: S.view === 'map', map, viewHint: S.view === 'map' ? t.hint_map : t.hint_list, inspSub: '',
+      vList: { cls: S.view !== 'map' ? 'on' : '', on: S.view !== 'map', go: () => this.setView('list') }, vMap: { cls: S.view === 'map' ? 'on' : '', on: S.view === 'map', go: () => this.setView('map') },
+      noInsp: !hasRole && !hasConn && !hasNode, hasRole, hasConn, hasNode, role, conn, node,
+      showMasked: S.showMasked, toggleMasked: () => this.setState({ showMasked: !S.showMasked }),
+      selectAll: (e) => { try { e.target.select(); } catch (x) { } },
+      drawerOpen: !!d, drw, closeDrawer: () => this.setState({ drawer: null }), escDrawer: (e) => { if (e.key === 'Escape') this.setState({ drawer: null }); },
+      dlgPlace: !!(dl && dl.type === 'place' && pd.title), pd, dlgConfirm: !!(dl && (dl.type === 'delete' || dl.type === 'revoke') && cd.title), cd,
+      closeDialog: () => this.setState({ dialog: null }), escDialog: esc,
+      hasNewTok: !!nt, newTok: nt ? { value: nt.value, title: this.tr('tok_issued_t', { label: nt.label }), sub: this.tr('tok_issued_sub', { path: nodes[nt.node] ? this.path(nodes, nt.node) : '—' }) } : {},
+      copyNewTok: () => this.copy(nt ? nt.value : '', 't_copied_tok'),
+      hideNewTok: () => { this.setState({ newTok: null }); this.toast(this.tr('t_hidden_tok'), 'info'); },
+      tokLabel: S.tokLabel, setTokLabel: (e) => this.setState({ tokLabel: e.target.value }),
+      tokNodes: flat.map((f) => { const n = nodes[f.id]; const on = f.id === tokNode; return { name: n.name, typ: this.typeL(n.type), indent: 6 + f.depth * 16, sens: n.type === 'env' && !!n.sensitive, sensL: t.badge_sens, on, cls: 'np' + (on ? ' on' : ''), pick: () => this.setState({ tokNode: f.id }) }; }),
+      tokTtl: this.tr('tok_ttl', { ttl: this.ttl(tokTtlE.v), src: tokTtlE.from === tokNode ? t.ttl_here : this.tr('mode_inh_from', { from: this.originName(nodes, tokTtlE.from) }) }),
+      emitLabel: this.tr('emit_on', { path: this.path(nodes, tokNode) }), emitToken: () => this.emitToken(),
+      testToks: S.tokens.filter((x) => x.status === 'active').map((x) => ({ label: x.label, path: nodes[x.node] ? this.path(nodes, x.node) : '—', on: x.id === S.testTok, cls: 'np' + (x.id === S.testTok ? ' on' : ''), pick: () => this.setState({ testTok: x.id }) })),
+      testRoles: this.rolesUnder(nodes, 'org').map((r) => ({ path: this.path(nodes, r), sens: this.isSens(nodes, r), sensL: t.badge_sens, on: r === S.testRole, cls: 'np' + (r === S.testRole ? ' on' : ''), pick: () => this.setState({ testRole: r }) })),
+      testMsg: tc.msg, testCls: 'note ' + (tc.ok ? 'info' : 'err'), tokens,
+      catalog, noTodo: !S.toolsAll && todoN === 0, toolsAll: S.toolsAll, toggleToolsAll: () => this.setState({ toolsAll: !S.toolsAll }),
+      auditRes: S.auditRes, setAuditRes: (e) => this.setState({ auditRes: e.target.value }), auditQ: S.auditQ, setAuditQ: (e) => this.setState({ auditQ: e.target.value }),
+      auditRows, auditEmpty: auditRows.length === 0, auditCount: this.tp('n_entries', auditRows.length),
+      statRows, statTotal: this.tr('stats_total', { calls: this.num(agg.org[0]), ref: this.num(agg.org[1]) }),
+      tipDescs: K.TIPS.map((k) => ({ id: 'tipd-' + k, text: this.tr('tip_' + k) })), hasTip: !!S.tip, tip,
+      hasToast: !!S.toast, toastMsg: S.toast ? S.toast.msg : '', toastCls: 'toast ' + (S.toast ? S.toast.kind : '')
+    };
+  }
+}
+</script>
+</body>
+</html>

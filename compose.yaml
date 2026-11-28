@@ -1,0 +1,31 @@
+# Development composition (session): same image and same constraints as production,
+# ports published on 127.0.0.1 only, without Traefik.  docker compose up --build
+name: hullgate-dev
+
+services:
+  hullgate:
+    image: hullgate:dev
+    build: .
+    read_only: true
+    environment:
+      PUBLIC_URL: http://127.0.0.1:4790
+      ADMIN_URL: http://localhost:4791 # F-016: a hostname, not an IP (BR-202)
+    # Throwaway session secrets (F-005): `python -m hullgate.keys signing-key secrets/signing_key`
+    # and `... totp-secret secrets/authorize_totp`, then chmod 0444 (read by UID 10001).
+    secrets:
+      - signing_key
+      - authorize_totp
+    volumes:
+      - data:/data
+    ports:
+      - "127.0.0.1:4790:4790"
+      - "127.0.0.1:4791:4791"
+
+volumes:
+  data:
+
+secrets:
+  signing_key:
+    file: ./secrets/signing_key
+  authorize_totp:
+    file: ./secrets/authorize_totp

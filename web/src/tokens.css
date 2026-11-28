@@ -1,0 +1,280 @@
+/* Console tokens (F-016 §8): colours and spacing copied from the validated prototype (#18) as
+   project values; no file of design/amaterasu/ is used (#41). Dark by default. Fonts are
+   self-hosted from @fontsource packages, under the SIL Open Font License (web/FONTS.md). */
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --surface-0: #0a1a2a;
+  --surface-1: #0d2033;
+  --surface-2: #11283e;
+  --hover: #15304a;
+  --text: #e6edf6;
+  --title: #e8efff;
+  --muted: #a3b2c8;
+  --faint: #8e9db4;
+  --rule: #1f3a55;
+  --cyan: #84cdee;
+  --primary: #579dc0;
+  --primary-h: #75cdd6;
+  --on-primary: #0a1a2a;
+  --danger: #f4a29b;
+  --ok: #75d6a5;
+  --warn: #f2b866;
+  --warn-bg: #2a2110;
+  --warn-bd: #5a4418;
+  --focus: #84cdee;
+  --scrim: rgb(5 12 20 / 70%);
+  --ok-bg: #12352a;
+  --danger-bg: #3a1c1c;
+  --info-bg: #12304a;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --surface-0: #f4f6fb;
+  --surface-1: #ffffff;
+  --surface-2: #f4f6fb;
+  --hover: #eef1f8;
+  --text: #0b1020;
+  --title: #0b1020;
+  --muted: #4a5a78;
+  --faint: #56657f;
+  --rule: #d7dee9;
+  --cyan: #2f93bd;
+  --primary: #1b2978;
+  --primary-h: #24359a;
+  --on-primary: #ffffff;
+  --danger: #b42318;
+  --ok: #146c43;
+  --warn: #8a4b00;
+  --warn-bg: #fff4e0;
+  --warn-bd: #eccb8f;
+  --focus: #1b2978;
+  --scrim: rgb(11 16 32 / 40%);
+  --ok-bg: #dcf3e6;
+  --danger-bg: #fde4e1;
+  --info-bg: #e6f2fa;
+}
+
+:root {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --radius: 6px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--surface-0);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+input {
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-4);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--primary-h);
+}
+
+.ghost {
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: var(--space-1) var(--space-3);
+}
+
+.notice {
+  color: var(--danger);
+  margin: 0 0 var(--space-4);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* Slice 2: shared pieces of the screens (dialogs, forms, badges, notices). */
+
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+}
+
+textarea {
+  resize: vertical;
+}
+
+fieldset {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+}
+
+legend {
+  color: var(--muted);
+  padding: 0 var(--space-1);
+}
+
+a {
+  color: var(--cyan);
+}
+
+a.button {
+  display: inline-block;
+  text-decoration: none;
+  color: var(--text);
+}
+
+ul.plain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.danger {
+  background: none;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-4);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+
+.small {
+  font-size: 0.8rem;
+  padding: 2px var(--space-2);
+}
+
+.link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--cyan);
+  text-align: left;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.hint {
+  color: var(--faint);
+  font-size: 0.85rem;
+}
+
+.ok {
+  color: var(--ok);
+  margin: 0 0 var(--space-3);
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.badge.sens {
+  color: var(--warn);
+  border-color: var(--warn-bd);
+}
+
+.badge.lock {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stack > label:not(.check) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.check {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

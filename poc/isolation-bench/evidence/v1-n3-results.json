@@ -1,0 +1,106 @@
+[
+ {
+  "contrôle": "nominal_grant_ping",
+  "tenu": true,
+  "token_http": 200,
+  "ping": 200
+ },
+ {
+  "contrôle": "S1_revoke_refresh_coffre_en_panne_503",
+  "tenu": true,
+  "http": 503,
+  "erreur": "temporarily_unavailable"
+ },
+ {
+  "contrôle": "S1_revoke_access_coffre_en_panne_503",
+  "tenu": true,
+  "http": 503,
+  "erreur": "temporarily_unavailable"
+ },
+ {
+  "contrôle": "S1_cli_revoke_coffre_en_panne_code_1",
+  "tenu": true,
+  "code": 1
+ },
+ {
+  "contrôle": "S1_refresh_coffre_en_panne_aucun_jeton",
+  "tenu": true,
+  "http": 503,
+  "erreur": "temporarily_unavailable"
+ },
+ {
+  "contrôle": "S1_point_d_acces_coffre_en_panne_503",
+  "tenu": true,
+  "http": 503
+ },
+ {
+  "contrôle": "S1_apres_retour_jeton_intact_non_revoque_par_un_503",
+  "tenu": true,
+  "http": 200
+ },
+ {
+  "contrôle": "S1_apres_retour_refresh_non_consomme",
+  "tenu": true,
+  "http": 200,
+  "erreur": null
+ },
+ {
+  "contrôle": "rotation_ancien_jeton_401",
+  "tenu": true,
+  "ancien": 401,
+  "nouveau": 200
+ },
+ {
+  "contrôle": "S2_point_d_acces_verrou_tenu_503_ferme_par_defaut",
+  "tenu": true,
+  "http": 503
+ },
+ {
+  "contrôle": "S2_revoke_refresh_ecriture_en_echec_503",
+  "tenu": true,
+  "http": 503,
+  "erreur": "temporarily_unavailable",
+  "delai_s": 1.0
+ },
+ {
+  "contrôle": "S2_revoke_access_ecriture_en_echec_503",
+  "tenu": true,
+  "http": 503,
+  "erreur": "temporarily_unavailable",
+  "delai_s": 1.0
+ },
+ {
+  "contrôle": "S2_cli_revoke_ecriture_en_echec_code_1",
+  "tenu": true,
+  "code": 1
+ },
+ {
+  "contrôle": "S2_refresh_ecriture_en_echec_aucun_jeton",
+  "tenu": true,
+  "http": 503,
+  "erreur": "temporarily_unavailable",
+  "delai_s": 1.0
+ },
+ {
+  "info": "S2_apres_verrou_ancien_jeton_d_acces",
+  "http": 200
+ },
+ {
+  "info": "S2_apres_verrou_refresh_r2",
+  "http": 200,
+  "erreur": null,
+  "jeton_delivre": true
+ },
+ {
+  "contrôle": "nominal_revoke_200_puis_401",
+  "tenu": true,
+  "revoke_http": 200,
+  "ping": 401
+ },
+ {
+  "contrôle": "journal_sans_jeton",
+  "tenu": true,
+  "lignes": 17,
+  "jwt_trouves": 0
+ }
+]

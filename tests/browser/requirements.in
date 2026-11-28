@@ -1,0 +1,7 @@
+# Runner of tests/browser (F-016, BR-035 v2): installed with --require-hashes into the pinned
+# Playwright image, whose browsers are those of this exact Playwright version. Regenerate
+# requirements.txt with:
+#   uv pip compile --generate-hashes --python-version 3.12 --no-header \
+#     tests/browser/requirements.in -o tests/browser/requirements.txt
+playwright==1.65.0
+pytest==9.2.0

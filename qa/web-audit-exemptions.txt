@@ -1,0 +1,6 @@
+# Exemptions of the console lockfile audit (F-016, BR-231), same form as audit-exemptions.txt.
+# One line per exemption: <identifier> <YYYY-MM-DD> <reason>
+#   identifier: the one the audit reports (GHSA-…, or npm's advisory number);
+#   date: last day the exemption holds (UTC); expired, it fails the audit;
+#   reason: one sentence, required.
+# Empty lines and lines starting with # are ignored.

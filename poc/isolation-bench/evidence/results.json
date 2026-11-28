@@ -1,0 +1,707 @@
+{
+  "meta": {
+    "date_utc": "2026-10-27T17:53:15+00:00",
+    "dev_mode": false,
+    "partial_run": false,
+    "images": {
+      "contextforge": "ghcr.io/ibm/mcp-context-forge@sha256:7eb21fb9a8070df59435c03c76c40d8c71230c55ba89f884f2482d2cc81cff1c",
+      "postgres": "postgres@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b",
+      "upstream": "python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2"
+    },
+    "contextforge_version": "1.1.0",
+    "bench_commit": "3f0a593ad985f1c81e20bcb1b20a4f7a93fc931e",
+    "config_dirty": false,
+    "config_sha256_start": {
+      "policy.json": "4e4378dc2af99b4f9e73d368bf40de7a2d6e10e66ffe2b58367009b3b7575198",
+      "cf.env": "87523986f10aa83ab2bfe9ec98be80afd4d7bd4eeccc49f8af74e09f165d7cdd",
+      "compose.yaml": "a6a4bbd19762e190696b714a0bd6b5de7ab9509053a8b466aa7591498d55f997"
+    },
+    "config_unchanged_during_run": true,
+    "first_commit_of_config_files": {
+      "policy.json": "1e36d9ac8b6f4be9131b48c959ba53860dabc68f 2026-10-27T17:26:17Z",
+      "cf.env": "1e36d9ac8b6f4be9131b48c959ba53860dabc68f 2026-10-27T17:26:17Z",
+      "compose.yaml": "1e36d9ac8b6f4be9131b48c959ba53860dabc68f 2026-10-27T17:26:17Z"
+    },
+    "policy": {
+      "_comment": "Politiques de la recette fixées avant elle (F-001, BR-011). Refus des demandes ambiguës et refus par défaut en panne du coffre : politiques de la spécification de la passerelle. Délai de coupure de 60 s : choix du banc, la spécification n'en fixe aucun ; il respecte la borne de BR-011 (strictement inférieur à la durée de vie du jeton d'accès). Tout changement en cours de recette invalide la recette.",
+      "ambiguous_requests": "refuse",
+      "store_outage": "deny_protected_operations",
+      "cutoff_seconds": 60,
+      "access_token_lifetime_seconds": 86400,
+      "contextforge_config_files": [
+        "cf.env",
+        "compose.yaml"
+      ]
+    }
+  },
+  "tests": [
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "http": 200,
+          "compte": "witness-1",
+          "verdict": "HTTP 200"
+        }
+      ],
+      "journal": {
+        "count": 5,
+        "by_component_account": {
+          "mcp:witness-1": 5
+        },
+        "calls": [
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp whoami 200",
+          "mcp witness-1 /mcp tools/list 200"
+        ]
+      },
+      "reason": "",
+      "id": "T01",
+      "title": "Access token A sur A, action autorisée",
+      "seconds": 1.8
+    },
+    {
+      "result": "échoué",
+      "observed": [
+        {
+          "variante": "jeton A sur profil B",
+          "status": 403,
+          "www-authenticate": "",
+          "body": "{\"detail\":\"Access denied\"}",
+          "attendu_401_invalid_token": false
+        },
+        {
+          "variante": "jeton A, tools/list sur B",
+          "status": 403,
+          "www-authenticate": "",
+          "body": "{\"detail\":\"Access denied\"}"
+        },
+        {
+          "variante": "jeton A, point d'accès /rpc, outil de B",
+          "status": 200,
+          "www-authenticate": "",
+          "body": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32601,\"message\":\"Tool not found: conn-2-whoami\"},\"id\":4}"
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "refus et journal vide, mais la réponse n'est pas 401 invalid_token comme exigé (HTTP 403)",
+      "id": "T02",
+      "title": "Access token A sur B",
+      "seconds": 1.1
+    },
+    {
+      "result": "non jouable",
+      "reason": "« refresh token de A avec ressource B » exige un serveur d'autorisation pour les clients MCP ; le produit n'en offre pas",
+      "proof": {
+        "openapi_path_count": 300,
+        "authorization_server_paths_in_openapi": [
+          "/v1/auth/email/register",
+          "/v1/catalog/{catalog_id}/register"
+        ],
+        "oauth_paths_in_openapi": [
+          "/oauth/authorize/{gateway_id}",
+          "/oauth/callback",
+          "/oauth/fetch-tools/{gateway_id}",
+          "/oauth/registered-clients",
+          "/oauth/registered-clients/{client_id}",
+          "/oauth/registered-clients/{gateway_id}",
+          "/oauth/status",
+          "/oauth/status/{gateway_id}"
+        ],
+        "probes": {
+          "/.well-known/oauth-authorization-server": 404,
+          "/.well-known/openid-configuration": 404,
+          "/token": 404,
+          "/authorize": 404,
+          "/oauth/token": 404,
+          "/register": 404,
+          "/oauth/register": 404
+        },
+        "version": "1.1.0"
+      },
+      "id": "T03",
+      "title": "Refresh token A avec ressource B",
+      "seconds": 1.4
+    },
+    {
+      "result": "non jouable",
+      "reason": "« refresh token de A sans resource ou avec A+B » exige un serveur d'autorisation pour les clients MCP ; le produit n'en offre pas",
+      "proof": {
+        "openapi_path_count": 300,
+        "authorization_server_paths_in_openapi": [
+          "/v1/auth/email/register",
+          "/v1/catalog/{catalog_id}/register"
+        ],
+        "oauth_paths_in_openapi": [
+          "/oauth/authorize/{gateway_id}",
+          "/oauth/callback",
+          "/oauth/fetch-tools/{gateway_id}",
+          "/oauth/registered-clients",
+          "/oauth/registered-clients/{client_id}",
+          "/oauth/registered-clients/{gateway_id}",
+          "/oauth/status",
+          "/oauth/status/{gateway_id}"
+        ],
+        "probes": {
+          "/.well-known/oauth-authorization-server": 404,
+          "/.well-known/openid-configuration": 404,
+          "/token": 404,
+          "/authorize": 404,
+          "/oauth/token": 404,
+          "/register": 404,
+          "/oauth/register": 404
+        },
+        "version": "1.1.0"
+      },
+      "id": "T04",
+      "title": "Refresh A sans resource ou avec A+B",
+      "seconds": 0.9
+    },
+    {
+      "result": "échoué",
+      "observed": [
+        {
+          "variante": "aud = [audience du produit, ressource B]",
+          "claims_aud": [
+            "mcpgateway-api",
+            "http://localhost:14444/servers/fc6d3d61888f44c7aee028881bfa8cee/mcp"
+          ],
+          "status": 200,
+          "www-authenticate": "",
+          "body": "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{\"content\":[{\"text\":\"{\\\"account\\\": \\\"witness-1\\\"}\",\"type\":\"text\"}],\"isError\":false}}"
+        },
+        {
+          "variante": "aud = [ressource A, ressource B]",
+          "claims_aud": [
+            "http://localhost:14444/servers/eac122cee7c74dac8a4bac6385e34d02/mcp",
+            "http://localhost:14444/servers/fc6d3d61888f44c7aee028881bfa8cee/mcp"
+          ],
+          "status": 401,
+          "www-authenticate": "Bearer",
+          "body": "{\"detail\":\"Invalid authentication credentials\"}"
+        }
+      ],
+      "journal": {
+        "count": 5,
+        "by_component_account": {
+          "mcp:witness-1": 5
+        },
+        "calls": [
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp whoami 200",
+          "mcp witness-1 /mcp tools/list 200"
+        ]
+      },
+      "reason": "au moins une demande n'a pas été refusée; 5 entrée(s) dans le journal amont après le refus (BR-002)",
+      "id": "T05",
+      "title": "Jeton à audiences A et B",
+      "seconds": 1.5
+    },
+    {
+      "result": "échoué",
+      "observed": [
+        {
+          "variante": "signature invalide",
+          "status": 401,
+          "www-authenticate": "Bearer",
+          "body": "{\"detail\":\"Invalid authentication credentials\"}"
+        },
+        {
+          "variante": "émetteur invalide",
+          "status": 401,
+          "www-authenticate": "Bearer",
+          "body": "{\"detail\":\"Invalid authentication credentials\"}"
+        },
+        {
+          "variante": "jeton expiré",
+          "status": 401,
+          "www-authenticate": "Bearer",
+          "body": "{\"detail\":\"Invalid authentication credentials\"}"
+        },
+        {
+          "variante": "ID token à la place d'un access token",
+          "status": 200,
+          "www-authenticate": "",
+          "body": "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{\"content\":[{\"text\":\"{\\\"account\\\": \\\"witness-1\\\"}\",\"type\":\"text\"}],\"isError\":false}}"
+        },
+        {
+          "contrôle_hors_verdict": "jeton sans jti seul (type inchangé)",
+          "status": 401,
+          "www-authenticate": "Bearer",
+          "body": "{\"detail\":\"Invalid authentication credentials\"}"
+        }
+      ],
+      "journal": {
+        "count": 5,
+        "by_component_account": {
+          "mcp:witness-1": 5
+        },
+        "calls": [
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp whoami 200",
+          "mcp witness-1 /mcp tools/list 200"
+        ]
+      },
+      "reason": "au moins une demande n'a pas été refusée; 5 entrée(s) dans le journal amont après le refus (BR-002)",
+      "id": "T06",
+      "title": "Signature, émetteur ou expiration invalides",
+      "seconds": 1.6
+    },
+    {
+      "result": "échoué",
+      "observed": [
+        {
+          "variante": "outil de la connexion B appelé depuis A",
+          "verdict": "refus",
+          "detail": "isError: Unknown tool: conn-2-whoami",
+          "compte": null
+        },
+        {
+          "variante": "argument connection_id = identifiant de B",
+          "verdict": "ok",
+          "detail": "HTTP 200",
+          "compte": "witness-1"
+        },
+        {
+          "variante": "en-tête X-Connection-Id = identifiant de B",
+          "verdict": "ok",
+          "detail": "HTTP 200",
+          "compte": "witness-1"
+        },
+        {
+          "variante": "paramètre de requête connection_id = identifiant de B",
+          "verdict": "ok",
+          "detail": "HTTP 200",
+          "compte": "witness-1"
+        }
+      ],
+      "journal": {
+        "count": 15,
+        "by_component_account": {
+          "mcp:witness-1": 15
+        },
+        "calls": [
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp whoami 200",
+          "mcp witness-1 /mcp tools/list 200",
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp whoami 200",
+          "mcp witness-1 /mcp tools/list 200",
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200"
+        ]
+      },
+      "reason": "au moins une demande n'a pas été refusée; 15 entrée(s) dans le journal amont après le refus (BR-002)",
+      "id": "T07",
+      "title": "Appel depuis A avec connection_id de B",
+      "seconds": 2.1
+    },
+    {
+      "result": "échoué",
+      "observed": [
+        {
+          "variante": "U1 fournit l'identifiant de connexion de U2 (argument)",
+          "verdict": "ok",
+          "detail": "HTTP 200",
+          "compte": "witness-1"
+        },
+        {
+          "variante": "outil de la connexion de U2 appelé par U1",
+          "verdict": "refus",
+          "detail": "isError: Unknown tool: conn-u2-whoami"
+        },
+        {
+          "variante": "U1 lit la connexion de U2 par l'API d'administration",
+          "http": 403
+        }
+      ],
+      "journal": {
+        "count": 5,
+        "by_component_account": {
+          "mcp:witness-1": 5
+        },
+        "calls": [
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp whoami 200",
+          "mcp witness-1 /mcp tools/list 200"
+        ]
+      },
+      "reason": "au moins une demande n'a pas été refusée; 5 entrée(s) dans le journal amont après le refus (BR-002)",
+      "id": "T08",
+      "title": "U1 fournit un identifiant de connexion U2",
+      "seconds": 1.5
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "outil masqué présent dans tools/list",
+          "present": false,
+          "outils_génériques_listés": []
+        },
+        {
+          "variante": "appel direct de l'outil masqué",
+          "verdict": "refus",
+          "detail": "isError: Unknown tool: conn-1-hidden-admin"
+        },
+        {
+          "variante": "appel direct par /rpc",
+          "verdict": "refus",
+          "detail": "JSON-RPC error -32601 Tool not found: conn-1-hidden-admin"
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T09",
+      "title": "Outil masqué appelé directement",
+      "seconds": 1.1
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "outils_avant": [
+            "conn-1-flaky",
+            "conn-1-get-note",
+            "conn-1-whoami",
+            "conn-1-write-note"
+          ],
+          "outils_apres": [
+            "conn-1-flaky",
+            "conn-1-get-note",
+            "conn-1-whoami",
+            "conn-1-write-note"
+          ],
+          "compte_apres": "witness-1"
+        }
+      ],
+      "journal": {
+        "count": 5,
+        "by_component_account": {
+          "mcp:witness-1": 5
+        },
+        "calls": [
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp whoami 200",
+          "mcp witness-1 /mcp tools/list 200"
+        ]
+      },
+      "reason": "",
+      "id": "T10",
+      "title": "Ajout d'un compte après création du profil",
+      "seconds": 2.3
+    },
+    {
+      "result": "échoué",
+      "observed": [
+        {
+          "appels_simultanes": [
+            [
+              "refus",
+              "isError: Tool invocation failed: Please authorize conn-1 first. Visit"
+            ],
+            [
+              "refus",
+              "isError: Tool invocation failed: OAuth token retrieval failed for gat"
+            ]
+          ],
+          "appel_suivant": [
+            "refus",
+            "isError: Tool invocation failed: Please authorize conn-1 first. Visit"
+          ],
+          "renouvellements_émis": 1,
+          "renouvellements_refusés_invalid_grant": 1,
+          "après_nouvelle_autorisation_par_l_administrateur": "ok"
+        }
+      ],
+      "journal": {
+        "count": 2,
+        "by_component_account": {
+          "as:witness-1": 2
+        },
+        "calls": [
+          "as witness-1 /token refresh_token issued",
+          "as witness-1 /token refresh_token invalid_grant"
+        ]
+      },
+      "reason": "renouvellements concurrents : perte ou refus (invalid_grant) du jeton renouvelé",
+      "id": "T11",
+      "title": "Deux renouvellements simultanés",
+      "seconds": 2.6
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "variante": "révocation du jeton",
+          "action_http": 204,
+          "appel_avant": true,
+          "appel_avant_détail": "HTTP 200",
+          "délai_de_coupure_s": 30.8,
+          "borne_s": 60,
+          "refus_ensuite": [
+            "refus",
+            "refus",
+            "refus",
+            "refus"
+          ],
+          "entrées_amont_après_coupure": 0
+        },
+        {
+          "variante": "suppression du profil",
+          "action_http": 200,
+          "appel_avant": true,
+          "appel_avant_détail": "HTTP 200",
+          "délai_de_coupure_s": 0.1,
+          "borne_s": 60,
+          "refus_ensuite": [
+            "refus",
+            "refus",
+            "refus",
+            "refus"
+          ],
+          "entrées_amont_après_coupure": 0
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T12",
+      "title": "Révocation ou suppression du profil",
+      "seconds": 34.0
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "après_s": 0,
+          "verdict": "refus",
+          "detail": "HTTP 401",
+          "compte": null
+        },
+        {
+          "après_s": 5,
+          "verdict": "refus",
+          "detail": "HTTP 401",
+          "compte": null
+        },
+        {
+          "après_s": 15,
+          "verdict": "refus",
+          "detail": "HTTP 401",
+          "compte": null
+        },
+        {
+          "après_rétablissement": "ok",
+          "reprise_après_s": 0.4
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "",
+      "id": "T13",
+      "title": "Coffre / contrôle de révocation indisponible",
+      "seconds": 23.1
+    },
+    {
+      "result": "échoué",
+      "observed": [
+        {
+          "profil": "A",
+          "défi_sans_jeton": {
+            "status": 401,
+            "www-authenticate": "Bearer",
+            "body": "{\"detail\":\"Authentication required for MCP endpoints\"}"
+          },
+          "métadonnées": [
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource/servers/eac122cee7c74dac8a4bac6385e34d02/mcp",
+              "http": 404,
+              "resource": null,
+              "authorization_servers": null
+            },
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource",
+              "http": 404,
+              "resource": null,
+              "authorization_servers": null
+            }
+          ],
+          "métadonnées_propres_à_la_ressource": false
+        },
+        {
+          "profil": "B",
+          "défi_sans_jeton": {
+            "status": 401,
+            "www-authenticate": "Bearer",
+            "body": "{\"detail\":\"Authentication required for MCP endpoints\"}"
+          },
+          "métadonnées": [
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource/servers/fc6d3d61888f44c7aee028881bfa8cee/mcp",
+              "http": 404,
+              "resource": null,
+              "authorization_servers": null
+            },
+            {
+              "url": "<passerelle>/.well-known/oauth-protected-resource",
+              "http": 404,
+              "resource": null,
+              "authorization_servers": null
+            }
+          ],
+          "métadonnées_propres_à_la_ressource": false
+        }
+      ],
+      "journal": {
+        "count": 0,
+        "by_component_account": {},
+        "calls": []
+      },
+      "reason": "pas de métadonnées propres à chaque ressource (profil A et/ou B)",
+      "id": "T14",
+      "title": "Découverte OAuth sur A et B",
+      "seconds": 1.2
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2024-11-05",
+          "version_négociée": "2024-11-05",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": false
+        },
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2025-03-26",
+          "version_négociée": "2025-03-26",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": false
+        },
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2025-06-18",
+          "version_négociée": "2025-06-18",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": false
+        },
+        {
+          "génération": "avec sessions",
+          "version_demandée": "2025-11-25",
+          "version_négociée": "2025-11-25",
+          "sans_jeton": 401,
+          "initialize": 200,
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "en_tête_de_session_émis": false
+        },
+        {
+          "preuve": "versions acceptées, d'après la réponse à une version inconnue",
+          "http": 400,
+          "supported": [
+            "2024-11-05",
+            "2025-03-26",
+            "2025-06-18",
+            "2025-11-25",
+            "2026-07-28"
+          ]
+        },
+        {
+          "génération": "sans session",
+          "version": "2026-07-28",
+          "server_discover": 200,
+          "supportedVersions_annoncées": [
+            "2026-07-28"
+          ],
+          "serveur": {
+            "name": "ContextForge",
+            "version": "1.1.0"
+          },
+          "tools_list": "ok",
+          "appel": "ok",
+          "compte": "witness-1",
+          "sans_jeton": 401,
+          "en_tête_de_session_émis": false
+        }
+      ],
+      "journal": {
+        "count": null
+      },
+      "reason": "",
+      "id": "T15",
+      "title": "Deux générations de clients MCP",
+      "seconds": 2.2
+    },
+    {
+      "result": "réussi",
+      "observed": [
+        {
+          "réponse_au_client": "refus",
+          "detail": "isError: provider_error",
+          "appels_amont_flaky": 1,
+          "écritures_effectives": 1,
+          "entrées_autre_compte": 0
+        }
+      ],
+      "journal": {
+        "count": 4,
+        "by_component_account": {
+          "mcp:witness-1": 4
+        },
+        "calls": [
+          "mcp witness-1 /mcp server/discover 200",
+          "mcp witness-1 /mcp initialize 200",
+          "mcp witness-1 /mcp notifications/initialized 202",
+          "mcp witness-1 /mcp flaky 200"
+        ]
+      },
+      "reason": "",
+      "id": "T16",
+      "title": "Reprise après erreur fournisseur",
+      "seconds": 4.3
+    }
+  ]
+}

@@ -1,0 +1,247 @@
+created: acme (client)
+created: acme/app (project)
+created: acme/app/prod (environment)
+created: acme/app/prod/principal (role)  https://gw.example.test/o/<org>/p/acme/app/prod/principal/mcp
+created: acme/app/prod/ops (role)  https://gw.example.test/o/<org>/p/acme/app/prod/ops/mcp
+created: acme/lab (project)
+created: acme/app/old (environment)
+created: acme/app/old/principal (role)  https://gw.example.test/o/<org>/p/acme/app/old/principal/mcp
+renamed: acme/app/old -> acme/app/staging
+OAuth lineages revoked: 0
+move: acme/app/staging -> acme/lab/staging
+  access points whose URL changes: 1
+  active OAuth lineages revoked: 0
+  active tokens of former ancestors that stop covering: 0
+  active tokens of new ancestors that cover: 0
+moved: acme/lab/staging
+deletion: acme/lab/staging
+  descendants: 1
+  active tokens revoked: 0
+  URLs that stop answering: 1
+  connection placements removed: 0
+deleted: acme/lab/staging
+/  « Organisation »  organisation  <org>
+  acme  « Acme »  client
+    app  « App »  project
+      prod  « Prod »  environment  non-sensitive
+        ops  « Ops »  role  non-sensitive  https://gw.example.test/o/<org>/p/acme/app/prod/ops/mcp
+        principal  « principal »  role  non-sensitive  https://gw.example.test/o/<org>/p/acme/app/prod/principal/mcp
+    lab  « Lab »  project
+active tokens on the environment, which will no longer pass: 0
+active role tokens and OAuth lineages valid more than 7 days (not revoked): 0
+acme/app/prod: sensitive
+active tokens on the ancestors, accepted again: 0
+acme/app/prod: non-sensitive
+locked: acme/app
+unlocked: acme/app
+token_duration = 10d  (origin: acme)
+connection_expiry_days = 7  (origin: /)
+token_duration = 10d  (origin: acme)
+lock = false  (origin: /)
+mode = write  (origin: /)
+pinning = auto  (origin: /)
+response_cap = 1MiB  (origin: /)
+token_rate_limit = 120/min  (origin: /)
+connection_rate_limit = 300/min  (origin: /)
+token_duration = 30d  (origin: /)
+id: tok_<id>
+path: acme/app
+expires: <ts>
+value (shown once):
+<operator-token>
+tok_<id>  operator  tour  acme/app  issued <ts>  expires <ts>  active
+revoked: tok_<id> (operator)
+client preregistered: tour-client on acme
+  redirect_uri: http://localhost/cb
+tour-client  preregistered  acme  active  http://localhost/cb
+dynamic registration: on
+client removed: tour-client
+OAuth lineages revoked: 0
+service declared: gitea-dev (gitea) https://gitea-dev.example.test
+  requested scopes: write:issue openid
+  authorization_endpoint: https://gitea-dev.example.test/login/oauth/authorize
+  registration_endpoint: https://gitea-dev.example.test/login/oauth/register
+  revocation_endpoint: https://gitea-dev.example.test/login/oauth/revoke
+  token_endpoint: https://gitea-dev.example.test/login/oauth/access_token
+  userinfo_endpoint: https://gitea-dev.example.test/login/oauth/userinfo
+service rediscovered: gitea-dev
+  authorization_endpoint: https://gitea-dev.example.test/login/oauth/authorize
+  registration_endpoint: https://gitea-dev.example.test/login/oauth/register
+  revocation_endpoint: https://gitea-dev.example.test/login/oauth/revoke
+  token_endpoint: https://gitea-dev.example.test/login/oauth/access_token
+  userinfo_endpoint: https://gitea-dev.example.test/login/oauth/userinfo
+upstream declared: gitea-dev mcp-public https://tour.mcp.test/mcp
+gitea-dev  gitea  https://gitea-dev.example.test  scopes write:issue openid
+  authorization_endpoint: https://gitea-dev.example.test/login/oauth/authorize
+  registration_endpoint: https://gitea-dev.example.test/login/oauth/register
+  revocation_endpoint: https://gitea-dev.example.test/login/oauth/revoke
+  token_endpoint: https://gitea-dev.example.test/login/oauth/access_token
+  userinfo_endpoint: https://gitea-dev.example.test/login/oauth/userinfo
+  upstream: mcp-public tour.mcp.test
+service declared: spare (generic) https://spare.example.test
+  requested scopes: -
+  authorization_endpoint: https://spare.example.test/login/oauth/authorize
+  registration_endpoint: https://spare.example.test/login/oauth/register
+  revocation_endpoint: https://spare.example.test/login/oauth/revoke
+  token_endpoint: https://spare.example.test/login/oauth/access_token
+  userinfo_endpoint: https://spare.example.test/login/oauth/userinfo
+service removed: spare
+application declared: app (service gitea-dev, declared)
+  client_id: <client>
+  redirect_uri to enter at the provider: http://127.0.0.1/oauth/callback
+  secret: none (public client)
+application registered: dyn (service gitea-dev, dynamic)
+  client_id: <client>
+  redirect_uri registered: http://127.0.0.1/oauth/callback
+  secret: none (public client)
+app  service gitea-dev  declared  client_id <client>  secret none
+dyn  service gitea-dev  dynamic  client_id <client>  secret none
+application reregistered: dyn, client_id <client>
+application removed: dyn
+connection created: acme/gitea-dev (provided token), state active
+prefix: acme/gitea-dev -> gt
+placed: acme/gitea-dev on acme/app/prod/ops (non-sensitive)
+tools of acme/gitea-dev on acme/app/prod/ops (version 2026-07-28): 2
+  gt__read  (read)
+  gt__write  (write)
+tools to classify: 2
+  gitea-dev  read  class read (annotations)
+  gitea-dev  write  class write (annotations)
+gitea-dev write: class destructive (manual)
+gitea-dev read: class read (annotations)
+mode of acme/gitea-dev on acme/app/prod/ops: read
+mode of acme/gitea-dev on acme/app/prod/ops: write (inherited)
+added to allowlist: 1
+  read
+added to open: 1
+  write
+removed from allowlist: 1
+added to deny: 1
+  read
+pin of acme/gitea-dev on acme/app/prod/ops: on
+argument rule: write method create
+tool pinned: read
+policy of acme/gitea-dev on acme/app/prod/ops
+  mode: write  (origin: /)
+  pin: on
+  open: write
+  deny: read
+  allowlist: -
+  pinned tools: read
+  argument rule: write method create
+rights of acme/app/prod/ops: 1 exposed, 1 hidden
+  exposed  gt__write  (write)  class destructive (manual)  opened  pinned  grouped {"method": ["create", "merge"]}  argument method ["create"]
+  hidden  gt__read  (read)  class read (annotations)  reasons denied  pinned
+pinned changes under acme/app: 1
+  changed  read  acme/gitea-dev on acme/app/prod/ops
+    description
+      - "tool read"
+      + "tool read, v2"
+validated: 1
+  read  acme/gitea-dev on acme/app/prod/ops  <hex>
+tool pin removed: read
+pin of acme/gitea-dev on acme/app/prod/ops: inherit
+argument rule removed: write
+placement removed: acme/gitea-dev from acme/app/prod/ops
+connection created: acme/oauth (oauth), state pending
+authorization URL, to open in the browser (valid 10 minutes):
+https://gitea-dev.example.test/login/oauth/authorize?response_type=code&client_id=<v>&redirect_uri=http%3A%2F%2F127.0.0.1%2Foauth%2Fcallback&state=<v>&code_challenge=<v>&code_challenge_method=S256&scope=write%3Aissue+openid
+then copy the URL of the address bar (connection error expected) into a file and: hullgate connection authorize acme/oauth --callback - < file
+authorized: acme/oauth, account cairn-ai, scopes write:issue openid, expires <ts>
+renewed: acme/oauth, generation <n>, expires <ts>
+acme/gitea-dev   service gitea-dev   account unknown   state active   upstream: mcp-public tour.mcp.test
+acme/oauth   service gitea-dev   account cairn-ai   scopes write:issue openid   state active   expires <ts>   upstream: mcp-public tour.mcp.test
+connections key: usable
+acme/gitea-dev  service gitea-dev  prefix gt  provided token  state active
+acme/oauth  service gitea-dev  prefix go  oauth  state active
+connection revoked: acme/oauth, reauthorization required
+  revocation at the provider: revoked
+authorization opened: acme/oauth, state pending
+authorization URL, to open in the browser (valid 10 minutes):
+https://gitea-dev.example.test/login/oauth/authorize?response_type=code&client_id=<v>&redirect_uri=http%3A%2F%2F127.0.0.1%2Foauth%2Fcallback&state=<v>&code_challenge=<v>&code_challenge_method=S256&scope=write%3Aissue+openid
+then copy the URL of the address bar (connection error expected) into a file and: hullgate connection authorize acme/oauth --callback - < file
+connection removed: acme/oauth
+  placements removed: 0
+  revocation at the provider: no_token
+<ts>  operator-cli  connection.upstream_revoke  ok  acme/oauth  reason=revoked
+<ts>  operator-cli  connection.authorize_open  ok  acme/oauth  before={"state": "reauth_required"}  after={"state": "pending"}
+<ts>  operator-cli  connection.remove  ok  acme/oauth  before={"kind": "oauth", "placements": [], "prefix": "go", "service": "gitea-dev", "state": "pending"}
+# hullgate: tree export (BR-070)
+format: 5
+organisation:
+  id: "<org>"
+  level: organisation
+  name: "Organisation"
+  settings:
+    connection_expiry_days: "7"
+    connection_rate_limit: "300/min"
+    lock: "false"
+    mode: "write"
+    pinning: "auto"
+    response_cap: "1MiB"
+    token_duration: "30d"
+    token_rate_limit: "120/min"
+  clients:
+    - level: client
+      segment: "acme"
+      name: "Acme"
+      settings: {}
+      projects:
+        - level: project
+          segment: "app"
+          name: "App"
+          settings: {}
+          environments:
+            - level: environment
+              segment: "prod"
+              name: "Prod"
+              sensitive: false
+              settings: {}
+              roles:
+                - level: role
+                  segment: "ops"
+                  name: "Ops"
+                  settings: {}
+                - level: role
+                  segment: "principal"
+                  name: "principal"
+                  settings: {}
+        - level: project
+          segment: "lab"
+          name: "Lab"
+          settings: {}
+          environments: []
+services:
+  - id: "gitea-dev"
+    model: "gitea"
+    url: "https://gitea-dev.example.test"
+    scopes: ["write:issue", "openid"]
+    internal_host: false
+    tools:
+      - name: "read"
+      - name: "write"
+        class: "destructive"
+applications:
+  - id: "app"
+    service: "gitea-dev"
+    mode: "declared"
+    client_id: <client>
+connections:
+  - name: "acme/gitea-dev"
+    service: "gitea-dev"
+    prefix: "gt"
+    application: null
+    state: "active"
+    placements: []
+administrator pending: adm_<id> ops@example.test
+the link below is shown once and expires in 30 minutes
+ENROLMENT-LINK: http://localhost:14791/admin/enrol/<link>
+adm_<id>  ops@example.test  pending  passkeys: 0  Ops
+sign-in attempts cleared: 0
+allow-list cleared: 0 entries removed
+administrator active: adm_<id> ops@example.test
+the link below is shown once and expires in 30 minutes
+ENROLMENT-LINK: http://localhost:14791/admin/enrol/<link>
+f28e-a948  acme/app/prod/ops  tour-client  localhost  expires <ts>
+approved: f28e-a948 (acme/app/prod/ops, tour-client)
+press Authorize on the barrier page, with no code, before the request expires

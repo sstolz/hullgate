@@ -1,0 +1,30 @@
+{
+  "name": "hullgate-console",
+  "private": true,
+  "version": "0.0.0",
+  "description": "hullgate admin console (F-016): Svelte 5 SPA served by the admin listener under /admin.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "build": "vite build && cp node_modules/@fontsource/inter/LICENSE dist/assets/LICENSE-inter.txt && cp node_modules/@fontsource/jetbrains-mono/LICENSE dist/assets/LICENSE-jetbrains-mono.txt",
+    "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
+    "lint": "eslint --max-warnings 0 .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fontsource/inter": "5.3.0",
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "svelte": "5.57.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "eslint": "10.15.0",
+    "eslint-plugin-svelte": "3.24.1",
+    "svelte-check": "4.7.8",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.0"
+  }
+}

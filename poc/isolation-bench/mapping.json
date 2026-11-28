@@ -1,0 +1,30 @@
+{
+  "_comment": "Table de transposition de la recette au rôle (F-002, BR-012), lue par l'exécuteur : un test sans ligne arrête le démarrage. Source : spécification de la passerelle, table de lecture au rôle.",
+  "terms": {
+    "U1 avec accès aux profils A et B": "jetons émis pour les rôles A et B",
+    "U1 fournit un identifiant de connexion de U2": "le jeton du rôle A fournit un connection_id placé dans le rôle B",
+    "révocation ou suppression du profil": "suppression d'un rôle : jetons invalidés, sessions coupées, caches vidés",
+    "suppression d'un utilisateur": "révocation d'un jeton",
+    "ajout d'un compte après création du profil": "placement d'une connexion dans un rôle existant : aucun changement de compte silencieux"
+  },
+  "tests": {
+    "T01": "tel quel", "T02": "tel quel", "T03": "tel quel, branche serveur d'autorisation présent",
+    "T04": "tel quel, branche serveur d'autorisation présent", "T05": "tel quel", "T06": "tel quel, variantes de BR-014",
+    "T07": "connexion B = connexion placée dans le rôle B", "T08": "U1/U2 lus : jeton du rôle A / connexion du rôle B",
+    "T09": "tel quel", "T10": "placement d'une connexion dans un rôle existant", "T11": "tel quel",
+    "T12": "suppression d'un rôle ; révocation d'un jeton", "T13": "tel quel", "T14": "tel quel", "T15": "tel quel", "T16": "tel quel"
+  },
+  "lectures_v1": {
+    "_source": "AC-29 de F-008, amendement post-gel du 2026-10-31 (décision de l'opérateur) : lectures propres à la cible v1 ; les cibles POC gardent leurs verdicts ; aucune BR modifiée ; précisions T06 et T09 : décision de l'opérateur du 2026-10-31 (arrêt B-3)",
+    "T06": "BR-054, BR-014 : les deux variantes de type changent l'en-tête typ du jeton d'accès (rt+jwt pour renouvellement, JWT pour identité), une propriété chacune, et la v1 répond 401 ; la claim token_use des POC n'existe pas dans la v1 ; les autres variantes sont inchangées",
+    "T07": "BR-115 : les variantes argument connection_id, en-tête X-Connection-Id et paramètre ?connection_id= réussissent si l'appel est servi pour le compte de A et que l'amont de B ne reçoit rien (aucune entrée à son journal) ; la variante « outil de B appelé depuis A » reste un refus sans échange (BR-113)",
+    "T08": "BR-115 : l'identifiant de connexion de U2 en argument est une valeur ordinaire, l'appel est servi pour le compte de U1 et l'amont de U2 ne reçoit rien ; l'outil de la connexion de U2 appelé par U1 reste un refus sans échange (BR-113)",
+    "T09": "BR-174, BR-176 (F-015 lot C, BR-071 v3) : hidden_admin, classé read, est dans la liste deny du placement de la connexion du rôle A ; il est absent de tools/list du rôle A, tandis que whoami, outil frère de la même connexion, y est listé ; ses appels directs (MCP et /rpc) sont refusés et, dans la fenêtre, l'amont de sa connexion ne reçoit aucun appel d'outil et aucune entrée ne nomme hidden_admin ; les autres entrées (listes, initialisations, échanges de jeton, appel d'un outil générique visible d'une autre connexion par la variante de contournement) sont relevées dans le résultat sans entrer dans le verdict",
+    "T10": "BR-109 : après l'ajout d'une connexion au rôle A, les outils déjà listés de A et le compte qui les sert sont inchangés (les outils de la connexion ajoutée, sous son propre préfixe, sont admis)",
+    "BR-015": "le rôle B passe par un second gitea-mcp lancé en lecture seule (-r) ; son outil d'écriture est absent de la liste de B et un appel direct est refusé sans entrée aux journaux des frontales"
+  },
+  "roles": {
+    "A": {"id": "role-a", "witness": "witness-1", "bench_client": 1, "prefix": "w1", "gitea_allow": ["list_issues", "issue_read", "issue_write", "get_me"]},
+    "B": {"id": "role-b", "witness": "witness-2", "bench_client": 2, "prefix": "w2", "gitea_allow": ["list_issues", "issue_read", "get_me"]}
+  }
+}

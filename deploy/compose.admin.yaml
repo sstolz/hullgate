@@ -1,0 +1,16 @@
+# BR-230: applied by ops.sh only when ADMIN_HOST is set. A dedicated name is recommended;
+# PathPrefix also makes sharing MCP_HOST safe. Host validation and sessions remain mandatory.
+services:
+  hullgate:
+    environment:
+      ADMIN_HOST: ${ADMIN_HOST:?ADMIN_HOST required}
+      ADMIN_URL: ${ADMIN_URL:?ADMIN_URL required}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:?TRUSTED_PROXIES required}
+    labels:
+      traefik.http.routers.hullgate-admin.rule: Host(`${ADMIN_HOST}`) && PathPrefix(`/admin`)
+      traefik.http.routers.hullgate-admin.priority: "1000"
+      traefik.http.routers.hullgate-admin.entrypoints: ${TRAEFIK_ENTRYPOINT:?TRAEFIK_ENTRYPOINT required}
+      traefik.http.routers.hullgate-admin.tls: "true"
+      traefik.http.routers.hullgate-admin.tls.certresolver: ${TRAEFIK_CERTRESOLVER:?TRAEFIK_CERTRESOLVER required}
+      traefik.http.routers.hullgate-admin.service: hullgate-admin
+      traefik.http.services.hullgate-admin.loadbalancer.server.port: "4791"

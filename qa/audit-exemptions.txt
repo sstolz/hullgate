@@ -1,0 +1,6 @@
+# Exemptions of the runtime dependency audit (F-007, BR-103).
+# One line per exemption: <identifier> <YYYY-MM-DD> <reason>
+#   identifier: the one the audit reports (GHSA-…, PYSEC-…, CVE-…);
+#   date:       last day the exemption holds (UTC); once expired, it fails the audit;
+#   reason:     one sentence, mandatory.
+# Empty lines and lines starting with # are ignored.

@@ -1,0 +1,132 @@
+# Banc d'isolation, cible « v1 » (F-005 BR-071, F-008 AC-29) : la passerelle construite depuis le Dockerfile racine du dépôt,
+# l'amont instrumenté du banc (journal, BR-002), une instance Gitea jetable et deux serveurs MCP Gitea réels (gitea-mcp 1.11.0,
+# épinglés par digest), chacun derrière une frontale journalisante (BR-013) : `gitea-mcp` (lecture et écriture, rôle A) et
+# `gitea-mcp-ro` (lecture seule `-r`, rôle B : lecture v1 du contrôle BR-015, décision de l'opérateur du 2026-10-31).
+# Secrets : .run/env (BR-010) ; clé de signature ES256, secret TOTP et clé de connexions jetables générés par l'image
+# (`hullgate.keys`) dans .run/, montés en secrets ; autorité de certification jetable (.run/tls, runner/tls_v1.py) : l'amont du
+# banc sert aussi en TLS (BR-084 : https vers un fournisseur) et la passerelle lit cette autorité comme magasin de certificats,
+# dans ce fichier seulement. Aucune route de test dans l'image (BR-068), pannes injectées de l'extérieur.
+# Réseaux (BR-016) : `internal` n'a aucune sortie ; Gitea et les serveurs MCP Gitea n'y sont qu'attachés.
+name: isolation-bench
+
+networks:
+  internal: { internal: true }
+  edge: {}
+
+services:
+  upstream:
+    image: python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2
+    command: ["python", "-u", "/srv/server.py"]
+    volumes: ["./upstream:/srv:ro", "./.run/tls:/tls:ro"]
+    networks: [edge, internal]
+    ports:
+      - "127.0.0.1:${UP_PORT:-19100}:9100"
+      - "127.0.0.1:${UP_CONTROL_PORT:-19101}:9101"
+    environment:
+      UP_CONTROL_TOKEN: ${UP_CONTROL_TOKEN}
+      UP_CLIENT_ID_1: bench-client-1
+      UP_CLIENT_SECRET_1: ${UP_CLIENT_SECRET_1}
+      UP_CLIENT_ID_2: bench-client-2
+      UP_CLIENT_SECRET_2: ${UP_CLIENT_SECRET_2}
+      ACCESS_TTL: "3600"
+      PUBLIC_BASE: https://upstream:9102
+      UP_TLS_CERT: /tls/upstream.pem
+      UP_TLS_KEY: /tls/upstream.key
+      UP_TLS_PORT: "9102"
+    healthcheck:
+      # connexion TCP sans requête HTTP : une sonde HTTP serait journalisée (BR-013)
+      test: ["CMD", "python", "-c", "import socket;[socket.create_connection(('localhost',p),2).close() for p in (9100,9102)]"]
+      interval: 2s
+      retries: 30
+
+  gateway:
+    build: { context: ../.., dockerfile: Dockerfile }
+    image: isolation-bench-v1:dev
+    read_only: true
+    networks: [edge, internal]
+    ports:
+      - "127.0.0.1:${GW_PORT:-18100}:4790"
+      - "127.0.0.1:${GW_ADMIN_PORT:-18102}:4791"   # administration : /healthz, console /admin (BR-068 v2)
+    environment:
+      PUBLIC_URL: http://localhost:${GW_PORT:-18100}
+      ADMIN_URL: http://localhost:${GW_ADMIN_PORT:-18102}  # F-016: a hostname (BR-202)
+      SIGNING_KEY_FILE: /run/secrets/signing_key
+      AUTHORIZE_TOTP_SECRET_FILE: /run/secrets/authorize_totp
+      CONNECTIONS_KEY_FILE: /run/secrets/connections_key
+    secrets: [signing_key, authorize_totp, connections_key]
+    volumes:
+      - "v1data:/data"
+      - "./.run/tls/ca.pem:/etc/ssl/certs/ca-certificates.crt:ro"   # autorité jetable du banc (BR-084, BR-010)
+    depends_on: { upstream: { condition: service_healthy } }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys,urllib.request as u; sys.exit(0 if u.urlopen('http://127.0.0.1:4790/readyz', timeout=2).status == 200 else 1)"]
+      interval: 2s
+      retries: 30
+
+  gitea:
+    image: gitea/gitea@sha256:a664a64d7740ef0db74f090f567040d0e5b34592473aad08ed5e296ccbe00eab
+    networks: [internal]
+    environment:
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__database__DB_TYPE: sqlite3
+      GITEA__server__ROOT_URL: http://gitea:3000/
+      GITEA__server__DOMAIN: gitea
+      GITEA__service__DISABLE_REGISTRATION: "true"
+      GITEA__mailer__ENABLED: "false"
+      GITEA__openid__ENABLE_OPENID_SIGNIN: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3000/api/healthz || exit 1"]
+      interval: 3s
+      retries: 60
+
+  # démarrés après la création du jeton Gitea jetable (profil « late », voir l'adaptateur)
+  gitea-mcp:
+    profiles: ["late"]
+    image: docker.gitea.com/gitea-mcp-server@sha256:ccdb5660ecdf54c5e480f10cc8120ba2bf150b582cea8a1974de2e59883582d3
+    # -H obligatoire : le défaut est un hôte public (BR-016). Aucun jeton au démarrage : le jeton de la connexion arrive par
+    # requête (Authorization posé par la passerelle), lu sur la frontale (BR-022).
+    command: ["/app/gitea-mcp", "-t", "http", "-H", "http://gitea:3000", "-p", "8080"]
+    networks: [internal]
+
+  gitea-mcp-ro:
+    profiles: ["late"]
+    image: docker.gitea.com/gitea-mcp-server@sha256:ccdb5660ecdf54c5e480f10cc8120ba2bf150b582cea8a1974de2e59883582d3
+    command: ["/app/gitea-mcp", "-t", "http", "-H", "http://gitea:3000", "-p", "8080", "-r"]   # lecture seule
+    networks: [internal]
+
+  front:
+    profiles: ["late"]
+    image: python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2
+    command: ["python", "-u", "/srv/front.py"]
+    volumes: ["./front:/srv:ro"]
+    networks: [edge, internal]
+    ports:
+      - "127.0.0.1:${FRONT_PORT:-19200}:8080"
+      - "127.0.0.1:${FRONT_CONTROL_PORT:-19201}:9201"
+    environment:
+      FRONT_UPSTREAM: gitea-mcp:8080
+      FRONT_CONTROL_TOKEN: ${FRONT_CONTROL_TOKEN}
+
+  front-ro:
+    profiles: ["late"]
+    image: python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2
+    command: ["python", "-u", "/srv/front.py"]
+    volumes: ["./front:/srv:ro"]
+    networks: [edge, internal]
+    ports:
+      - "127.0.0.1:${FRONT_RO_PORT:-19202}:8080"
+      - "127.0.0.1:${FRONT_RO_CONTROL_PORT:-19203}:9201"
+    environment:
+      FRONT_UPSTREAM: gitea-mcp-ro:8080
+      FRONT_CONTROL_TOKEN: ${FRONT_CONTROL_TOKEN}
+
+volumes:
+  v1data: {}
+
+secrets:
+  signing_key:
+    file: ./.run/signing_key
+  authorize_totp:
+    file: ./.run/authorize_totp
+  connections_key:
+    file: ./.run/connections_key

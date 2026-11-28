@@ -1,0 +1,54 @@
+# Banc d'isolation (F-001). Images épinglées par digest (BR-005).
+# Les secrets viennent de .run/env, généré à chaque lancement par bench.sh (BR-010).
+name: isolation-bench
+
+services:
+  postgres:
+    image: postgres@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
+    environment:
+      POSTGRES_USER: cf
+      POSTGRES_DB: cf
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cf -d cf"]
+      interval: 2s
+      retries: 30
+    # pas de volume nommé : l'état est jetable et disparaît avec le conteneur
+
+  upstream:
+    image: python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2
+    command: ["python", "-u", "/srv/server.py"]
+    volumes: ["./upstream:/srv:ro"]
+    ports:
+      - "127.0.0.1:${UP_PORT:-19100}:9100"
+      - "127.0.0.1:${UP_CONTROL_PORT:-19101}:9101"
+    environment:
+      UP_CONTROL_TOKEN: ${UP_CONTROL_TOKEN}
+      UP_CLIENT_ID_1: bench-client-1
+      UP_CLIENT_SECRET_1: ${UP_CLIENT_SECRET_1}
+      UP_CLIENT_ID_2: bench-client-2
+      UP_CLIENT_SECRET_2: ${UP_CLIENT_SECRET_2}
+      ACCESS_TTL: "3600"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:9100/.well-known/oauth-authorization-server')"]
+      interval: 2s
+      retries: 30
+
+  contextforge:
+    image: ghcr.io/ibm/mcp-context-forge@sha256:7eb21fb9a8070df59435c03c76c40d8c71230c55ba89f884f2482d2cc81cff1c
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports: ["127.0.0.1:${CF_PORT:-14444}:4444"]
+    env_file: [cf.env]
+    environment:
+      DATABASE_URL: postgresql+psycopg://cf:${PG_PASSWORD}@postgres:5432/cf
+      JWT_SECRET_KEY: ${CF_JWT_SECRET}
+      AUTH_ENCRYPTION_SECRET: ${CF_ENC_SECRET}
+      PLATFORM_ADMIN_PASSWORD: ${CF_ADMIN_PASSWORD}
+      PLATFORM_ADMIN_EMAIL: admin@example.test
+      BASIC_AUTH_PASSWORD: ${CF_ADMIN_PASSWORD}
+      DEFAULT_USER_PASSWORD: ${CF_ADMIN_PASSWORD}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:4444/health')"]
+      interval: 3s
+      retries: 60

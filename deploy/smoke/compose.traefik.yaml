@@ -1,0 +1,37 @@
+# Local Traefik of `make prod-smoke` (session only): plays the role of the production server's existing Traefik.
+# Image pinned by index digest (Traefik 3.6.25). HTTPS entry point `websecure` published on
+# 127.0.0.1:${TRAEFIK_HTTPS_PORT}; ACME resolver `smoke-acme` declared but unreachable (no Internet
+# needed): Traefik then serves its default certificate, hence `VERIFY_INSECURE=1` for `make verify`.
+# Read-only API (port 8080) on the internal network only, read by deploy/smoke/probe.py.
+name: hullgate-smoke-traefik
+
+services:
+  traefik:
+    image: traefik@sha256:31267173a15b4944e797a76ffd9c419707c8d8b32fe5b610f80cd0cfa05f372d
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      # Only the smoke's own stack: another hullgate stack on the same daemon (the container suite's
+      # session fixture) declares the same router names, and Traefik drops conflicting routers.
+      - --providers.docker.constraints=Label(`com.docker.compose.project`,`hullgate-smoke`)
+      - --entrypoints.websecure.address=:443
+      # Deliberately pass forged XFF through: the gateway must reject it (BR-315).
+      - --entrypoints.websecure.forwardedHeaders.insecure=true
+      - --api.insecure=true
+      - --certificatesresolvers.smoke-acme.acme.tlschallenge=true
+      - --certificatesresolvers.smoke-acme.acme.email=smoke@example.invalid
+      - --certificatesresolvers.smoke-acme.acme.storage=/tmp/acme.json
+      - --certificatesresolvers.smoke-acme.acme.caserver=https://127.0.0.1:1/directory
+      - --log.level=WARN
+    ports:
+      - "127.0.0.1:${TRAEFIK_HTTPS_PORT}:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      traefik:
+        ipv4_address: ${TRAEFIK_ADDRESS}
+
+networks:
+  traefik:
+    name: ${TRAEFIK_NETWORK}
+    external: true

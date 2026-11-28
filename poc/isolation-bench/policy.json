@@ -1,0 +1,12 @@
+{
+  "_comment": "Politiques de la recette fixées avant elle (F-001, BR-011 ; valeurs inchangées pour F-002). Refus des demandes ambiguës et refus par défaut en panne du coffre : politiques de la spécification de la passerelle. Délai de coupure de 60 s : choix du banc, la spécification n'en fixe aucun ; il respecte la borne de BR-011 (strictement inférieur à la durée de vie du jeton d'accès). Tout changement en cours de recette invalide la recette.",
+  "ambiguous_requests": "refuse",
+  "store_outage": "deny_protected_operations",
+  "cutoff_seconds": 60,
+  "access_token_lifetime_seconds": 86400,
+  "access_token_lifetime_seconds_v1": 3600,
+  "_comment_v1": "Cible v1 (F-005) : jeton d'accès OAuth de 1 h fixé par BR-052 ; le délai de coupure (60 s) reste strictement inférieur (BR-011). Les cibles des POC gardent 86400.",
+  "contextforge_config_files": ["cf.env", "compose.yaml"],
+  "gateway_config_files": ["gateway.compose.yaml", "mapping.json", "../go-gateway/Dockerfile", "../go-gateway/go.mod", "../go-gateway/go.sum"],
+  "v1_config_files": ["v1.compose.yaml", "mapping.json", "../../Dockerfile", "../../pyproject.toml", "../../uv.lock"]
+}

@@ -1,0 +1,127 @@
+[
+  {
+    "violations": [],
+    "screen": "tree"
+  },
+  {
+    "violations": [],
+    "screen": "tokens"
+  },
+  {
+    "violations": [],
+    "screen": "audit"
+  },
+  {
+    "violations": [],
+    "screen": "tools"
+  },
+  {
+    "violations": [],
+    "screen": "role inspector with the policy editor"
+  },
+  {
+    "violations": [],
+    "screen": "rights preview"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-11.undo-confirm"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-12.preview-empty"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-01"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-01.unsupported"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-02.unsupported"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-02"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-03.vault-down"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-03"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-04.empty"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-01.refused"
+  },
+  {
+    "violations": [
+      {
+        "id": "empty-table-header",
+        "impact": "minor",
+        "help": "Table header text should not be empty",
+        "nodes": [
+          "th:nth-child(4)"
+        ]
+      }
+    ],
+    "screen": "SCR-03.passkeys"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-02.expired"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-03.session-expired"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-01.limited"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-01.blocked"
+  },
+  {
+    "violations": [],
+    "screen": "tree"
+  },
+  {
+    "violations": [],
+    "screen": "tokens"
+  },
+  {
+    "violations": [],
+    "screen": "audit"
+  },
+  {
+    "violations": [],
+    "screen": "tools"
+  },
+  {
+    "violations": [],
+    "screen": "role inspector with the policy editor"
+  },
+  {
+    "violations": [],
+    "screen": "rights preview"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-11.undo-confirm"
+  },
+  {
+    "violations": [],
+    "screen": "SCR-12.preview-empty"
+  }
+]

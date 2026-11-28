@@ -1,0 +1,90 @@
+# Production composition of hullgate on the production server (F-004), behind the existing Traefik.
+# Played by `make deploy` from the root of the clone: docker compose -f deploy/compose.prod.yaml --env-file .env
+# Values specific to the production server come from .env (copy of deploy/env.example), never from the repository (BR-041).
+# F-005 (BR-032 v2): signing key and TOTP secret of the authorization barrier as mounted secrets, files
+# created by the operator outside the repository (runbook docs/guides/keys-and-upstreams.md), readable by 10001.
+# F-006 (BR-032 v3): connections key (32 bytes in base64) as a mounted secret, file created by
+# the operator before the deployment (runbook docs/guides/keys-and-upstreams.md); a missing file
+# makes the container creation fail.
+name: hullgate
+
+services:
+  hullgate:
+    image: ${HULLGATE_IMAGE:-hullgate:current}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # No `user:`: the image sets 10001:10001 (BR-030).
+    read_only: true # BR-031: only /data is writable
+    environment:
+      PUBLIC_URL: https://${MCP_HOST:?MCP_HOST required in .env}
+      # F-016 (BR-202, BR-204): a hostname WebAuthn accepts, the console reached over the tunnel
+      # `ssh -L 14791:127.0.0.1:14791`; its passkeys are bound to the RP id `localhost` (Q3 = a).
+      ADMIN_URL: http://localhost:${ADMIN_LOCAL_PORT:-14791}
+      ADMIN_RP_ID: ${ADMIN_RP_ID:-}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:?TRUSTED_PROXIES required in .env (see docs/guides/admin.md step P1)}
+      PUBLIC_PORT: "4790"
+      ADMIN_PORT: "4791"
+      DATA_DIR: /data
+      SIGNING_KEY_FILE: /run/secrets/signing_key
+      AUTHORIZE_TOTP_SECRET_FILE: /run/secrets/authorize_totp
+      CONNECTIONS_KEY_FILE: /run/secrets/connections_key
+    secrets:
+      - signing_key
+      - authorize_totp
+      - connections_key
+    volumes:
+      - data:/data
+    # BR-034: administration is published only on the production server's local interface.
+    # BR-041: no published port for the public listener, reached by Traefik only.
+    ports:
+      - "127.0.0.1:${ADMIN_LOCAL_PORT:-14791}:4791"
+    networks:
+      - traefik
+      - upstreams # F-008: network of the MCP upstreams (deploy/upstreams.compose.yaml), with no other service
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import sys,urllib.request as u; sys.exit(0 if u.urlopen('http://127.0.0.1:4790/readyz', timeout=2).status == 200 else 1)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # Frequent probe at startup: Traefik routes the container only once it is "healthy".
+      start_period: 60s
+      start_interval: 1s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:?TRAEFIK_NETWORK required in .env}
+      traefik.http.routers.hullgate.rule: Host(`${MCP_HOST}`)
+      traefik.http.routers.hullgate.entrypoints: ${TRAEFIK_ENTRYPOINT:?TRAEFIK_ENTRYPOINT required in .env}
+      traefik.http.routers.hullgate.tls: "true"
+      traefik.http.routers.hullgate.tls.certresolver: ${TRAEFIK_CERTRESOLVER:?TRAEFIK_CERTRESOLVER required in .env}
+      traefik.http.routers.hullgate.service: hullgate
+      # Only the public listener (4790) is served; no router targets 4791 (BR-034).
+      traefik.http.services.hullgate.loadbalancer.server.port: "4790"
+
+volumes:
+  data:
+    name: ${HULLGATE_VOLUME:-hullgate_data}
+
+# Paths relative to this file: `../secrets/` is the clone's `secrets/` folder (not versioned).
+secrets:
+  signing_key:
+    file: ${SIGNING_KEY_PATH:-../secrets/signing_key}
+  authorize_totp:
+    file: ${AUTHORIZE_TOTP_PATH:-../secrets/authorize_totp}
+  connections_key:
+    file: ${CONNECTIONS_KEY_PATH:-../secrets/connections_key}
+
+networks:
+  traefik:
+    name: ${TRAEFIK_NETWORK}
+    external: true
+  # Created by `make deploy`, joined by the MCP upstreams (deploy/upstreams.compose.yaml). Named by
+  # UPSTREAMS_NETWORK, default `hullgate_upstreams`, not derived from the project name (F-010 §3.2):
+  # both files read the same key.
+  upstreams:
+    name: ${UPSTREAMS_NETWORK:-hullgate_upstreams}

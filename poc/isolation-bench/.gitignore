@@ -1,0 +1,6 @@
+.run/
+.digests/
+__pycache__/
+evidence/dev-*.json
+runner/harness/*-results.json
+runner/harness/*-db/

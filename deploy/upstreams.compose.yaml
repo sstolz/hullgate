@@ -1,0 +1,22 @@
+# MCP upstreams of hullgate on the production server (F-008, runbook docs/guides/keys-and-upstreams.md), outside the gateway's
+# image (#1, l. 530-532): one container per MCP server, on the `upstreams` network that carries only the gateway and
+# its upstreams (F-008 §12, cleartext traffic to a named internal host, BR-106). Played by the operator:
+#   docker compose -f deploy/upstreams.compose.yaml --env-file .env up -d
+# `gitea-mcp` 1.11.0 pinned by digest, stateless HTTP; one Gitea host per process (GITEA_URL in .env); no
+# token at startup: the connection's token arrives with each request (Authorization set by the relay, BR-114).
+# F-010 (§3.2): project `hullgate-upstreams`, network `hullgate_upstreams` (UPSTREAMS_NETWORK), the same name
+# `deploy/compose.prod.yaml` gives the network it creates.
+name: hullgate-upstreams
+
+services:
+  gitea-mcp:
+    image: docker.gitea.com/gitea-mcp-server@sha256:ccdb5660ecdf54c5e480f10cc8120ba2bf150b582cea8a1974de2e59883582d3
+    command: ["/app/gitea-mcp", "-t", "http", "-H", "${GITEA_URL:?GITEA_URL required in .env}", "-p", "8080"]
+    restart: unless-stopped
+    read_only: true
+    networks: [upstreams]
+
+networks:
+  upstreams:
+    name: ${UPSTREAMS_NETWORK:-hullgate_upstreams}
+    external: true
