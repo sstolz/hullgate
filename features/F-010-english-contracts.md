@@ -31,7 +31,7 @@ validated-by: human:sstolz
 
 ### Current State
 
-On 2026-10-31 the operator switched the project `language` to `en` (`307d0f4`) and opened #52, now an umbrella (readiness `split`, comment 10931); this feature is its first lot, ticket #56 « English contracts and product rename to hullgate (lot 1 of #52) ». Siblings: #57 code text, #58 docs (which also takes the deletion of `poc/py-gateway`), #59 bench verdict vocabulary. The same day the operator settled the product name, **`hullgate`** (#43, comment 10909), to be applied in the same break: renaming after 1.0.0 would be a second CLI break and a second cutover. Facts read on `main` at `b37664f`; each count has its instrument in §3.5 and can be replayed.
+On 2026-10-31 the operator switched the project `language` to `en` (`307d0f4`) and opened HULL-52, now an umbrella (readiness `split`, comment 10931); this feature is its first lot, ticket HULL-56 « English contracts and product rename to hullgate (lot 1 of HULL-52) ». Siblings: HULL-57 code text, HULL-58 docs (which also takes the deletion of `poc/py-gateway`), HULL-59 bench verdict vocabulary. The same day the operator settled the product name, **`hullgate`** (HULL-43, comment 10909), to be applied in the same break: renaming after 1.0.0 would be a second CLI break and a second cutover. Facts read on `main` at `b37664f`; each count has its instrument in §3.5 and can be replayed.
 
 - **CLI** (`src/<old-name>/cli.py:69-226`): 9 groups, 40 verbs, 34 distinct flags. French spellings: 2 groups (`jeton`, `connexion`), 24 verbs (21 with no English twin), 17 flags (+ `--url-mcp`, renamed for word order, = 18), 4 accepted values, 3 level aliases, 2 setting keys (`duree_jetons`, `verrou`, `tree.py:134-137`). The default role segment `principal` (`tree.py:47`; created with each new **environment**, `tree.py:408`) is kept.
 - **CLI output**: 99 `self.say(` sites (`cli.py:329-934`; 9 of them take a non-literal argument whose text lives in helpers and module constants), 9 error prefixes (`:977-1031`) and the `usage :` prefix (`:58`). **No program parses them**: the bench uses `--json`, exit codes and the authorization URL. Their readers are 14 test files (31 occurrences) and the runbooks' « expected result ».
@@ -47,13 +47,13 @@ On 2026-10-31 the operator switched the project `language` to `en` (`307d0f4`) a
 
 ### Objective
 
-After this feature, every name a client, script, runbook or audit reader depends on by its exact spelling is English, the product is called `hullgate` in every contract form, the stored values are migrated, and the old spellings are gone from the repository outside the pinned exclusions. The guarantee is stated per family by its extractor (§3.5, BR-131): the families that have a surface extractor are pinned by snapshot, the others by sweep. Free text (messages, comments, docs) is left to #57 and #58.
+After this feature, every name a client, script, runbook or audit reader depends on by its exact spelling is English, the product is called `hullgate` in every contract form, the stored values are migrated, and the old spellings are gone from the repository outside the pinned exclusions. The guarantee is stated per family by its extractor (§3.5, BR-131): the families that have a surface extractor are pinned by snapshot, the others by sweep. Free text (messages, comments, docs) is left to HULL-57 and HULL-58.
 
 ### Expected Impact
 
-- No contract spelling changes after 1.0.0 **except the DNS name of the gateway (#42)**, which is not a code contract.
+- No contract spelling changes after 1.0.0 **except the DNS name of the gateway (HULL-42)**, which is not a code contract.
 - One DB migration (version 6) at the cutover, under a pre-deploy backup, with a way back that works (§3.6); no data move: the volume keeps its real name.
-- Downstream tickets (#10 policy, #11 admin web and tree import, #12 retention) are shaped on the English names and on `hullgate` from their first line.
+- Downstream tickets (HULL-10 policy, HULL-11 admin web and tree import, HULL-12 retention) are shaped on the English names and on `hullgate` from their first line.
 
 ### Settled decisions and open points
 
@@ -63,7 +63,7 @@ After this feature, every name a client, script, runbook or audit reader depends
 2. **Data volume keeps its real name `<old-name>_data`** (explicit `name:` in `deploy/compose.prod.yaml:67`); no data move. Said explicitly because the compose project rename would otherwise change the volume name: the volume is named by `HULLGATE_VOLUME`, default `<old-name>_data`, not derived from the project.
 3. **Delivery**: one integration branch carries the PRs, each reviewed separately; one merge to `main` and one deploy (§3.8).
 4. **Audit history**: old rows kept byte for byte plus one marker row; `restore-check` made migration-aware (§3.3, BR-039, BR-132).
-5. **Bench verdicts excluded in BR-131's Rule text itself**; #59 handles them.
+5. **Bench verdicts excluded in BR-131's Rule text itself**; HULL-59 handles them.
 6. **Names**: `principal` kept; `mcp-public` / `mcp-internal` replace `mcp-distant` / `mcp-local` (both renamed in migration 6); `verify-auth` replaces `verify-core`; the 7 typed access codes are prefixed `access_`.
 7. **Clean break, no aliases.**
 8. **N1**: the rename is its own mechanical PR **R**, first.
@@ -72,7 +72,7 @@ After this feature, every name a client, script, runbook or audit reader depends
 11. **N4**: new backups are named `hullgate-<ts>.db`, **and** rotation and `restore-check` sort and select on the timestamp, never on the file name (AC-27).
 12. **N5**: the integration branch merges to `main` with a merge commit (`no-ff`).
 
-**Recommendations applied, not yet explicitly validated** (the operator **confirms the naming table of §3.2 at the freeze**; the names concerned: `connection status` with field `state`, `unplace`, `provided`, `connection_reauth_required`, export `format: 3` with `organisation` kept, `/oauth/callback`, and the other choices listed in the amendment report): redirect URI `/oauth/retour` → `/oauth/callback` with a second URI registered before the deploy (§3.6); BR policy of §4.4 (every rule that names an old spelling or a changed value is versioned, now); the 109 fixed CLI lines in phase 1, `Refused` bodies to #57; the bench adapters follow the CLI with one conclusive v1 replay at the close of phase 1.
+**Recommendations applied, not yet explicitly validated** (the operator **confirms the naming table of §3.2 at the freeze**; the names concerned: `connection status` with field `state`, `unplace`, `provided`, `connection_reauth_required`, export `format: 3` with `organisation` kept, `/oauth/callback`, and the other choices listed in the amendment report): redirect URI `/oauth/retour` → `/oauth/callback` with a second URI registered before the deploy (§3.6); BR policy of §4.4 (every rule that names an old spelling or a changed value is versioned, now); the 109 fixed CLI lines in phase 1, `Refused` bodies to HULL-57; the bench adapters follow the CLI with one conclusive v1 replay at the close of phase 1.
 
 ## 2. Scope
 
@@ -92,11 +92,11 @@ After this feature, every name a client, script, runbook or audit reader depends
 
 ## Out of Scope
 
-- **#57 — code text**: messages, `Refused(...)` bodies (264 raise sites), `error_description` (9 French of 11), docstrings, comments, log lines, the consent page HTML, shell-script messages, free-text audit `reason`s that no code compares (≈8), Python identifiers that BR Rules cite (`signaler_refus`, `Accès`; BR-125, BR-127).
-- **#58 — docs**: 8 feature specs, the prose of all BRs and runbooks (and how a pure translation is versioned), ADRs, trials, capability map, changelog, release notes, `README.md`, the `domain` tags of BR and spec frontmatter, the **deletion of `poc/py-gateway/`** carried over from F-009.
-- **#59 — bench verdict vocabulary** `réussi | échoué | non jouable | non joué` (BR-037, BR-071), with a guard reading both spellings until `results-v1.json` is replayed.
-- **Open tickets' bodies** (#52 lot 4): a standing practice (translate when touched), not a ticket.
-- **The gateway's DNS name (#42)**: not a code contract; `MCP_HOST` is a deployment setting.
+- **HULL-57 — code text**: messages, `Refused(...)` bodies (264 raise sites), `error_description` (9 French of 11), docstrings, comments, log lines, the consent page HTML, shell-script messages, free-text audit `reason`s that no code compares (≈8), Python identifiers that BR Rules cite (`signaler_refus`, `Accès`; BR-125, BR-127).
+- **HULL-58 — docs**: 8 feature specs, the prose of all BRs and runbooks (and how a pure translation is versioned), ADRs, trials, capability map, changelog, release notes, `README.md`, the `domain` tags of BR and spec frontmatter, the **deletion of `poc/py-gateway/`** carried over from F-009.
+- **HULL-59 — bench verdict vocabulary** `réussi | échoué | non jouable | non joué` (BR-037, BR-071), with a guard reading both spellings until `results-v1.json` is replayed.
+- **Open tickets' bodies** (HULL-52 lot 4): a standing practice (translate when touched), not a ticket.
+- **The gateway's DNS name (HULL-42)**: not a code contract; `MCP_HOST` is a deployment setting.
 - **Any behaviour change** beyond spellings, the migration and one accepted shape change: in `connection status --json`, `state` and `stored_state` carry tokens where they carried labels (§3.2).
 - **Renaming data at rest**: volume `<old-name>_data`, database file `<old-name>.db`, the key-check label (changing it would make every key read `key_different`, BR-088), the operator-token prefix `clo_` (N3).
 - **Editing any `evidence/*.json` by hand.**
@@ -227,13 +227,13 @@ Behaviour is unchanged; only spellings move. After phase 1: `hullgate connection
 | compose project `<old-name>-amonts`, network `<old-name>_amonts`, key `amonts`, `AMONTS_NETWORK`, `deploy/amonts.compose.yaml` | `hullgate-upstreams`, `hullgate_upstreams`, `upstreams`, `UPSTREAMS_NETWORK`, `deploy/upstreams.compose.yaml` |
 | backup files (N4) | `<old-name>-<ts>.db` → `hullgate-<ts>.db` (rotation and `restore-check` **sort and select on the timestamp part of the name, never on the whole name**: `sed -E 's/^[a-z]+-//'` before `sort`, `ops.sh:124-126,146`; both prefixes accepted) |
 
-**Kept on purpose**: the English words `client`, `service`, `application`, `organisation`, `segment`, `format`, `roles`, `principal`; `GATE:`, `QA`, `DEPLOY:`, `BACKUP:`, `OPS:` tokens; audit action names; OAuth and HTTP `error` codes; the data-at-rest names above; the bench's verdict spellings (#59).
+**Kept on purpose**: the English words `client`, `service`, `application`, `organisation`, `segment`, `format`, `roles`, `principal`; `GATE:`, `QA`, `DEPLOY:`, `BACKUP:`, `OPS:` tokens; audit action names; OAuth and HTTP `error` codes; the data-at-rest names above; the bench's verdict spellings (HULL-59).
 
 ### 3.3 Migration 6 and `restore-check` (SCR-02)
 
 At startup (BR-069), one transaction with `rebuild=True`: rebuild `service`, `application` and `connection` with the new CHECK sets (SQLite cannot alter a CHECK) **and with their indexes, columns and constraints** — the four indexes of `connection` (two partial unique: `connection_name`, `connection_prefix`), `application_service`, the columns added by migrations 4 and 5 (`auth_method` with its CHECK, `last_reason`, `upstream_type`, `mcp_url`, `mcp_internal` with its CHECK) and the table-level `CHECK ((kind = 'provided') = (application_id IS NULL))`; child tables (`placement`, `pending_auth`, `key_alert`, `tool_name`, `application`→`service`, `connection`→`application`) keep referencing the final names. Then `UPDATE setting` keys, `connection.last_outcome`, `connection.last_reason` sentinels, `key_alert.reason`, `application.redirect_uri`.
 
-**How an unknown value aborts**, with static statements only (the runner `Migration` holds none other, `migrations.py:17-23`): after the mappings, one `TEMP TABLE _vocab_guard (ok INTEGER CHECK (ok = 1))` per unconstrained column receives `INSERT … SELECT CASE WHEN EXISTS (SELECT 1 FROM <table> WHERE <column> NOT IN (<english values>)) THEN 0 ELSE 1 END`; a violated CHECK raises `IntegrityError`, the runner rolls back and reports `schema_error` naming the guard, leaving the database at version 5. `connection.last_outcome` additionally carries a CHECK in the rebuilt table. `setting.key` carries **no permanent CHECK** (#10 adds keys); `last_reason` is guarded only on the eight sentinels (any other value is a provider code or text and is kept).
+**How an unknown value aborts**, with static statements only (the runner `Migration` holds none other, `migrations.py:17-23`): after the mappings, one `TEMP TABLE _vocab_guard (ok INTEGER CHECK (ok = 1))` per unconstrained column receives `INSERT … SELECT CASE WHEN EXISTS (SELECT 1 FROM <table> WHERE <column> NOT IN (<english values>)) THEN 0 ELSE 1 END`; a violated CHECK raises `IntegrityError`, the runner rolls back and reports `schema_error` naming the guard, leaving the database at version 5. `connection.last_outcome` additionally carries a CHECK in the rebuilt table. `setting.key` carries **no permanent CHECK** (HULL-10 adds keys); `last_reason` is guarded only on the eight sentinels (any other value is a provider code or text and is kept).
 
 Sealed columns (`tokens_enc`, `secret_enc`, `verifier_enc`), row counts and ids are not touched. Migrations 1 to 5 are not edited (BR-069); a fresh database passes through them and migration 6; `SCHEMA_VERSION` becomes 6 (`test_br_069_migrations.py:169` pins 5 and moves with it).
 
@@ -258,7 +258,7 @@ Roots: `ROOTS="src scripts deploy Makefile Dockerfile compose.yaml pyproject.tom
 | F (JSON values) | `"(actif\|expiré\|révoqué\|retiré\|operateur\|inconnu\|chiffré)"\|\(supprimé\)\|amont MCP non déclaré` | measured at the first run of the test | 1 |
 | G (product name, contract forms) | `(from\|import) <old-name>\|src/<old-name>\|<old-name>\.[a-z_]+\|python -m <old-name>\|<old-name>:(current\|dev\|multiarch\|smoke)\|<OLD-NAME>_[A-Z]+\|<old-name>[-_](dev\|smoke\|restorecheck\|backup\|oauth\|liste\|relais\|consent)\|name: <old-name>\b\|(routers\|services)\.<old-name>\|^ *<old-name>:\|exec -T <old-name>\|"<old-name>"\|<old-name> admin\|<compose-root>/<old-name>\|gitea-<old-name>\|<repository-url>\|projectKey=<old-name>\|projectName=<old-name>\|<old-name>_deploy\|^<old-name> = \|SERVICE=<old-name>\|ps -q <old-name>\|issuer=<old-name>\|<old-name> \{\|<old-name>-\{\|# <old-name>\|<old-name> connexion\|<old-name> <` | 123 / 505 (444 once the kept names `<old-name>_data\|<old-name>\.db\|<old-name>/connexions/controle-de-cle` are **stripped from each line** before matching, so a line that also carries a contract form still counts) | 0 |
 
-**Exclusions** (pinned in the test as a literal list, each with its reason; seven since the operator decision of 2026-11-01, §13; an eighth entry is a review finding): `src/hullgate/migrations.py` (migrations 1 to 6 carry the old values by design), `tests/unit/test_br_132_vocabulary_migration.py` (fabricated pre-migration database), `tests/unit/test_br_131_contract_surface.py` (holds the sweeps), `tests/unit/test_br_069_migrations.py` and `tests/unit/test_br_069_migration_f008.py` (they build v3 to v5 databases whose CHECKs require the old values: `'declaree'`, `'fourni'`, `'mcp-distant'`, the old URI), `docs/runbooks/hullgate-cutover.md` (names the old directory, image, project and network on purpose), `deploy/smoke/cutover.sh` (the rehearsal of AC-28 deploys the previous code and speaks its CLI, targets and names). Not swept, by design: `business-rules/`, `features/`, `docs/trials`, `docs/reviews`, `CHANGELOG.md`, `poc/isolation-bench/evidence/`, `.cairn/`, and runbook **prose** mentioning the old product name (#58).
+**Exclusions** (pinned in the test as a literal list, each with its reason; seven since the operator decision of 2026-11-01, §13; an eighth entry is a review finding): `src/hullgate/migrations.py` (migrations 1 to 6 carry the old values by design), `tests/unit/test_br_132_vocabulary_migration.py` (fabricated pre-migration database), `tests/unit/test_br_131_contract_surface.py` (holds the sweeps), `tests/unit/test_br_069_migrations.py` and `tests/unit/test_br_069_migration_f008.py` (they build v3 to v5 databases whose CHECKs require the old values: `'declaree'`, `'fourni'`, `'mcp-distant'`, the old URI), `docs/runbooks/hullgate-cutover.md` (names the old directory, image, project and network on purpose), `deploy/smoke/cutover.sh` (the rehearsal of AC-28 deploys the previous code and speaks its CLI, targets and names). Not swept, by design: `business-rules/`, `features/`, `docs/trials`, `docs/reviews`, `CHANGELOG.md`, `poc/isolation-bench/evidence/`, `.cairn/`, and runbook **prose** mentioning the old product name (HULL-58).
 
 **Extractors per family** (what BR-131's snapshot reads, one mutant per key compared, never one per function): CLI — a walk of `cli._parser()` for groups, verbs, flags and choices; JSON shapes — the real output of each command in the CLI tour test; CHECK lists — `sqlite_master` of a fresh migrated database, normalised; wire and audit values — the distinct `detail.issue`, `reason` and `result` values written by the integration suite, collected by a session fixture, against a pinned set; Makefile targets — `make -pn`; compose and env — YAML parse of `compose.yaml`, `deploy/*.yaml` and `env.example`. A family with no extractor is covered by the sweeps alone and is not claimed more.
 
@@ -273,7 +273,7 @@ The runbook is written in PR C; nothing is played toward the production server b
 
 *Cutover*
 4. Gitea: rename the repository `<repository-url>` to `hullgate`; SonarQube: **Update Key** to `hullgate` (project settings, history kept). Do not run `make sonar` between the merge and this step.
-5. Session (on the operator's go, right after step 4): `git remote set-url origin <repository-url>`; one commit on `main` updating `.cairn/project-context.yaml` (name, repository, tracker project). **Check**: one read call on the tracker (`ticket.get` on #56) through the gitea MCP server after the rename; if it fails, the server's own configuration carries the old repository name and is corrected before any further tracker act.
+5. Session (on the operator's go, right after step 4): `git remote set-url origin <repository-url>`; one commit on `main` updating `.cairn/project-context.yaml` (name, repository, tracker project). **Check**: one read call on the tracker (`ticket.get` on HULL-56) through the gitea MCP server after the rename; if it fails, the server's own configuration carries the old repository name and is corrected before any further tracker act.
 6. The production server, ssh: add `Host gitea-hullgate` (same `HostName`, `Port`, `IdentityFile ~/.ssh/<old-name>_deploy`; the read-only deploy key stays attached to the renamed repository and its file name is not changed), then `git remote set-url origin <repository-url>`; keep the old `Host` entry until step 15.
 7. `.env`: rename `<OLD-NAME>_IMAGE` → `HULLGATE_IMAGE`, `<OLD-NAME>_VOLUME` → `HULLGATE_VOLUME` (value `<old-name>_data`, written explicitly), add `UPSTREAMS_NETWORK=hullgate_upstreams`, drop `AMONTS_NETWORK`. The secret paths in `.env` are unchanged (the directory is kept).
 8. `git fetch origin && git checkout --detach <sha>` by hand (new `ops.sh`, new compose files in place), then build the new image: `docker compose -f deploy/compose.prod.yaml --env-file .env build` — the old container keeps serving meanwhile.
@@ -290,7 +290,7 @@ The runbook is written in PR C; nothing is played toward the production server b
 
 *Rollback (before step 14) — short blocks R0 to R7 in `docs/runbooks/hullgate-cutover.md`, played in the clone of the cutover, each ending on a printed `OK`/`KO` check that stops it (review 488, B1); every command uses the previous checkout, the previous image or the previous module, never the new tree on the restored file*
 
-- **R0** sets `PREV` and `TS` once, checks their format and the safeguards of step 3, and chooses the backup R4 restores (`SRC`, operator decision of 2026-11-01, #56): **step 10's pre-deploy backup** `backups/hullgate-<ts10>.db`, taken at the start of downtime with no writer and before migration 6, named by step 10's own output (`make deploy … | tee -a backups/cutover-step10.log`, last attempt first, never "the latest backup": `make verify` writes later ones at schema 6), kept only if its timestamp is after `<ts>`, its `PRAGMA user_version` is 5 and `restore-check` of the **previous** code passes on it; otherwise **step 3's aside copy** `backups/pre-hullgate-<ts>.db`, with the reason printed. Nothing changes in R0.
+- **R0** sets `PREV` and `TS` once, checks their format and the safeguards of step 3, and chooses the backup R4 restores (`SRC`, operator decision of 2026-11-01, HULL-56): **step 10's pre-deploy backup** `backups/hullgate-<ts10>.db`, taken at the start of downtime with no writer and before migration 6, named by step 10's own output (`make deploy … | tee -a backups/cutover-step10.log`, last attempt first, never "the latest backup": `make verify` writes later ones at schema 6), kept only if its timestamp is after `<ts>`, its `PRAGMA user_version` is 5 and `restore-check` of the **previous** code passes on it; otherwise **step 3's aside copy** `backups/pre-hullgate-<ts>.db`, with the reason printed. Nothing changes in R0.
 - **R1** `docker compose -p hullgate down --remove-orphans`, then a printed check that no `hullgate` container runs.
 - **R2-R4** (one block, `set -e`): proof that no container uses `<old-name>_data`; `git checkout --detach <previous sha>`; `cp .env.pre-hullgate .env`; `rm -f` of the database and its side files then `python -m <old-name>.backup restore - /data/<old-name>.db < $SRC` in `<old-name>:pre-hullgate` (the OLD image and the OLD module: nothing migrates the file); a printed check that `PRAGMA user_version` is 5.
 - **R5-R6** (`set -e`): `make deploy REF=<previous sha>` (old script, old compose, project `<old-name>`); the old upstream recreated (`docker compose -f deploy/amonts.compose.yaml --env-file .env up -d --force-recreate`, in case step 9 or R1 removed its network); `docker compose -p hullgate-upstreams down --remove-orphans` and a printed check.
@@ -302,14 +302,14 @@ Why this order: the old code refuses a v6 database (`schema_too_new`), so the da
 
 ### 3.7 Canonical terms (SCR-06)
 
-`domain-glossary.md` (20 rows in three tables) takes the English canonical terms the names above spell: Access point, Segment, Sensitive environment, Lock, Operator token, Authorization order, Lineage, Authorization barrier, Library, Connection, Provided-token connection, Service, Application (outbound OAuth), Placement, Tool prefix, Quality tool, QA line, Relay, Upstream, Public (tool) name. Each row keeps its former French term in the Definition (« formerly Amont ») and **not** in the "do not use" column, so INV-021 does not fire on the French BR prose until #58 moves the term there. The glossary names the product `hullgate`.
+`domain-glossary.md` (20 rows in three tables) takes the English canonical terms the names above spell: Access point, Segment, Sensitive environment, Lock, Operator token, Authorization order, Lineage, Authorization barrier, Library, Connection, Provided-token connection, Service, Application (outbound OAuth), Placement, Tool prefix, Quality tool, QA line, Relay, Upstream, Public (tool) name. Each row keeps its former French term in the Definition (« formerly Amont ») and **not** in the "do not use" column, so INV-021 does not fire on the French BR prose until HULL-58 moves the term there. The glossary names the product `hullgate`.
 
 ### 3.8 Delivery: one integration branch, four PRs, one merge
 
 - Integration branch **`feat/HULL-56-english-contracts`**, cut from `main` once the spec is frozen. PR branches `feat/HULL-56-r-rename`, `feat/HULL-56-a-cli-stored`, `feat/HULL-56-b-wire`, `feat/HULL-56-c-ops`.
 - Each PR is opened **with the integration branch as its base** (not `main`), reviewed by the review act on its own diff, merged by the AI (squash, `access.merge-by: ai`) into the integration branch, in the order R, A, B, C. A PR body states: « integration branch only — do not deploy ».
 - `close-feature` runs per PR on its PR branch (BR extraction committed there); BR-131, which spans R to C, is extracted at the closure of C. `main` is merged into the integration branch (merge commit) whenever it moves, so the final merge is conflict-free.
-- The identifiers BR-131 and BR-132 are reserved from the freeze: the spec is committed on `main` at the freeze and `br-identifiers.md` §Allocation scans the §4 of every open spec, so a spec drafted meanwhile (#10) cannot take them.
+- The identifiers BR-131 and BR-132 are reserved from the freeze: the spec is committed on `main` at the freeze and `br-identifiers.md` §Allocation scans the §4 of every open spec, so a spec drafted meanwhile (HULL-10) cannot take them.
 - After C: one PR **integration → `main`** (N5: merge commit), carrying no new change; its checks are `make gate`, `make test-container`, `cairn check` green, the four PR approvals. `main` stays deployable throughout, and the first deploy that contains migration 6 contains the whole feature, which is what makes the marker of §3.4 true.
 
 ## 4. Business Rules
@@ -388,7 +388,7 @@ All evolved rules keep their `kind` and `enforcement` (`behavioral`; `strict` or
 
 ### 4.4 Spelling and value evolutions — the 47 evolved rules (v+1; BR-066 and BR-039 are written out above)
 
-Rule: a rule is versioned when its Rule **or its Clarifications or Examples** state a spelling or a value that this feature changes (a quoted command, flag, code, stored or JSON value, output line, URI, `format`). Prose that merely uses a French word is #58's. The edit applies the §3.2 substitutions to the Rule, Clarifications and Examples and nothing else; the Versioning row reads « Contract spelling migrated to English (F-010) ». A rule that names tokens of two phases is versioned in the **last** of them (inside the integration branch the intermediate state is never deployed). Implementation References of the 84 rules citing `src/<old-name>/` follow the rename in PR R **without a version** (a pointer, not a requirement; `cairn check` is run at R's closure to confirm no pointer check fails).
+Rule: a rule is versioned when its Rule **or its Clarifications or Examples** state a spelling or a value that this feature changes (a quoted command, flag, code, stored or JSON value, output line, URI, `format`). Prose that merely uses a French word is HULL-58's. The edit applies the §3.2 substitutions to the Rule, Clarifications and Examples and nothing else; the Versioning row reads « Contract spelling migrated to English (F-010) ». A rule that names tokens of two phases is versioned in the **last** of them (inside the integration branch the intermediate state is never deployed). Implementation References of the 84 rules citing `src/<old-name>/` follow the rename in PR R **without a version** (a pointer, not a requirement; `cairn check` is run at R's closure to confirm no pointer check fails).
 
 | Phase | BR | Tokens (Rule = R, Clarification/Example = C) |
 |---|---|---|
@@ -430,7 +430,7 @@ Rule: a rule is versioned when its Rule **or its Clarifications or Examples** st
 | 2 | BR-122 R | the 12 issue values |
 | 2 | BR-124 R | `amont_occupe` |
 | 2 | BR-126 R | `reponse_trop_grande`, `[masqué]` |
-| 2 | BR-127 R | `connexion_a_reautoriser` (the identifier `signaler_refus` stays: #57) |
+| 2 | BR-127 R | `connexion_a_reautoriser` (the identifier `signaler_refus` stays: HULL-57) |
 | 2 | BR-128 R | `connexion_a_reautoriser` |
 | 2 | BR-129 R | `requete_trop_grande` |
 | 2 | BR-107 C | wire codes |
@@ -440,7 +440,7 @@ Rule: a rule is versioned when its Rule **or its Clarifications or Examples** st
 | 2 | BR-130 C | `connexion etat`, `connexion outils`, omission reason `sensible` |
 | 3 | BR-104 C | SonarQube project key `<old-name>` → `hullgate` |
 
-That makes **47** touched rules (`br-touched`): 27 by their Rule, 20 by a Clarification or Example only. Instrument: `grep` of the sweeps' patterns over `business-rules/*.md` Rule, Clarification and Example text (Archives and Implementation References excluded) at the start of each phase lists the rules the phase must still version, and must list none at its closure. State labels used in prose (« réauthentification requise », « en attente ») are prose, not tokens: #58.
+That makes **47** touched rules (`br-touched`): 27 by their Rule, 20 by a Clarification or Example only. Instrument: `grep` of the sweeps' patterns over `business-rules/*.md` Rule, Clarification and Example text (Archives and Implementation References excluded) at the start of each phase lists the rules the phase must still version, and must list none at its closure. State labels used in prose (« réauthentification requise », « en attente ») are prose, not tokens: HULL-58.
 
 ## 5. Acceptance Criteria
 
@@ -467,7 +467,7 @@ That makes **47** touched rules (`br-touched`): 27 by their Rule, 20 by a Clarif
 - [x] **AC-16** (BR-042, BR-131) — runbooks follow: every command line of `docs/runbooks/*.md` that invokes the CLI (the `$C …` and `hullgate admin …` lines; 19, 18, 3 and 1 at `b37664f` in `keys-and-upstreams.md`, `keys-and-upstreams.md`, `keys-and-upstreams.md`, `update.md`) is extracted and parsed by the new parser without a usage error (`-k runbook_commands`); `pytest tests/unit/test_br_042_runbooks.py -q` stays green; each « Résultat attendu » that quotes an output line quotes the English line.
 - [x] **AC-17** (BR-071, BR-131) — bench follows the CLI: every `self.cli(...)` call of `adapter_v1.py` (35 at `b37664f`) **and** every CLI call of `runner/harness/v1-harness.py` and the two review harnesses (`HULL-5-review-*-test.py`) is extracted by AST and parses under the new parser, and each reads only field names and values of the pinned status JSON (`-k bench_adapter_parses`); at the close of phase 1 the implementation plays, in the toolbox, `cd poc/isolation-bench && ./bench.sh --target v1 --purge-images`, which ends 16 tests and every control `réussi`; `python3 scripts/sdk_guard.py` exits 0 on the regenerated `results-v1.json`; the verdict vocabulary is unchanged (`grep -c '"result": "réussi"' results-v1.json` is 27); the duration is recorded (a reading, not an assertion).
 - [x] **AC-18** (BR-131) — declaration terms: `domain-glossary.md` has 20 rows, no French term in the **Term** column, and each term of §3.7 is present (`for t in …; do grep -c "\*\*$t" domain-glossary.md; done` over the 20 terms prints `1` twenty times).
-- [x] **AC-19** (phase 1 BRs) — at the closure of phase 1 each of the 30 rules of §4.4 phase 1 has its `version` incremented, no old spelling of sweeps A to G left in its Rule, Clarifications and Examples (`awk '/^## Rule/,/^## Versioning/' business-rules/BR-052.md | grep -cE -- "$A|$B1|$B2|$C|$E|$F|$G"` prints `0`, per rule — every sweep, not the tokens of its row), its previous text in Archives; and it differs from its previous version **only on lines containing a §3.2 old spelling** (**read by hand** on `git diff -U0`). Reading fixed by the operator (2026-11-01, #56): the criterion counts quoted tokens; four prose phrases that the sweeps also hit stay as prose and are translated by #58 (BR-066 « refus signalé », BR-089 « bail échu », BR-090 and BR-092 « écriture impossible »).
+- [x] **AC-19** (phase 1 BRs) — at the closure of phase 1 each of the 30 rules of §4.4 phase 1 has its `version` incremented, no old spelling of sweeps A to G left in its Rule, Clarifications and Examples (`awk '/^## Rule/,/^## Versioning/' business-rules/BR-052.md | grep -cE -- "$A|$B1|$B2|$C|$E|$F|$G"` prints `0`, per rule — every sweep, not the tokens of its row), its previous text in Archives; and it differs from its previous version **only on lines containing a §3.2 old spelling** (**read by hand** on `git diff -U0`). Reading fixed by the operator (2026-11-01, HULL-56): the criterion counts quoted tokens; four prose phrases that the sweeps also hit stay as prose and are translated by HULL-58 (BR-066 « refus signalé », BR-089 « bail échu », BR-090 and BR-092 « écriture impossible »).
 
 **Phase 2 — PR B**
 
@@ -518,8 +518,8 @@ flowchart TD
 ### Dependencies (prerequisite features)
 
 - F-004 to F-009 — implemented (2026-10-31): the surfaces renamed here.
-- Tracker: #56 (this spec's ticket) under the umbrella #52; siblings #57, #58, #59 follow and must not start before phase 0 and 1 are on the integration branch (same files). #43 (name) is settled as `hullgate`; #42 (DNS) is independent.
-- Downstream, to be shaped on the English names: #10 (policy: new settings keys), #11 (admin web and tree import: reads export `format: 3`), #12 (retention).
+- Tracker: HULL-56 (this spec's ticket) under the umbrella HULL-52; siblings HULL-57, HULL-58, HULL-59 follow and must not start before phase 0 and 1 are on the integration branch (same files). HULL-43 (name) is settled as `hullgate`; HULL-42 (DNS) is independent.
+- Downstream, to be shaped on the English names: HULL-10 (policy: new settings keys), HULL-11 (admin web and tree import: reads export `format: 3`), HULL-12 (retention).
 - Tools: `make`, `uv`, `buildx` exist in the toolbox only (`.cairn/runs/acts/HULL-6-toolbox.Dockerfile`), not in the session: the gate and the bench replay run there.
 
 ### Technical Constraints
@@ -538,7 +538,7 @@ flowchart TD
 | Compatibility | clean break, no aliases (operator) | one deployment, one operator; aliases double the tested surface |
 | Audit history | rows kept byte for byte, one marker row; `restore-check` migration-aware (operator) | BR-066 is `strict`; a read-time map is a permanent legacy table |
 | Delivery | integration branch, PRs R, A, B, C into it, one merge to `main`, one deploy (operator) | `main` stays deployable; the marker is true |
-| Bench verdicts | excluded in BR-131's Rule, #59 (operator) | a `strict` rule takes its exception in its own text |
+| Bench verdicts | excluded in BR-131's Rule, HULL-59 (operator) | a `strict` rule takes its exception in its own text |
 | Names | `principal` kept; `mcp-public`/`mcp-internal`; `verify-auth`; `access_` typed codes (operator) | avoid a mixed tree, the `mcp-remote` bridge name, two meanings of « core », OAuth/`result` collisions |
 | Rollback order | a literal block: previous checkout, previous `.env`, restore with the previous image and module, then the previous code (§3.6) | the old code refuses a v6 file; the new `backup restore` migrates what it restores |
 | The production server directory | kept through the cutover, renamed after acceptance (operator, N2 revised) | its absolute secret paths are in `.env`; moving it inside the window broke the saved `.env` |
@@ -648,7 +648,7 @@ Minors :
 - **m2** · axe B · §3.4 — a fresh or empty database would get a marker row for nothing. Sort : corrigé — marker only when the audit table is non-empty (AC-06).
 - **m3** · axe B · §3.3 — an operator script outside the repository, or an old `.env` key, would break silently. Sort : accepté — one operator; the old `AMONTS_NETWORK` is ignored because the new key has a default; risk in §12.
 - **m4** · axe C · §2 — the lot is large (27 BRs, about 75 test files). Sort : accepté — three PRs; splitting A by layer touches the same tests twice (Q7).
-- **m5** · axe C · §3.2 export — `format: 3` although no importer exists yet (#11). Sort : accepté — renaming keys after #11 would version a consumer.
+- **m5** · axe C · §3.2 export — `format: 3` although no importer exists yet (HULL-11). Sort : accepté — renaming keys after HULL-11 would version a consumer.
 - **m6** · axe C · §3.7 — translating the whole glossary in a « contracts » lot is a docs task. Sort : accepté — 15 rows, and it is where the canonical English terms of the new names are declared (declaration-term rule).
 - **m7** · axe D · §Out of Scope — BR Rules cite code identifiers (`signaler_refus`, `Accès`) that the code lot will rename. Sort : différé — §Out of Scope; those BRs take them with their translation.
 - **m8** · axe D · §Out of Scope — `domain` tags of BR and spec frontmatter (`socle`, `connexions`) are French labels. Sort : différé — docs lot.
@@ -674,13 +674,13 @@ Majors et minors : sort table of the pass.
 | M7 output-line instrument | corrigé | tour test over the CLI instead of AST; stem check over the tour output; `motif=/avant=/après=` named (AC-15) |
 | M8 exclusions cannot hold | corrigé | five pinned exclusions plus the cutover runbook (`test_br_069_*` named with their reason); `SCHEMA_VERSION` pin moves |
 | M9 BR lists | corrigé | every rule whose Clarification states a changed value is versioned now: 47 touched (27 Rule, 19 Clarification), deferred list empty; BR-074, BR-109 added; recount in §4.4 |
-| M10 exception in a Clarification | corrigé | the exceptions are in BR-131's Rule text; #59 owns the bench; permanent keeps separated from exceptions |
+| M10 exception in a Clarification | corrigé | the exceptions are in BR-131's Rule text; HULL-59 owns the bench; permanent keeps separated from exceptions |
 | M11 key-check label | corrigé | named in BR-131 (Rule and Clarification), literal-digest regression test (AC-04) |
 | M12 guard form | corrigé | extractors per family, one mutant per key, positive fixture per sweep; Objective narrowed (§3.5) |
 | M13 deploy between PRs | corrigé | integration branch, one merge to `main` (§3.8); the marker is true |
 | M14 redirect URI window | corrigé | second URI registered before the deploy, removed after acceptance; `connection reauthorize` end to end; no pending authorization pre-check (§3.6, AC-OP-01) |
-| M15 name collision with #43 | corrigé | the operator settled `hullgate`; the rename is in this feature; §1 promise reworded |
-| M16 spec on a `split` ticket | corrigé | `ticket: HULL-56`, #52 umbrella |
+| M15 name collision with HULL-43 | corrigé | the operator settled `hullgate`; the rename is in this feature; §1 promise reworded |
+| M16 spec on a `split` ticket | corrigé | `ticket: HULL-56`, HULL-52 umbrella |
 | m1 old verb never tested under new group | corrigé | AC-08 invokes each old verb under its new group and each old flag under a verb that had it |
 | m2 unwritten « above zero » instrument | corrigé | positive fixture per sweep (§3.5, AC-07) |
 | m3 `v1-harness.py` outside the parse | corrigé | AC-17 extended to it and to the review harnesses |
@@ -693,7 +693,7 @@ Majors et minors : sort table of the pass.
 | m10 window between deploy and upstream recreation | corrigé | stated, steps 11 and 12 contiguous (§3.6, §12, AC-OP-01 reading) |
 | m11 backup rotation | corrigé | aside copy `pre-hullgate-<ts>.db` outside the rotation regex (§3.6 step 3) |
 | m12 French tag `exploitation` | corrigé | `operations` |
-| m13 `poc/py-gateway` deletion has no lot | corrigé | named in §Out of Scope as carried by #58 |
+| m13 `poc/py-gateway` deletion has no lot | corrigé | named in §Out of Scope as carried by HULL-58 |
 | m14 marker wording | corrigé | « separates vocabularies of values » (§3.4) |
 
 Partial adoptions, not rejections: M8 took the first of the two proposed forms (five pinned exclusions rather than one fixture module); M6 chose guard tables rather than a Python step in the runner. **Rejected: none.**
@@ -710,7 +710,7 @@ Majors :
 - **X3** · axe F · §4.4, BR-070/BR-080 — the Rule-level `<old-name>` command names (`<old-name> export`, `<old-name> jeton creer`) are versioned by phase 1 while PR R renames the binary; PR R must not edit versioned text. Sort : corrigé — R touches Implementation References only (no version); the four Rules take the binary name with their phase-1 version.
 
 Minors :
-- **X4** · axe D · §3.5 sweep G — runbook prose mentions the old product name in 8 files; the sweep would flag prose. Sort : corrigé — sweep G matches contract forms only; prose is #58's and not swept.
+- **X4** · axe D · §3.5 sweep G — runbook prose mentions the old product name in 8 files; the sweep would flag prose. Sort : corrigé — sweep G matches contract forms only; prose is HULL-58's and not swept.
 - **X5** · axe B · §3.6 step 4 — a `make sonar` between the merge and the SonarQube key rename creates a second project. Sort : corrigé — ordering note in step 4 and §12.
 - **X6** · axe F · §4.4 — a rule naming tokens of two phases would be versioned twice. Sort : corrigé — versioned in the last phase; the intermediate state stays inside the integration branch.
 - **X7** · axe A · AC-02 — « mechanical » had no instrument. Sort : corrigé — the rename is a committed, replayable script and the criterion compares trees.
@@ -762,20 +762,21 @@ Minors :
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-10-31 | model:claude-sonnet-5-5 | Spec creation (framing of HULL-52, lot 1 « contracts »), up to the freeze, excluded |
-| 2026-10-31 | model:claude-sonnet-5-5 | Amendment (commit on `draft/HULL-52-f010`): ticket → #56; operator decisions of 2026-10-31 written in; 32 findings of the Opus pass applied (sort table in the Stress-test section); third pass on the new material |
-| 2026-10-31 | human:sstolz (decisions) | Decisions of 2026-10-31: (1) product renamed `hullgate` in the same break, repository/remotes/SonarQube key/directory at the cutover; (2) volume keeps `<old-name>_data`, no data move; (3) one integration branch, PRs reviewed separately, one merge and one deploy; (4) audit rows kept plus one marker row, `restore-check` migration-aware; (5) bench verdicts excluded in BR-131's Rule, #59; (6) `principal` kept, `mcp-public`/`mcp-internal`, `verify-auth`, `access_` typed codes; (7) clean break, no aliases |
+| 2026-10-31 | model:claude-sonnet-5-5 | Amendment (commit on `draft/HULL-52-f010`): ticket → HULL-56; operator decisions of 2026-10-31 written in; 32 findings of the Opus pass applied (sort table in the Stress-test section); third pass on the new material |
+| 2026-10-31 | human:sstolz (decisions) | Decisions of 2026-10-31: (1) product renamed `hullgate` in the same break, repository/remotes/SonarQube key/directory at the cutover; (2) volume keeps `<old-name>_data`, no data move; (3) one integration branch, PRs reviewed separately, one merge and one deploy; (4) audit rows kept plus one marker row, `restore-check` migration-aware; (5) bench verdicts excluded in BR-131's Rule, HULL-59; (6) `principal` kept, `mcp-public`/`mcp-internal`, `verify-auth`, `access_` typed codes; (7) clean break, no aliases |
 | 2026-10-31 | model:claude-sonnet-5-5 | Amendment 2 (commit on `draft/HULL-52-f010`): operator decisions on N1 to N5; Opus pass 2 applied (14 findings, sort table); BR-091 added (47 touched); AC-27, AC-28; passe 4 |
 | 2026-10-31 | human:sstolz (decisions) | Decisions of 2026-10-31 (second set): N1 the rename is its own mechanical PR R, first; N2 revised: `<compose-root>/<old-name>` kept through the cutover, renamed after acceptance as a standalone gesture; N3 `clo_` kept; N4 new backups `hullgate-<ts>.db`, rotation and `restore-check` select on the timestamp; N5 merge commit (`no-ff`) of the integration branch |
 | 2026-10-31 | human:sstolz (freeze) | Freeze: `ready-for-dev`. The operator confirms the naming table of §3.2, including the names listed in the amendment-2 report. Capabilities: extends Jetons opérateur, Journal d'audit, Bibliothèque de connexions, Client OAuth sortant, Relais d'outils MCP, Client MCP amont; introduces English contract vocabulary. Merge: AI (integration branch `feat/HULL-56-english-contracts`, PRs R, A, B, C each reviewed, one `no-ff` merge to `main`); Split: 4 PRs. |
 | 2026-11-01 | orchestrator (ruling) | Post-freeze: the BR versioning that §3.8 and §10 place on each PR branch (AC-19, AC-22) and the extraction of BR-131 and BR-132 are moved to the closure of F-010, after PR C: nothing deploys between the PRs; AC-25 is read there. |
-| 2026-11-01 | human:sstolz (decision, #56) | Post-freeze: the rehearsal script `deploy/smoke/cutover.sh` is accepted as a seventh pinned exclusion of the sweeps (§3.5): it deploys the previous code and speaks its CLI, targets and names, like the cutover runbook. |
-| 2026-11-01 | human:sstolz (decision, #56) | Post-freeze: AC-28 is accepted without a fake OAuth provider (the image trusts only its CA store, BR-084, and `service declare` runs an https discovery): the rehearsal seeds the service row and uses a provided-token connection; the OAuth renewal path stays with the integration tests and AC-OP-01 steps 12-13. |
-| 2026-11-01 | human:sstolz (decision, #56) | Post-freeze amendment of §3.6 (PR C, review 488): the rollback is written as short blocks R0 to R7 that stop on a printed `KO`; R4 restores step 10's pre-deploy backup (schema 5, named by step 10's output, after step 3, `restore-check` of the previous code passing) and falls back to step 3's aside copy otherwise, printing the reason; what a rollback cannot restore is stated. |
+| 2026-11-01 | human:sstolz (decision, HULL-56) | Post-freeze: the rehearsal script `deploy/smoke/cutover.sh` is accepted as a seventh pinned exclusion of the sweeps (§3.5): it deploys the previous code and speaks its CLI, targets and names, like the cutover runbook. |
+| 2026-11-01 | human:sstolz (decision, HULL-56) | Post-freeze: AC-28 is accepted without a fake OAuth provider (the image trusts only its CA store, BR-084, and `service declare` runs an https discovery): the rehearsal seeds the service row and uses a provided-token connection; the OAuth renewal path stays with the integration tests and AC-OP-01 steps 12-13. |
+| 2026-11-01 | human:sstolz (decision, HULL-56) | Post-freeze amendment of §3.6 (PR C, review 488): the rollback is written as short blocks R0 to R7 that stop on a printed `KO`; R4 restores step 10's pre-deploy backup (schema 5, named by step 10's output, after step 3, `restore-check` of the previous code passing) and falls back to step 3's aside copy otherwise, printing the reason; what a rollback cannot restore is stated. |
 | 2026-11-01 | model:claude-opus-5-5 (amendment, review 494) | Under the §3.6 amendment above: step 10 appends its output to `backups/cutover-step10.log` (`tee -a`), which R0 reads for the pre-deploy backup (last attempt first) and for `PREV` (the ref deployed before step 10, right after a `DEPLOY: KO` as well); R0 reads the backup's schema from its header on the host. |
 | 2026-11-01 | model:claude-opus-5-5 (amendment, review 494) | Under the decision of 2026-11-01 on the seventh exclusion: §3.5 and BR-131's candidate state read seven pinned exclusions (`deploy/smoke/cutover.sh` named in §3.5); an eighth is a review finding. |
 | 2026-11-01 | model:claude-sonnet-5-5 (close-feature, Phase 3) | Closure after PR C: BR-131 and BR-132 extracted (v1); the 47 evolved rules versioned (v+1, previous text archived, only the contract tokens of §3.2 changed; BR-039 and BR-066 carry the edits §4.1 writes out); `status: implemented`; indexes, capability map and CHANGELOG rendered or synced. AC-26 (final PR) and AC-OP-01 (operator) stay open. |
-| 2026-11-01 | human:sstolz (decision, #56) | Post-freeze: AC-19 and AC-22 count quoted tokens; four prose phrases (BR-066 « refus signalé », BR-089 « bail échu », BR-090 and BR-092 « écriture impossible ») stay as prose for #58. |
-| 2026-11-01 | human:sstolz (decision, #56) | Post-freeze: AC-05 is played by a new integration test `test_br_131_product_name.py` asserting the nine client-visible names positively; ticked. |
-| 2026-11-01 | human:sstolz (decision, #56, freeze owner) | Post-freeze amendment of `capabilities.extends`: adds Arbre des points d'accès, Coffre chiffré des connexions, Sauvegarde et contrôle de restauration, Outils d'analyse de qualité (their rules are in `br-touched`); the four rows move to `Last touched` F-010. |
+| 2026-11-01 | human:sstolz (decision, HULL-56) | Post-freeze: AC-19 and AC-22 count quoted tokens; four prose phrases (BR-066 « refus signalé », BR-089 « bail échu », BR-090 and BR-092 « écriture impossible ») stay as prose for HULL-58. |
+| 2026-11-01 | human:sstolz (decision, HULL-56) | Post-freeze: AC-05 is played by a new integration test `test_br_131_product_name.py` asserting the nine client-visible names positively; ticked. |
+| 2026-11-01 | human:sstolz (decision, HULL-56, freeze owner) | Post-freeze amendment of `capabilities.extends`: adds Arbre des points d'accès, Coffre chiffré des connexions, Sauvegarde et contrôle de restauration, Outils d'analyse de qualité (their rules are in `br-touched`); the four rows move to `Last touched` F-010. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

@@ -1,5 +1,5 @@
 # MCP upstreams of hullgate on the production server (F-008, runbook docs/guides/keys-and-upstreams.md), outside the gateway's
-# image (#1, l. 530-532): one container per MCP server, on the `upstreams` network that carries only the gateway and
+# image (HULL-1, l. 530-532): one container per MCP server, on the `upstreams` network that carries only the gateway and
 # its upstreams (F-008 §12, cleartext traffic to a named internal host, BR-106). Played by the operator:
 #   docker compose -f deploy/upstreams.compose.yaml --env-file .env up -d
 # `gitea-mcp` 1.11.0 pinned by digest, stateless HTTP; one Gitea host per process (GITEA_URL in .env); no

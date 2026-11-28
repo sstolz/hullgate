@@ -1,6 +1,6 @@
-# Matrix of targeted official servers — desk study (phase 1 of #4)
+# Matrix of targeted official servers — desk study (phase 1 of HULL-4)
 
-Ticket: #4 (HULL-4). Reading date of all sources: **2026-10-28**. No authenticated call to a provider, no account or application created. Only anonymous reads of public metadata (`/.well-known/...`) and of the 401 response of the MCP access points were made; they are marked "observed".
+Ticket: HULL-4 (HULL-4). Reading date of all sources: **2026-10-28**. No authenticated call to a provider, no account or application created. Only anonymous reads of public metadata (`/.well-known/...`) and of the 401 response of the MCP access points were made; they are marked "observed".
 
 Conventions: `[Sn]` refers to the list of sources at the end of the document. "not verified" = no source read for this claim; it is a point to settle in phase 2.
 

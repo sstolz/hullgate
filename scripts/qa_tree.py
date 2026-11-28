@@ -1,4 +1,4 @@
-"""Cleanliness of the working tree in BR-104's sense, and writing of `coverage.sha` (#45).
+"""Cleanliness of the working tree in BR-104's sense, and writing of `coverage.sha` (HULL-45).
 
 A single definition of "clean tree": no tracked modification, no untracked file under
 `src/` and `tests/`. `qa_sonar.py` uses it as its send guard; the gate uses it to write

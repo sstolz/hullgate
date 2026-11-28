@@ -1,5 +1,5 @@
 <script lang="ts">
-  // SCR-04: Library | Tree | Inspector, three columns collapsed with `[` and `]` (#18), the List
+  // SCR-04: Library | Tree | Inspector, three columns collapsed with `[` and `]` (HULL-18), the List
   // and Map views, and the acts of §3.5: add, rename, move, delete, sensitivity, lock, placement.
   // Every irreversible act goes through BR-214's impact dialog; a placement refused for a share
   // opens SCR-07.share (BR-078 v3). The console decides nothing (BR-211).

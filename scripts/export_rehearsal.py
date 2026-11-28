@@ -4,6 +4,8 @@ Default: archive HEAD into a new directory, make its single local snapshot, run 
 full gate and QA, then judge the example and an ephemeral local context. Use
 --checks non-docker for the offline Python checks, or --checks prepare to only export.
 A tree object may be supplied for pre-commit validation; it is labelled as such.
+--with-tag TAG (F-025) also exports TAG's tree into the same scratch repository as a parentless
+commit carrying a local TAG, as the public repository holds it: BR-350's guard reads that tree.
 """
 
 from __future__ import annotations
@@ -16,6 +18,7 @@ import re
 import subprocess
 import sys
 import tarfile
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -119,6 +122,32 @@ def export(source: Path, destination: Path, ref: str) -> str:
     return oid
 
 
+def add_tag(source: Path, destination: Path, tag: str) -> str:
+    """Export `tag`'s tree into `destination`'s repository as a parentless commit tagged `tag`."""
+    with tempfile.TemporaryDirectory(prefix="export-tag-") as scratch:
+        side = Path(scratch) / "tag"
+        export(source, side, f"refs/tags/{tag}")
+        files = local_git(side, "ls-files", "-z")
+        env = isolated_env() | {
+            "GIT_DIR": str(destination / ".git"),
+            "GIT_WORK_TREE": str(side),
+            "GIT_INDEX_FILE": str(Path(scratch) / "tag.index"),
+        }
+        for args, data in (
+            (("update-index", "--add", "-z", "--stdin"), files),
+            (("write-tree",), None),
+        ):
+            result = subprocess.run(
+                ["git", *args], cwd=side, env=env, input=data, capture_output=True, check=False
+            )
+            if result.returncode:
+                raise ValueError("export Git operation failed (output withheld)")
+        tree = result.stdout.decode().strip()
+    commit = local_git(destination, "commit-tree", tree, data=f"Public export of {tag}\n".encode())
+    local_git(destination, "tag", tag, commit.decode().strip())
+    return tree
+
+
 def assert_boundary(root: Path) -> None:
     paths = set(local_git(root, "ls-files", ".cairn").decode().splitlines())
     if paths != EXPORTED_CAIRN:
@@ -217,11 +246,15 @@ def main() -> int:
     parser.add_argument("--ref", default="HEAD")
     parser.add_argument("--checks", choices=("full", "non-docker", "prepare"), default="full")
     parser.add_argument("--cairn", default="cairn")
+    parser.add_argument("--with-tag", help="also export this tag's tree, tagged, beside HEAD")
     args = parser.parse_args()
     try:
         source, destination = Path.cwd(), args.destination.resolve()
         oid = export(source, destination, args.ref)
         print(f"Exported tree {oid}; ref={args.ref}; mode={args.checks}", flush=True)
+        if args.with_tag:
+            tree = add_tag(source, destination, args.with_tag)
+            print(f"Exported tag {args.with_tag} tree {tree}", flush=True)
         if args.checks == "prepare":
             print("Export prepared; no gate/QA/cairn acceptance claimed")
             return 0

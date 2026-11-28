@@ -2,7 +2,7 @@
 
 Il porte le provisionnement, les actions d'administration qu'exigent certains tests (ajout de compte T10,
 révocation T12, panne T13) et l'inventaire des fonctions du produit (preuve des lignes « non jouable », BR-009).
-Pour le POC Go (#5), on écrit un autre adaptateur ; l'exécuteur (recette.py) ne change pas.
+Pour le POC Go (HULL-5), on écrit un autre adaptateur ; l'exécuteur (recette.py) ne change pas.
 """
 import base64
 import hashlib

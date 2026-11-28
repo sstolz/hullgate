@@ -29,7 +29,7 @@ capabilities:
 
 ### Current State
 
-The stack is decided: Python 3.13, `uv`, SDK `mcp==2.3.0` pinned (ADR-001, operator's decision of 2026-10-28). The repository contains only disposable POCs (`poc/go-gateway/`, `poc/py-gateway/`) and the isolation bench (`poc/isolation-bench/`). There is no v1 Python project, no quality gate (`quality-gate.*` and `test-categories` empty in `.cairn/project-context.yaml`), no image and no deployment: no construction feature (#7 to #13) can start on a tooled base. The session currently has no `uv`, no `make` and no `docker buildx` plugin (observed on 2026-10-28: `command -v` empty for the three).
+The stack is decided: Python 3.13, `uv`, SDK `mcp==2.3.0` pinned (ADR-001, operator's decision of 2026-10-28). The repository contains only disposable POCs (`poc/go-gateway/`, `poc/py-gateway/`) and the isolation bench (`poc/isolation-bench/`). There is no v1 Python project, no quality gate (`quality-gate.*` and `test-categories` empty in `.cairn/project-context.yaml`), no image and no deployment: no construction feature (HULL-7 to HULL-13) can start on a tooled base. The session currently has no `uv`, no `make` and no `docker buildx` plugin (observed on 2026-10-28: `command -v` empty for the three).
 
 ### Objective
 
@@ -37,7 +37,7 @@ Deliver the usable skeleton of v1: a tooled Python project whose quality gate fi
 
 ### Expected Impact
 
-- Features #7 to #13 start on a green `make gate`, with no tooling decision to revisit.
+- Features HULL-7 to HULL-13 start on a green `make gate`, with no tooling decision to revisit.
 - The first deployment on the production server is done through operator actions copied and pasted (estimate: 45 min, not measured), with no action from the session toward production.
 - An `mcp` SDK version upgrade cannot pass the quality gate without a conclusive replay of the isolation bench.
 - The size of the Python image, not measured by the POCs (ADR-001, "Neutral"), is measured and recorded.
@@ -50,7 +50,7 @@ Declaration term: F-004 coins none (the project has no domain glossary; "SDK gua
 
 ## 2. Scope
 
-- **v1 Python project**: `hullgate` package in `src/` layout, described by `pyproject.toml`, committed `uv.lock` lock, SDK `mcp==2.3.0` declared as an exact dependency. Minimal application: two HTTP listeners (public and administration) serving the probes, a SQLite database opened under `/data`. No business function (tree, OAuth, relay: #7 and following).
+- **v1 Python project**: `hullgate` package in `src/` layout, described by `pyproject.toml`, committed `uv.lock` lock, SDK `mcp==2.3.0` declared as an exact dependency. Minimal application: two HTTP listeners (public and administration) serving the probes, a SQLite database opened under `/data`. No business function (tree, OAuth, relay: HULL-7 and following).
 - **Quality gate**: `make gate` = consistent lock, format, lint, strict typing, unit and integration tests, SDK version guard. Fills in `quality-gate.*`, `quality-gate.tools` and `test-categories`.
 - **SDK non-regression guard**: mechanical check, in the gate, that the `mcp` version of the v1 lock is that of a recorded conclusive replay of the isolation bench; upgrade procedure documented.
 - **Image**: a single multi-stage `Dockerfile`, building `linux/amd64` and `linux/arm64`, base pinned by digest, non-root, file system read-only except `/data`.
@@ -61,20 +61,20 @@ Declaration term: F-004 coins none (the project has no domain glossary; "SDK gua
 
 ## Out of Scope
 
-- **CI**: absent (`infra.ci: none`, ticket #6); the gate is run by the session. A Gitea Actions repository is a future feature if the operator asks for it.
+- **CI**: absent (`infra.ci: none`, ticket HULL-6); the gate is run by the session. A Gitea Actions repository is a future feature if the operator asks for it.
 - **Image registry**: the image is built on the production server from the clone (hypothesis H3); no publication on the Gitea registry or elsewhere.
 - **Session action on the production server** during F-004 (BR-043); later deployments by the session under `access.production: autonomous`: decision to take after the acceptance of F-004 (backlog candidate).
-- **Business functions**: tree, tokens, inbound OAuth, connections, relay, policy, web administration, audit (#7 to #13). In particular, no administration Traefik router and no public administration name: they arrive with the passkey (web administration, #11 or equivalent).
-- **Application secrets** (per-organisation encryption key, `AUTHORIZE_SECRET`, signing keys): none in F-004; their way of being provided ("mounted secrets") is set by the core (#7).
+- **Business functions**: tree, tokens, inbound OAuth, connections, relay, policy, web administration, audit (HULL-7 to HULL-13). In particular, no administration Traefik router and no public administration name: they arrive with the passkey (web administration, HULL-11 or equivalent).
+- **Application secrets** (per-organisation encryption key, `AUTHORIZE_SECRET`, signing keys): none in F-004; their way of being provided ("mounted secrets") is set by the core (HULL-7).
 - **Complete probes**: `/readyz` does not yet check "key loaded" (no key in F-004); the core adds it.
 - **Off-site copy of the backups**, imposed scheduling (the runbook proposes a `crontab` line, the operator chooses), litestream (rejected, §9).
 - **In-place restore on the production server**: procedure documented in the runbook, never played at acceptance (destructive); only the non-destructive restore check (`restore-check`) is played.
 - **Load and memory footprint measurement** under traffic: outside the foundation (ADR-001, "Neutral"); only the image size is measured.
 - **Test coverage threshold**, `pre-commit` framework, Renovate / automatic upgrades.
-- **Docker log rotation** on the production server: configuration of the production server's daemon, operator action; structured logging: audit (#12).
-- **External monitoring** of `/readyz` (availability probe, alert): audit, statistics and alerts (#12).
-- **Trust in the `X-Forwarded-*` headers of the declared proxies**: core (#7), when a client address or a URL derived from the request becomes useful.
-- **Turning the bench into a v1 target** (adapter `adapter_gateway.py` pointed at the v1 application): it presupposes OAuth and roles, hence the core (#7).
+- **Docker log rotation** on the production server: configuration of the production server's daemon, operator action; structured logging: audit (HULL-12).
+- **External monitoring** of `/readyz` (availability probe, alert): audit, statistics and alerts (HULL-12).
+- **Trust in the `X-Forwarded-*` headers of the declared proxies**: core (HULL-7), when a client address or a URL derived from the request becomes useful.
+- **Turning the bench into a v1 target** (adapter `adapter_gateway.py` pointed at the v1 application): it presupposes OAuth and roles, hence the core (HULL-7).
 
 ## 3. Functional Spec
 
@@ -214,7 +214,7 @@ Three files, each step = one block to paste, the expected result, what to do if 
 **Clarifications**
 - Writability is checked without writing: `BEGIN IMMEDIATE` then `ROLLBACK`, wait timeout bounded to 1 s. In WAL mode the write lock lives in `-shm` and is obtained even on a read-only file: the right to write the file is checked separately (`os.access`, reason `db_read_only`); a file deleted after opening gives `db_unavailable`.
 - Response bodies: JSON `{"status": "ok"}` or `{"status": "unavailable", "reason": "<code>"}`; no file path or exception message in the body.
-- The core (#7) adds "key loaded" to `/readyz` (§Out of Scope).
+- The core (HULL-7) adds "key loaded" to `/readyz` (§Out of Scope).
 - Database missing at startup: created empty; opening impossible: the process starts anyway, `/healthz` 200 and `/readyz` 503 (SCR-02.db-unavailable).
 
 ### BR-034 · Administration has its own port, never behind Traefik in F-004
@@ -264,7 +264,7 @@ Three files, each step = one block to paste, the expected result, what to do if 
 **Rule** — The gate refuses an `mcp` SDK version (packages `mcp` and `mcp-types`) that is not that of a conclusive replay of the isolation bench recorded in the repository (condition 2 of ADR-001).
 
 **Clarifications**
-- Upgrade procedure (README and `make bench-sdk`): change the version in the `pyproject.toml` of v1 **and** of `poc/py-gateway/`, `uv lock` in both, `./bench.sh --target py-gateway` (conclusive, not `--dev`), commit the evidence, PR. As long as the core (#7) has not made v1 a bench target, the `py-gateway` target (POC built on the new version) is the witness; the core replaces the target read by the guard.
+- Upgrade procedure (README and `make bench-sdk`): change the version in the `pyproject.toml` of v1 **and** of `poc/py-gateway/`, `uv lock` in both, `./bench.sh --target py-gateway` (conclusive, not `--dev`), commit the evidence, PR. As long as the core (HULL-7) has not made v1 a bench target, the `py-gateway` target (POC built on the new version) is the witness; the core replaces the target read by the guard.
 - The checks outside the acceptance run (N3 and nominal `/revoke` harnesses, T10) are replayed at each upgrade and cited in the PR (reading in review); the guard reads only `results-py-gateway.json`.
 - Current state: the POC's `uv.lock` and the evidence say `mcp` and `mcp-types` 2.3.0 (`bench_commit` `a8faea7`); v1 is born compliant.
 - Consequence: `poc/py-gateway/` and `poc/isolation-bench/` stop being disposable; they are kept and maintained as a witness until the core makes v1 the bench target. Deleting them fails the guard.
@@ -339,7 +339,7 @@ Three files, each step = one block to paste, the expected result, what to do if 
 **Rule** — Every action on the production server that F-004 assumes (reading the Traefik configuration, DNS, deploy key, clone, `.env`, deployment, verification, backup, scheduling, update, restore) is delivered in a runbook where each step is a block to paste, its expected result and what to do if it differs; an incomplete step fails the test.
 
 **Clarifications**
-- Each step also carries a "To report on #6" line (operator instruction, checked by the test).
+- Each step also carries a "To report on HULL-6" line (operator instruction, checked by the test).
 
 ### BR-043 · The session does not act on the production server during F-004
 
@@ -369,7 +369,7 @@ Three files, each step = one block to paste, the expected result, what to do if 
 
 ### On the production server (operator, after merge)
 
-- [ ] **AC-OP** (BR-040, BR-041, BR-034, BR-038, BR-039, BR-042) — the operator plays `install.md` from O1 to O9. **Bounded instrument**: `make verify` on the production server, which plays only the F-004 checks and prints one line per check of the form `VERIFY <id> OK|KO <valeur>` then the banner `VERIFY: n/6 OK`. The six checks: `deployed-ref` (reference read from `.deployed-ref`), `readyz-public` (`https://${MCP_HOST}/readyz` 200 through Traefik, reached from the production server by `curl --connect-to ${MCP_HOST}:443:127.0.0.1:${TRAEFIK_HTTPS_PORT}` — equivalent to `curl --resolve ${MCP_HOST}:443:127.0.0.1` when `TRAEFIK_HTTPS_PORT` is 443, see BR-041 —, without depending on DNS or NAT return), `admin-local` (`http://127.0.0.1:${ADMIN_LOCAL_PORT}/healthz` 200), `admin-not-public` (`https://${MCP_HOST}/admin` 404, counted only if `readyz-public` is OK: without a router, Traefik also answers 404), `backup` (file produced by `make backup`, integrity `ok`), `restore-check` (code 0). **Readings to record, without threshold**: duration of `make deploy` (s), `DOWNTIME` read from its output, response of `curl -s https://<MCP_HOST>/readyz` from the operator's Mac (DNS and TLS end to end), image size on the production server (`docker image ls` of `hullgate`), the production server's architecture (`uname -m`). **To paste on #6**: the 7 lines from the first `VERIFY ` line to the banner, and the five readings; the name `MCP_HOST` is reread from the output of `make verify`, never imposed by the runbook. A banner `VERIFY: 6/6 OK` means the criterion is met; any other banner points back to the runbook step named in the `KO` line.
+- [ ] **AC-OP** (BR-040, BR-041, BR-034, BR-038, BR-039, BR-042) — the operator plays `install.md` from O1 to O9. **Bounded instrument**: `make verify` on the production server, which plays only the F-004 checks and prints one line per check of the form `VERIFY <id> OK|KO <valeur>` then the banner `VERIFY: n/6 OK`. The six checks: `deployed-ref` (reference read from `.deployed-ref`), `readyz-public` (`https://${MCP_HOST}/readyz` 200 through Traefik, reached from the production server by `curl --connect-to ${MCP_HOST}:443:127.0.0.1:${TRAEFIK_HTTPS_PORT}` — equivalent to `curl --resolve ${MCP_HOST}:443:127.0.0.1` when `TRAEFIK_HTTPS_PORT` is 443, see BR-041 —, without depending on DNS or NAT return), `admin-local` (`http://127.0.0.1:${ADMIN_LOCAL_PORT}/healthz` 200), `admin-not-public` (`https://${MCP_HOST}/admin` 404, counted only if `readyz-public` is OK: without a router, Traefik also answers 404), `backup` (file produced by `make backup`, integrity `ok`), `restore-check` (code 0). **Readings to record, without threshold**: duration of `make deploy` (s), `DOWNTIME` read from its output, response of `curl -s https://<MCP_HOST>/readyz` from the operator's Mac (DNS and TLS end to end), image size on the production server (`docker image ls` of `hullgate`), the production server's architecture (`uname -m`). **To paste on HULL-6**: the 7 lines from the first `VERIFY ` line to the banner, and the five readings; the name `MCP_HOST` is reread from the output of `make verify`, never imposed by the runbook. A banner `VERIFY: 6/6 OK` means the criterion is met; any other banner points back to the runbook step named in the `KO` line.
 
 ## 6. Diagrams
 
@@ -394,7 +394,7 @@ flowchart TD
   O6 -->|DEPLOY: OK| O7[O7 · make backup puis make verify]
   O6 -->|DEPLOY: KO| X[Lire la sortie, corriger .env ou DNS, recoller O6]
   O7 --> O8[O8 · Optionnel : installer la ligne crontab de sauvegarde]
-  O8 --> O9[O9 · Coller les lignes VERIFY et les relevés sur #6]
+  O8 --> O9[O9 · Coller les lignes VERIFY et les relevés sur HULL-6]
 ```
 
 ### 6.2 Sequence — `make deploy REF=<ref>`
@@ -438,13 +438,13 @@ Not applicable: no visual element.
 - ADR-001 — Python stack (accepted, 2026-10-28): upstream, done.
 - F-003 / HULL-16 — Python POC (implemented): `poc/py-gateway/uv.lock` and `evidence/results-py-gateway.json` are read by the guard (BR-037).
 - **Missing session tools**: `uv`, `make`, `docker buildx` plugin (observed on 2026-10-28). The implementation act applies `ai-vademecum/missing-tool-handshake.md` first (installation if there is a path to root, otherwise a command for the operator); this is a planned dependency, not a freeze blocker.
-- Downstream: #7 (core) replaces the target read by `sdk_guard.py` and adds "key loaded" to `/readyz`; #8 to #13 inherit the gate.
+- Downstream: HULL-7 (core) replaces the target read by `sdk_guard.py` and adds "key loaded" to `/readyz`; HULL-8 to HULL-13 inherit the gate.
 
 ### Technical Constraints
 
 - Stack: ADR-001. Python 3.13 (as the POC; 3.14 not retained so as not to change the interpreter judged by the bench).
 - Shared VM disk: 22 GB free (89% used, observed on 2026-10-28); clean the multi-architecture build images after the evidence (`make clean-images`).
-- Session writes outside `.cairn/`: on the branch `feat/HULL-6-fondation`, PR `Refs #6`, never a closing keyword.
+- Session writes outside `.cairn/`: on the branch `feat/HULL-6-fondation`, PR `Refs HULL-6`, never a closing keyword.
 
 ### Selected tooling (2026, versions read on PyPI on 2026-10-28)
 
@@ -464,7 +464,7 @@ Not applicable: no visual element.
 
 | Question | Decision | Rationale |
 |----------|----------|-----------|
-| Splitting of the ticket (readiness verdict, "one feature" check) | one spec for build, gate, hosting and deployment | four parts, but the operator's brief commands one F-004 spec for #6; they hold together: deployment requires the image, the gate verifies the image and the composition |
+| Splitting of the ticket (readiness verdict, "one feature" check) | one spec for build, gate, hosting and deployment | four parts, but the operator's brief commands one F-004 spec for HULL-6; they hold together: deployment requires the image, the gate verifies the image and the composition |
 | Backup | `VACUUM INTO` by `make backup` | zero dependency, consistent when hot, already the form foreseen by the specification; litestream rejected in v1: one more process or sidecar and an S3 target to provide |
 | Administration exposure | separate port, the production server's `127.0.0.1`, no Traefik router | no administration function nor passkey in F-004; the ticket says "domain **or** port" |
 | SDK non-regression guard | consistency check lock ↔ conclusive evidence in the gate; replay of the bench at upgrade (`make bench-sdk`) | the full bench takes several minutes and ~1 GB: outside the routine gate; the guard makes an upgrade impossible without it |
@@ -531,7 +531,7 @@ Not applicable: no visual element.
 
 - [x] `Dockerfile`, `container` tests, multi-architecture evidence
 - [x] `deploy/compose.prod.yaml`, operations Makefile, `make prod-smoke` 4/4
-- [x] Runbooks, `project-context.yaml` filled in, PR `Refs #6`
+- [x] Runbooks, `project-context.yaml` filled in, PR `Refs HULL-6`
 
 ## 11. Tests
 
@@ -596,7 +596,7 @@ Minor:
 - **m4** · axis B · §BR-040 — first deployment failing: no previous reference to print. Sort : corrigé — "aucune référence précédente".
 - **m5** · axis A · §1 — the spec did not say whether it coins a declaration term. Sort : corrigé — none, stated in §1.
 - **m6** · axis D · §Out of Scope — Docker log rotation on the production server not mentioned. Sort : différé.
-- **m7** · axis D · §Out of Scope — external monitoring of `/readyz`. Sort : différé (audit and alerts, #12).
+- **m7** · axis D · §Out of Scope — external monitoring of `/readyz`. Sort : différé (audit and alerts, HULL-12).
 - **m8** · axis F · §6.1 — "merge tag" although no cut is planned. Sort : corrigé — merge SHA on `main`.
 - **m9** · axis A · §1 Expected Impact — "≤ 45 min" presented as a bound, never measured. Sort : corrigé — estimate.
 - **m10** · axis A · §BR-029, BR-038, BR-040 — several clauses per rule. Sort : rejeté — each rule enumerates the parts of a single object (image content; backup act; deployment act), `templates/business-rule.md` §Rule.
@@ -609,9 +609,10 @@ Minor:
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-10-28 | Claude (product, model:claude-opus-5-5) | Draft created from #6, ADR-001 and the original specification ("Operations", "Storage") |
+| 2026-10-28 | Claude (product, model:claude-opus-5-5) | Draft created from HULL-6, ADR-001 and the original specification ("Operations", "Storage") |
 | 2026-10-28 | Claude (product, model:claude-opus-5-5) | Stress-test (22 findings, 17 fixed); status left `draft` at the operator's request, human freeze |
 | 2026-10-28 | human:sstolz (freeze) | Freeze: `ready-for-dev`, hypotheses H1–H13 accepted as written. Merge: AI; Cut: no. |
 | 2026-10-28 | Claude (implementation, model:claude-opus-5-5) | Implemented (HULL-6): `make gate` OK, `make test-container` 36 passed, `make image-multiarch` (159,280,670 / 183,398,062 bytes), `make prod-smoke` 4/4 and `make verify` 6/6 locally, at `f89e9ce`. BR-028..043 extracted (v1). Corrections at implementation: BR-028, false emulation finding (amd64 session, empty `binfmt_misc`) → cross-build without emulation; BR-033, read-only detected by `os.access` (WAL); BR-040, wait for the `healthy` state (Traefik routing); BR-041 and AC-OP, `curl --connect-to` instead of `--resolve` (`Host` header without port) and `admin-not-public` tied to `readyz-public`; BR-035, BR-038, BR-039, BR-042, implementation clarifications. `project-context.yaml` modified on the branch, `Dockerfile.project` unchanged (path to root "none"). `capabilities` written in the frontmatter (absent at the freeze, INV-047). |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

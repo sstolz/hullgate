@@ -424,7 +424,7 @@ Implementation (2026-11-15), deltas and findings:
 ### Phase 1 — Code, migration, bench (one PR)
 
 - [x] AC-01 to AC-17 pass, withdrawn numbers excepted (AC-14: bench v1 16/16 and every control at `9fd0aed`, `results-v1.json` regenerated)
-- [x] Review with the isolation lens: every route family, every refusal (PR #93: reviews 587 and 589; PR #101: reviews 610 and 614)
+- [x] Review with the isolation lens: every route family, every refusal (PR HULL-93: reviews 587 and 589; PR HULL-101: reviews 610 and 614)
 
 ### Phase 2 — Deployment and reconnection (before HULL-13)
 
@@ -529,3 +529,4 @@ Minors :
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
 | 2026-11-17 | Claude (product, model:claude-fable-5-2) | Acceptance (HULL-42, `.cairn/runs/acts/HULL-42-acceptance-1.md`, ticket comment 13446): 16 criteria met; AC-OP-01 and the two open §10 boxes ticked on the operator's evidence of 2026-11-17 (`.cairn/runs/acts/HULL-42-acop-evidence.md`) |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

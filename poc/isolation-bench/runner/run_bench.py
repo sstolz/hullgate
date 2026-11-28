@@ -71,7 +71,7 @@ def v1_secrets(bench):
 
 
 def run_v1_harnesses(reg):
-    """Harnais N3 et nominal de la revue de la PR #15, transposés à la v1 (runner/harness/v1-harness.py) : mêmes contrôles,
+    """Harnais N3 et nominal de la revue de la PR HULL-15, transposés à la v1 (runner/harness/v1-harness.py) : mêmes contrôles,
     pannes injectées de l'extérieur, barrière TOTP ; identifiants de contrôle repris des POC (AC-08 de F-005)."""
     hd, out = os.path.join(HERE, "harness"), []
     for mode, ident, dest, title in (("n3", "H-10/HULL-5-review-2-n3", "v1-n3-results.json", "Révocation et émission sur panne du coffre (N3)"),

@@ -22,7 +22,7 @@ capabilities:
 | Field | Value |
 |-------|-------|
 | **Priority** | — (HULL-98 carries no priority label; it blocks HULL-80 in milestone 1.0.0) |
-| **Branch** | `feat/HULL-98-slice-3` (PR #105, last slice) |
+| **Branch** | `feat/HULL-98-slice-3` (PR HULL-105, last slice) |
 | **Last updated** | 2026-11-17 |
 
 ## 1. Context & Objective
@@ -37,7 +37,7 @@ Read at `main` `205e16c9` (2026-11-16) unless stated otherwise.
 - **Identity.** The former provenance value (annex S8) sits on 209 `validated-by` lines (183 rule files, 18 specs, 8 ADRs) and on 30 other lines outside the workshop.
 - **Secrets.** The inventory's eight detectors found 662 candidate lines (302 under `.cairn/`), no confirmed credential; 14 test-generated authorization codes sit in a workshop probe result; the two private-key markers are invalid-PEM test inputs. HULL-80 (2026-11-14) records two secret-like patterns in the history, not opened. No secret scanner exists in `make gate` or `make qa`.
 - **Workshop.** 508 tracked files under `.cairn/`: `runs/` 440, `learnings/` 66, `project-context.yaml` 1, `docker/Dockerfile.project` 1. `cairn.version` is `0.57.0`; the installed framework is `0.60.0`; INV-068 to INV-070 exist from 0.58.0 and print `skip raison=version` today. `.cairn/workshop.git` does not exist.
-- **Ticket identifiers.** 762 `HULL-NN` occurrences in 193 files outside `.cairn/` (inventory); reporting instructions toward a ticket (`post on HULL-NN`, `To report on #6`) sit in BR-020, BR-042, F-002, F-004, F-005, F-011, F-014, F-018, F-021, two trial reports and `test_br_042_runbooks.py` (11 lines), plus the private runbooks. The workshop's forge role accounts (`cairn-ai`, `cairn-review`) appear in 13 files outside the workshop, mostly fixtures, F-006 and BR-096.
+- **Ticket identifiers.** 762 `HULL-NN` occurrences in 193 files outside `.cairn/` (inventory); reporting instructions toward a ticket (`post on HULL-NN`, `To report on HULL-6`) sit in BR-020, BR-042, F-002, F-004, F-005, F-011, F-014, F-018, F-021, two trial reports and `test_br_042_runbooks.py` (11 lines), plus the private runbooks. The workshop's forge role accounts (`cairn-ai`, `cairn-review`) appear in 13 files outside the workshop, mostly fixtures, F-006 and BR-096.
 - **Fixtures.** `tests/integration/test_br_062_cimd.py` lines 568–574 copy a real resolver answer (two of its addresses are public addresses of a hosting provider); `poc/isolation-bench/runner/adapter_contextforge.py` uses an invented non-reserved domain (`bench-isolation.dev`); `poc/isolation-bench/runner/secrets_guard.py` spells the operator's forge host as a forbidden pattern; other routable IP literals are mocked public-address cases.
 - **Captures.** 117 tracked files under `docs/captures/`: 116 PNG images, never inspected for what they render, and one JSON report (`F-016/axe-report.json`).
 - **No `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`** — HULL-80's.
@@ -388,7 +388,7 @@ On the private source, the same candidate commit passes `make gate` with BR-325 
 ### Rules touched
 
 - **BR-020**, retired (D3) — `status: retired`, `retired-by: F-022`: its POC runbooks leave the public tree and the F-002 verdict it governed is given; its text and its `control` entries stay as they were (`br-lifecycle.md` §Retirement). `poc/isolation-bench/runner/report_check.py`, its regression guard, drops the runbook-presence check in the same slice.
-- **BR-042**, new version (C2) — extracted as [BR-042 v2](../business-rules/BR-042.md) on 2026-11-16 — the actions are delivered in the generic guides (§3.3), steps keep block, expected result and what-if-it-differs; the clarification "each step also carries a *To report on #6* line" is removed, and the test's assertion of it with it.
+- **BR-042**, new version (C2) — extracted as [BR-042 v2](../business-rules/BR-042.md) on 2026-11-16 — the actions are delivered in the generic guides (§3.3), steps keep block, expected result and what-if-it-differs; the clarification "each step also carries a *To report on HULL-6* line" is removed, and the test's assertion of it with it.
 - **BR-104**, new version (C2) — extracted as [BR-104 v3](../business-rules/BR-104.md) on 2026-11-16 (existing v2 retained; §9) — the SonarQube server URL comes from `SONAR_HOST_URL`; unset, `qa-sonar` returns `SKIP` naming it, without calling a server; `sonar-project.properties` carries no host.
 - **BR-105**, new version (C2) — extracted as [BR-105 v2](../business-rules/BR-105.md) on 2026-11-16 — the token comes from `SONAR_TOKEN`, or the file `SONAR_TOKEN_FILE` names; neither set → `SKIP` naming both; every other clause unchanged.
 - **BR-016**, clarification (C3) — the forge-host pattern the bench scan forbids comes from a private input in the workshop, not from `secrets_guard.py`; the rule's text already says "the host of the project's Gitea". Input absent (the export, a public clone): the scan prints a skip naming the input for the forge-host half and still enforces the public half of its pattern.
@@ -409,13 +409,13 @@ Neighbour outside the index: the former-name guard `tests/unit/test_former_names
 ## 5. Acceptance Criteria
 
 Implementation closure on 2026-11-17 uses the evidence ledger below. Slice 1 was
-APPROVED (review 629, `HULL-98-review-2.md`) and merged as `beab41c` (#103);
+APPROVED (review 629, `HULL-98-review-2.md`) and merged as `beab41c` (HULL-103);
 slice 2 was APPROVED (review 633, `HULL-98-review-4.md`) and merged as `29e21da`
-(#104), with the gate green on main after each merge (orchestrator attestation).
+(HULL-104), with the gate green on main after each merge (orchestrator attestation).
 The workshop evidence paths below are relative to `.cairn/runs/acts/`.
 
 The export rehearsal of record is on the closure head `c0e66fe`
-(`HULL-98-ac24-rehearsal-2.log`, transcript in the PR #105 body). Its gate, QA and
+(`HULL-98-ac24-rehearsal-2.log`, transcript in the PR HULL-105 body). Its gate, QA and
 required public invariants passed; its `REHEARSAL: KO` is the expected INV-001
 result, not a failure of those clauses (retouche 5). An earlier rehearsal on
 `028f204` (`HULL-98-ac24-rehearsal-1.log`) predates scanner 1.1.0 and retouche 5.
@@ -473,7 +473,7 @@ No frozen criterion or requirement is rewritten by this closure.
 | AC-03 | `HULL-98-ac03-inventory.md`; review 629 B3 verifies the per-test kept/moved/removed assertions and reasons. |
 | AC-04 | `HULL-98-review-1.md` AC-04 and review 629; parameter guard, key defaults and unchanged Compose defaults verified. |
 | AC-05 | `business-rules/BR-042.md` v2; review 629 B4 confirms reporting lines removed and BR-331 guard strengthened. |
-| AC-06 | `business-rules/BR-020.md`: retired by F-022; slice 1 approved and merged (#103). |
+| AC-06 | `business-rules/BR-020.md`: retired by F-022; slice 1 approved and merged (HULL-103). |
 | AC-07 | `tests/unit/test_br_104_qa_sonar_guard.py` missing-host/no-call case; slice 1 approved and gate green on main. |
 | AC-08 | `tests/unit/test_br_105_qa_sonar_token.py` absent-variable, environment-only and masking checks; slice 1 approved and gate green on main. |
 | AC-09 | Review 629 B1 ratchet/missing-input mutations; reviews 631/633 strict guard with baseline removed; current BR-325 guard tests. |
@@ -489,9 +489,9 @@ No frozen criterion or requirement is rewritten by this closure.
 | AC-19 | `docs/captures/REVIEW.md`; reviews 631/633 independently confirm all 116 images clean after the six replacements; BR-333 guard. |
 | AC-20 | `HULL-98-ac24-rehearsal-1.log`: QA secrets blocking OK; BR-326 integration tests cover planted/second-value/stale findings; scanner 1.1.0 validation in implementation-5. |
 | AC-21 | `HULL-98-history-scan.md`: orchestrator mirror scan on 2026-11-17, scanner 1.1.0, 47 refs including pull-request refs, 435 commits, 25 distinct fingerprints, masked rows. |
-| AC-22 | Held on the final closure head: orchestrator rehearsal `HULL-98-ac24-rehearsal-2.log`, transcript in the PR #105 body; review 635 verified the boundary on 028f204. |
+| AC-22 | Held on the final closure head: orchestrator rehearsal `HULL-98-ac24-rehearsal-2.log`, transcript in the PR HULL-105 body; review 635 verified the boundary on 028f204. |
 | AC-23 | `tests/unit/test_export_rehearsal.py` contract/local-key checks; review 635 contract reading; public comments corrected at 86161db (implementation-5). |
-| AC-24 | Held on the final closure head: orchestrator rehearsal `HULL-98-ac24-rehearsal-2.log` (GATE: OK, QA secrets blocking OK, INV-068/069/070 pass, scratch deleted; `REHEARSAL: KO` on INV-001 only, as retouche 5 reads it), transcript in the PR #105 body. |
+| AC-24 | Held on the final closure head: orchestrator rehearsal `HULL-98-ac24-rehearsal-2.log` (GATE: OK, QA secrets blocking OK, INV-068/069/070 pass, scratch deleted; `REHEARSAL: KO` on INV-001 only, as retouche 5 reads it), transcript in the PR HULL-105 body. |
 | AC-25 | `HULL-98-ac25-walkthrough-1.log` and `-2.log`, review 629 B2; orchestrator attests replay on 028f204: WALKTHROUGH: OK; 30 passed, 52 named skips. |
 | AC-26 | `domain-glossary.md`: all five §9 terms present once; checked at closure, no glossary edit needed. |
 | AC-OP-01 | `HULL-98-history-verdicts.md`: 25 verdicts for the report's 25 distinct fingerprints, operator `human:sstolz`, 2026-11-17, both 2026-11-14 candidates reconciled there; `history_secrets.py --check-verdicts` prints `History verdicts: complete`. |
@@ -531,7 +531,7 @@ flowchart TD
 ### Dependencies (prerequisite features)
 
 - **Framework version** — the private source stays at cairn 0.57.0 through 1.0.0: `migrate-project` raises the marker only on a check without failure, and open specs holding inline deltas of extracted rules (F-017, F-019, milestone 1.1.0) fail INV-001 until their closures (decision of 2026-11-16; migration after 1.1.0). The 0.60.0 checks run on the export rehearsal copy, whose context example declares `cairn.version: 0.60.0` (§3.12): INV-068 to INV-070 are read there (AC-24). Slice 3 measured the 0.57.1, 0.58.0 and 0.59.0 migration files on that copy; the measured results and applicable gestures are recorded below and in the slice-3 PR draft, so the example's version describes the tree truthfully.
-- **Concurrent lanes integrated** — the local ancestry includes HULL-11 slice 5 (`7d9e074`, #99), HULL-70 closure (`7a34baa`, #102) and HULL-85 (`fd418ba`, #96, with rule record `00f1df1`). The approved sweep covers their records; BR-325 continues to guard later merges.
+- **Concurrent lanes integrated** — the local ancestry includes HULL-11 slice 5 (`7d9e074`, HULL-99), HULL-70 closure (`7a34baa`, HULL-102) and HULL-85 (`fd418ba`, HULL-96, with rule record `00f1df1`). The approved sweep covers their records; BR-325 continues to guard later merges.
 - **HULL-12 (F-021)** — downstream: tags the tree whose export this spec makes publishable. F-021's own pending retouch (§12 order, Out of Scope naming HULL-98 and HULL-80) is not this spec's; it is where the operator's reading of `docs/guides/update.md` joins F-021's operator criteria. Its substitution is this spec's (D4). Its scope item naming the server's update runbook (annex R2) becomes `docs/guides/update.md`.
 - **HULL-80** — downstream, blocked by this ticket: replays the export on the tag, creates the public repository born `public` and its workshop repository, writes the ignore entries there.
 
@@ -593,18 +593,18 @@ Slice 1 deltas (2026-11-16, frozen contract `10d166e`):
 - F-018's glossary population was nine rows at implementation (the six enumerated in §3.1 plus Recovery, Retirement and Route command); all nine leave. BR-282 stays allocated in the private copy, retired from the public lifecycle per D5.
 - Slice 1 supplies 82 carried steps (including the relay's six policy steps), no identifier collision in the merged guide. Review 626 read the seven mappings; review 629 approved the corrected slice and walkthrough evidence (AC-02/AC-25).
 - Local non-Docker validation: 3132 passed, 1 web-environment skip; format, lint, strict mypy (313 files), SDK guard and the infrastructure ratchet pass. Validation uses a temporary candidate Git index because the shared metadata is read-only; the actual checkout index is unchanged.
-- Slice-1 local checks excluded Docker by instruction; the orchestrator subsequently supplied the walkthrough and full gate evidence, review 629 approved, and #103 merged as `beab41c` with the gate green on main.
+- Slice-1 local checks excluded Docker by instruction; the orchestrator subsequently supplied the walkthrough and full gate evidence, review 629 approved, and HULL-103 merged as `beab41c` with the gate green on main.
 
 
 Slice 2 deltas (2026-11-16, freeze `10d166e`, retouch 2 `7aac9e6`):
 - §3.2 applied outside the workshop, with the pinned design colour literals and forge role accounts kept. The private baseline is removed; the gate test also refuses restoring it before a commit.
 - This slice's AC-12 merge-base evidence set is: BR-016, BR-028, BR-030, BR-032, BR-034, BR-038, BR-040, BR-041, BR-043, BR-068, BR-086, BR-096, BR-245, BR-301, BR-324. Thirteen extracted rules gain clarification rows, without version changes; BR-245 and BR-324 stay inline. The frontmatter is the union across slices: it also retains BR-020, BR-042, BR-088, BR-104 and BR-105 from slice 1, matching their F-022 traceability. BR-088 has no current-section delta on this slice's base.
-- BR-330, BR-332 and BR-333 are extracted verbatim with their banners. BR-333's first reading recorded 116 clean rows by four delegated readers on 2026-11-16, and its mechanical gate passes. The six captures requested by review 631 were replaced at `dbc1b76`, with fresh records; review 633 confirmed all 116 clean. Slice 2 was approved and merged as `29e21da` (#104), with the gate green on main; §5 identifies the remaining feature acceptance items.
+- BR-330, BR-332 and BR-333 are extracted verbatim with their banners. BR-333's first reading recorded 116 clean rows by four delegated readers on 2026-11-16, and its mechanical gate passes. The six captures requested by review 631 were replaced at `dbc1b76`, with fresh records; review 633 confirmed all 116 clean. Slice 2 was approved and merged as `29e21da` (HULL-104), with the gate green on main; §5 identifies the remaining feature acceptance items.
 - BR-016's private input is `.cairn/runs/private/bench-forbidden-hosts.txt`; missing input prints a named skip for the private half, while the public pattern is still checked. A malformed present input fails closed.
 - BR-330 keeps scoped local Compose service labels (not internet domains), exact malformed-authority refusal cases and a reasoned list of public services. The invented bench e-mail domain is reserved in both the adapter and Compose configuration. The resolver fixture uses documentation addresses with unchanged order/deduplication assertions.
 - The five open specs already had same-date retouch lines from slice 1. S8 updates each existing line; none is duplicated. All 18 other specs receive one slice-2 §13 record.
 - Provenance reconciliation outside the workshop, recounted at closure with AC-10's `git grep -h -F` command: 239 constat lines + 30 subsequently extracted rule records + five open-spec retouch lines + 17 F-022 records = 291 lines. Review 633 counted 285; retouche 4 and BR-326/BR-327 extraction brought 289, and retouche 5 adds its freeze line and operator §13 row. The product inbox records the new value for later freezes.
-- Slice-2 local validation was constrained by missing pinned Python packages and no Docker daemon. Offline pytest, Ruff and strict mypy invocations could not start; those failures and standard-library checks are recorded in implementation-2. `cairn check`: 33 pass, 2 fail (known INV-001 and INV-032), 6 warn, 22 skip; INV-061 was version-skipped on the private source. The orchestrator subsequently ran the full gate on main after #104; INV-061 passes on the 0.60.0 rehearsal copy without migrating the source.
+- Slice-2 local validation was constrained by missing pinned Python packages and no Docker daemon. Offline pytest, Ruff and strict mypy invocations could not start; those failures and standard-library checks are recorded in implementation-2. `cairn check`: 33 pass, 2 fail (known INV-001 and INV-032), 6 warn, 22 skip; INV-061 was version-skipped on the private source. The orchestrator subsequently ran the full gate on main after HULL-104; INV-061 passes on the 0.60.0 rehearsal copy without migrating the source.
 
 
 Slice 3 deltas (2026-11-16 to 2026-11-17, retouches 4 and 5):
@@ -626,7 +626,7 @@ Feature delivered in 3 slices — one PR each. Each slice passes `make gate` and
 The five guides, the parameter table, `deploy/` and callers pointed at the guides, the five tests rewritten, Sonar from the environment, private runbooks and F-018 out, `report_check.py` cleaned; the denylist, its baseline and BR-325's guard; the guides' walkthrough.
 
 - [x] Slice 1 implementation: guides, private-material boundary, optional Sonar, rule records and infrastructure ratchet delivered; local evidence in the implementation notes.
-- [x] AC-01 to AC-08, AC-09 (ratchet part), AC-17, AC-25 — review 629 APPROVED; merged `beab41c` (#103), gate green on main; walkthrough logs and replay evidence in §5.
+- [x] AC-01 to AC-08, AC-09 (ratchet part), AC-17, AC-25 — review 629 APPROVED; merged `beab41c` (HULL-103), gate green on main; walkthrough logs and replay evidence in §5.
 
 ### Slice 2 — Substitution sweep
 
@@ -635,7 +635,7 @@ The five guides, the parameter table, `deploy/` and callers pointed at the guide
 The table of §3.2 over specs, rules, ADRs, root documents, code and tests; provenance; fixtures; captures and their records; the identifiers note; the baseline emptied and removed.
 
 - [x] Slice 2 implementation: substitution sweep, strict infrastructure guard, fixture guard, private bench input, identifiers note and image review inventory; first reading recorded (116 rows, four delegated readers, 2026-11-16).
-- [x] AC-09 (strict part), AC-10, AC-11, AC-13 to AC-16, AC-18, AC-19 — review 633 APPROVED; merged `29e21da` (#104), gate green on main; INV-061 passed on the slice-3 rehearsal copy.
+- [x] AC-09 (strict part), AC-10, AC-11, AC-13 to AC-16, AC-18, AC-19 — review 633 APPROVED; merged `29e21da` (HULL-104), gate green on main; INV-061 passed on the slice-3 rehearsal copy.
 - [x] AC-12 — held at acceptance on `d20aa5c`: 20 changed-section rules plus the retired BR-020 (retouche 6).
 
 ### Slice 3 — Secrets and export *(last)*
@@ -648,7 +648,7 @@ The table of §3.2 over specs, rules, ADRs, root documents, code and tests; prov
 - [x] Slice 3 implementation: offline scanner, exact fingerprint allowlist, local mirror report/verdict tooling, public context example, export/rehearsal script and glossary rows. The orchestrator supplied the masked history scan and the full rehearsal, replayed on the closure head `c0e66fe` (§5).
 
 - [x] AC-11 (INV-061 on the rehearsal copy), AC-20, AC-21, AC-23, AC-26 — recorded rehearsal, real mirror report, regression checks and glossary evidence in §5.
-- [x] AC-22, AC-24 — replayed on the final closure head; transcript in the PR #105 body.
+- [x] AC-22, AC-24 — replayed on the final closure head; transcript in the PR HULL-105 body.
 
 ### Operator checks
 
@@ -720,7 +720,7 @@ with the gate (3229 passed in the closure head's rehearsal).
 - **Slice 3 and the framework version.** The private source is not migrated before 1.0.0 (§9 Dependencies); the export rehearsal reads the 0.60.0 checks on its copy, and slice 3 plays on the tree the migration gestures whose condition holds there.
 - **The sweep outruns the lanes**: every merge of `main` after the constat can bring names back; BR-325's guard, live from slice 1, fails on any match outside its baseline.
 - **A guard that reports only zero**: a denylist path typo on the private source would skip the guard if the skip condition were "denylist absent"; BR-325 fails instead when a local context exists.
-- **The export is the boundary**: a path the export forgets to drop publishes the workshop; rehearsal step 5 reads it, and HULL-80 replays the same commands, never a push of the private source or of its GitHub private mirror (#81), which carries the full history.
+- **The export is the boundary**: a path the export forgets to drop publishes the workshop; rehearsal step 5 reads it, and HULL-80 replays the same commands, never a push of the private source or of its GitHub private mirror (HULL-81), which carries the full history.
 - **Text inside images** escapes every text guard; BR-333's two looks are the only line of defence.
 - **Rewritten runbook tests lose a guarantee** silently: AC-03 lists every assertion kept, moved or dropped.
 - **`cairn render-index features`** loses F-018's row; BR-270 to BR-284 stay allocated (the next number is read above them).
@@ -790,3 +790,4 @@ Minors :
 | 2026-11-17 | human:sstolz (operator) | Retouche 5: AC-11, AC-23, AC-24 wording after retouche 4; §3.12 export-only ignore entries (review 635 N1, N4, N6); operator go on the text shown in full. |
 | 2026-11-17 | Codex (implementation-coder, model:gpt-6-astra) | Closure on the last slice (review 635 B1): implemented and closed together; evidence-led §5/§9/§10, complete §11 test inventory, diagram and capability-map sync, rendered indexes and changelog; frozen requirements and the 20-rule list preserved; AC-12, final-head rehearsal and operator acceptance remain explicit. |
 | 2026-11-17 | human:sstolz (operator) | Retouche 6: AC-12 counts the retired BR-020 in `br-touched` without a changed-section hunk (review 633, 19 vs 20); operator go on the text shown in full. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

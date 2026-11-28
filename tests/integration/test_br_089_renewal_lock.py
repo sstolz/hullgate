@@ -187,7 +187,7 @@ def test_br_089_renouveler_command(gw: Gateway) -> None:
 
 
 def test_br_089_async_contract_does_not_hold_process_lock(gw: Gateway) -> None:
-    """The async contract (#9) holds the `Database` lock only per short transaction."""
+    """The async contract (HULL-9) holds the `Database` lock only per short transaction."""
     provider = _ready(gw)
     gw.expire(NAME, 30)
     provider.script.append(Reply(normal=True, delay=2.0))

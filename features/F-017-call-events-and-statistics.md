@@ -225,7 +225,7 @@ Filter over the `Statement` column of `business-rules/index.md`, then over the �
 | BR-293 | off topic | F-019's alert, its own token and setting; BR-253's `refusal_concentration` is a report (A6) |
 | BR-312, BR-313 | off topic | F-020 writes these entries; BR-243 and BR-249 place them |
 | **BR-066** | overlap | **new version (C2)**: a state that satisfied "no command deletes an entry" stops being the rule |
-| **BR-122** | overlap | **new version (C2)**: entries gain fields; "sa rétention est de #12" is settled |
+| **BR-122** | overlap | **new version (C2)**: entries gain fields; "sa rétention est de HULL-12" is settled |
 | **BR-131** | overlap | **clarification (C3)**: it already requires English for the new CLI, audit and API values; the pinned table gains them |
 | **BR-218** | overlap | **clarification (C3)**: two filters added to the read; "filter on" is a case list, and no assertion changes |
 | **BR-211** | overlap | **clarification (C3)**: it already requires every CLI verb to be mapped or excluded; `audit query`, `audit export`, `stats <report>` join its sweep, mapped to the audit and stats routes |
@@ -483,13 +483,13 @@ One object's parts (`templates/business-rule.md` §Rule): BR-243 is the guard on
 
 **Rule** — Unchanged but for the population: added `audit.retention`.
 
-**Clarifications** — "Table en ajout seul : aucune commande ni migration ne modifie ni ne supprime une entrée (rétention : #12)" is replaced by: *no command or migration modifies an entry; an entry leaves only under BR-243 and BR-244, by the retention run.*
+**Clarifications** — "Table en ajout seul : aucune commande ni migration ne modifie ni ne supprime une entrée (rétention : HULL-12)" is replaced by: *no command or migration modifies an entry; an entry leaves only under BR-243 and BR-244, by the retention run.*
 
 ### BR-122 · next version · Call entries
 
 **Rule** — Unchanged, with BR-240's fields added.
 
-**Clarifications** — "L'audit croît d'une ligne par appel ; sa rétention est de #12" is replaced by *traffic class, BR-243*. "Elle n'écrit jamais d'argument" holds: the digest is not an argument (BR-241).
+**Clarifications** — "L'audit croît d'une ligne par appel ; sa rétention est de HULL-12" is replaced by *traffic class, BR-243*. "Elle n'écrit jamais d'argument" holds: the digest is not an argument (BR-241).
 
 ### BR-131 · clarification
 
@@ -899,6 +899,8 @@ Addendum 2026-11-01, retouch 6 (operator decision, no new pass played): HULL-57 
 
 **Retouche du 2026-11-16** — gel, human:sstolz
 
+**Retouche du 2026-11-24** — gel, human:sstolz
+
 ## 13. Changelog
 
 | Date | Author | Change |
@@ -908,3 +910,4 @@ Addendum 2026-11-01, retouch 6 (operator decision, no new pass played): HULL-57 
 | 2026-11-15 | Claude (orchestrator, model:claude-opus-5-5) | §10 transcribed into canonical slices (start-feature step 7a), same content and order, dependencies renamed to F-016 slices; operator go |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

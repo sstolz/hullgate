@@ -7,7 +7,7 @@
 
 | Item | Value |
 |------|-------|
-| Probative acceptance run date | 2026-10-28T00:25:58Z, `./bench.sh --target gateway --purge-images`, from scratch (POC images absent at start); replay after the round 2 review of PR #15 |
+| Probative acceptance run date | 2026-10-28T00:25:58Z, `./bench.sh --target gateway --purge-images`, from scratch (POC images absent at start); replay after the round 2 review of PR HULL-15 |
 | Bench commit (`bench_commit`) | `bc87ce94df54487f4b8f12098da0a4401eff5565` (source and configuration clean, `source_dirty: false`) |
 | Go / no-go table commit | `e681dd9e9d215b460a2d3df539ca4767c5a74124`, ancestor of the `bench_commit` (`git merge-base --is-ancestor`: true, recorded in `results-gateway.json`) |
 | Libraries | `ory/fosite` v0.49.0, `modelcontextprotocol/go-sdk` v1.4.0, `golang.org/x/oauth2` v0.34.0, `modernc.org/sqlite` v1.38.2 (`go.sum`) |
@@ -17,7 +17,7 @@
 
 **Discarded acceptance runs.** An acceptance run at commit `0899265` (23:09Z, 16/16) was discarded: its BR-021 check read `docker images` without `-a`, blind to images pulled by digest and to builder intermediates, and wrongly concluded "lists equal" (fixed in `af4759f`). The run of `af4759f` (23:11Z, 16/16) was replaced by that of `2aaec9c` (23:19Z, 16/16) after the discovery of a gateway defect outside the acceptance run (role and vault check never executed at `/token`); this one, by the run of `9f8f2eb` after the addition to T06 of the assertion "one property per variant" (BR-014), identical results. The verdict covers the delivered POC (gateway source identical between `2aaec9c` and `9f8f2eb`). The go / no-go table did not change between these runs.
 
-**Replay after review.** The run of `9f8f2eb` (2026-10-27T23:26:47Z, 16/16, six controls passed) is replaced by that of `b2458d6`, which carries the fixes of the review of PR #15 (N3, N5 to N9, see "Requirements carried over to the v1 core"): 16/16, six controls passed, identical results; T08 now plays the connection placed in role B (reading at the spec's role), refused in the same way. Configuration (`policy.json`, `mapping.json`, compose, `go.mod`, `go.sum`, `Dockerfile`) unchanged since `9f8f2eb`; go / no-go table unchanged.
+**Replay after review.** The run of `9f8f2eb` (2026-10-27T23:26:47Z, 16/16, six controls passed) is replaced by that of `b2458d6`, which carries the fixes of the review of PR HULL-15 (N3, N5 to N9, see "Requirements carried over to the v1 core"): 16/16, six controls passed, identical results; T08 now plays the connection placed in role B (reading at the spec's role), refused in the same way. Configuration (`policy.json`, `mapping.json`, compose, `go.mod`, `go.sum`, `Dockerfile`) unchanged since `9f8f2eb`; go / no-go table unchanged.
 
 **Replay after the round 2 review.** The run of `b2458d6` (2026-10-28T00:05:45Z) is replaced by that of `bc87ce9` (2026-10-28T00:25:58Z), which carries the fix of `/revoke` (503 if the revocation is not persisted, see "Requirements carried over to the v1 core") and the memory of `core.hooksPath` in the common git directory: 16/16, six controls passed (BR-013, BR-015/BR-022, H-2, BR-022, BR-016, BR-003), identical results; growth 2.08 GB, 23.5 GB free before and after, image and volume lists equal to those from before. The hook found a different pre-existing value (`core.hooksPath` absolute to the main worktree), replaced it for the launch, then restored it at teardown (`results-gateway.json`, `meta.hook`). Configuration unchanged since `9f8f2eb`; go / no-go table unchanged.
 
@@ -127,9 +127,9 @@ Changes of the runner since F-001: branches T03 / T04 "authorization server pres
 | Benchmarks | specification: 3 to 5 d and 8,000 to 15,000 lines (for the v1, not the POC); ContextForge: 31.5 d of gaps |
 | Remaining gaps | E-01 + E-02 + E-03 = 3.5 d (E-04 noted: 1.5 d, outside the sum; with it 5.0 d) |
 
-## Requirements carried over to the v1 core (review of PR #15)
+## Requirements carried over to the v1 core (review of PR HULL-15)
 
-Three non-blocking findings of the review (PR #15, review 397) are not fixed in this disposable POC (BR-008 v2); they are **requirements of the v1 core** (ticket #7 "Core"):
+Three non-blocking findings of the review (PR HULL-15, review 397) are not fixed in this disposable POC (BR-008 v2); they are **requirements of the v1 core** (ticket HULL-7 "Core"):
 
 - **N1 · `client_id` claim (RFC 9068 §2.2)**: the access token carries `client_id` (REQUIRED), in addition to `aud`, `exp`, `iat`, `iss`, `jti`, `sub`; the POC omits it although spec §3.1 announces the RFC 9068 profile.
 - **N2 · scope checked at the access point**: the announced scope (`scopes_supported: [mcp]`, RFC 9728 and 8414) is required by the token verification; failing that, `403` with `WWW-Authenticate: Bearer error="insufficient_scope"` (RFC 6750 §3.1). The POC does not check it (no effect on isolation: the role carries the boundary).

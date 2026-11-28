@@ -38,7 +38,7 @@ def test_br_105_token_reaches_the_scanner_by_environment_only(fakes: Fakes) -> N
 def test_br_105_token_is_never_echoed_even_when_the_scanner_prints_it(fakes: Fakes) -> None:
     proc = run_sonar(fakes, FAKE_DOCKER_MODE="401")
     assert proc.stdout.startswith("QA sonar info ERROR — ")
-    assert "renew" in proc.stdout  # free text (#57)
+    assert "renew" in proc.stdout  # free text (HULL-57)
     assert "SONAR_TOKEN_FILE" in proc.stdout
     assert TOKEN not in _everything_visible(fakes, proc)
     assert proc.returncode == 1  # ERROR when informative: visible by hand

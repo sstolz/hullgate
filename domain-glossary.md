@@ -9,7 +9,7 @@
 | **Access point** | MCP URL of a role, `/o/<id>/p/<path>/mcp` from F-014, `/p/<path>/mcp` until then. | endpoint (for an access point), profil, Point d'accès | `BR-044` |
 | **Segment** | Part of the path that belongs to one node, unique among siblings. | slug (outside code), identifiant | `BR-044` |
 | **Sensitive environment** | Marked environment whose roles accept only tokens placed on them. | prod (as a status), environnement protégé, Environnement sensible | `BR-047` |
-| **Lock** | Freeze of a node and its subtree: structure, settings, sensitivity (setting `lock`). | figé, figeage (reserved for tool definitions, #10), gel, Verrou | `BR-049` |
+| **Lock** | Freeze of a node and its subtree: structure, settings, sensitivity (setting `lock`). | figé, figeage (reserved for tool definitions, HULL-10), gel, Verrou | `BR-049` |
 | **Operator token** | Opaque token the operator places on a node (`token create`). | jeton statique, clé d'API, PAT, role token, Jeton opérateur | `BR-053` |
 | **Authorization order** | Fixed sequence of the access point's checks. | pipeline d'auth, chaîne de vérification, Ordre d'autorisation | `BR-055` |
 | **Organisation identifier** | Public, permanent, random 12-character base32 name of the organisation in URLs. | org id, tenant id, slug | `F-014` |
@@ -20,7 +20,7 @@
 | Term | Definition | Also seen as (do not use) | Origin |
 |---|---|---|---|
 | **Lineage** | Sequence of the OAuth tokens issued from one authorization, revoked as a block. | famille de jetons, session OAuth, Lignée | `BR-059` |
-| **Authorization barrier** | Page where the operator authenticates (TOTP in F-005, passkey with #11) before any code. | consentement (seul), page opérateur, Barrière d'autorisation | `BR-060` |
+| **Authorization barrier** | Page where the operator authenticates (TOTP in F-005, passkey with HULL-11) before any code. | consentement (seul), page opérateur, Barrière d'autorisation | `BR-060` |
 | **Request reference** | Short non-secret value derived from a pending authorization request, shown on the barrier page and by `consent list`. | — | `F-020` |
 
 ## connections
@@ -155,3 +155,9 @@
 | **Generic guide** | A deployment guide written for any installation of the supported baseline. | — | `BR-328` |
 | **Export rehearsal** | The export of a commit, judged without a local context, then with a scratch local context. | — | `F-022` |
 | **Private source** | The Gitea repository that keeps the full history before and after public export. | — | `F-022` |
+| **Public repository** | The GitHub repository born from the export of the version tag; the working repository after the switch. | public mirror | `F-025` |
+| **Publication overlay** | The closed list of files, outside the image's build inputs, added to the export of the tag in the public repository's first commit. | — | `F-025` |
+| **Catch-up commit** | The public repository's second commit: the export of the private source's `main` at the switch. | — | `F-025` |
+| **Switch** | The ordered sequence after which the public repository is the working repository and the private source is archived. | — | `F-025` |
+| **Publication check** | The comparison of the public repository's commits, tag and refs with the expected export: trees path by path, objects, refs and headers. | — | `F-025` |
+| **Ticket migration** | The copy of selected open private tickets to GitHub issues, screened by the publication guards and traced to their `HULL-NN`. | — | `F-025` |

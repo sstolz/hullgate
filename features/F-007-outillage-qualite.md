@@ -31,7 +31,7 @@ validated-by: human:sstolz
 
 `make gate` (BR-035) chains `uv lock --check`, `ruff format --check`, `ruff check` (E, F, W, I, B, UP, SIM, RUF, S, PT), `mypy --strict`, `pytest tests/unit tests/integration`, `sdk_guard`. Neither measured nor tracked: **coverage** (no measurement), **known vulnerabilities of the dependencies** (no audit of `uv.lock`), **trends** (duplication, complexity, debt). No CI (`infra.ci: none`): everything happens in session. The SonarQube server exists (Community Build 26.4: analysis of the main branch only, no PRs or branches, no taint, no SCA); its project `hullgate` (branch `main`) is created and a project analysis token is stored outside the repository (`.cairn/auth/sonar/token`, ignored by git).
 
-Reminder from the ticket: the acceptance run on the production server found two production defects (#31, #32) that ~600 green tests did not see; an analysis tool would not have found them. This feature **does not substitute** for real trials.
+Reminder from the ticket: the acceptance run on the production server found two production defects (HULL-31, HULL-32) that ~600 green tests did not see; an analysis tool would not have found them. This feature **does not substitute** for real trials.
 
 ### Objective
 
@@ -371,7 +371,7 @@ BR-100: not tested (review point), see its classification. `container`: not requ
 - **Non-deterministic gate**: a new CVE blocks. Mitigation: the audit is outside the gate (BR-101).
 - **Blocking by a tool on code already there**: BR-100.
 - **Shared VM disk** (22 GB free on 2026-10-28): scanner image and `uv` cache; purge by `make clean-images` to extend if needed.
-- **Drift of a false sense of security**: these tools do not find production defects like #31/#32 (§1).
+- **Drift of a false sense of security**: these tools do not find production defects like HULL-31/HULL-32 (§1).
 - **Gate duration budget** (AC-07, +35% maximum with warm caches since the decision of 2026-10-30): the +20% of the framing, set without measurement, did not hold; thin margin (+23 to +29.7% measured), the operator arbitrates at the next overrun (fallback: `qa-cov` replays the tests).
 - **Nothing obliges the session to play `make qa`**: `close-feature` and the review read `quality-gate.*` of `project-context.yaml`; without a key for `qa`, the gesture relies on the instruction of §3.3 and on the comment of `quality-gate`. Chosen parry (operator, 2026-10-29): the gesture is carried by the orchestrator's instructions.
 - **Revoked or renewed token** (without expiration to date): first symptom `QA sonar info ERROR` on 401.
@@ -416,5 +416,6 @@ Minors:
 | 2026-10-30 | human:sstolz (decision) | AC-07: +35% with warm caches (measured +29.0% warm, +34.3% cold) — review 428 |
 | 2026-10-30 | human:sstolz (decision) | §3.2 / BR-104: the `SKIP` of `make sonar` on absent or stale coverage is ratified, and tied to the commit — the gate writes `coverage.sha` (SHA of the tested head, ignored by git) next to `coverage.xml`; `make sonar` renders `SKIP` if this SHA is missing or differs from `git rev-parse HEAD` (the clean tracked tree is still required) — review 428, N-1 |
 | 2026-10-30 | Claude (implementation, model:claude-sonnet-5-5) | Consistency fixes, without changing the meaning of a rule (review 428): §9 "Scanner ownership" describes the real mounts, no more repository under `/usr/src` (N-2); the version line `== QA <nom> :` must be non-empty (N-3, BR-098); `coverage.xml` SKIP tied to the SHA in place of the date test (N-1) |
-| 2026-10-30 | Claude (implementation, model:claude-sonnet-5-5) | #45: the gate writes `coverage.sha` only on a clean tree in the sense of BR-104 (`scripts/qa_tree.py`, definition shared with the `qa-sonar` guard); on a dirty tree the file stays absent and `make sonar` renders `SKIP` ("rerun make gate"). Clarification of BR-104 (stays v1), meaning of the rule unchanged; the frontmatter waiver, granted until 2026-12-31 for this gap, is withdrawn |
+| 2026-10-30 | Claude (implementation, model:claude-sonnet-5-5) | HULL-45: the gate writes `coverage.sha` only on a clean tree in the sense of BR-104 (`scripts/qa_tree.py`, definition shared with the `qa-sonar` guard); on a dirty tree the file stays absent and `make sonar` renders `SKIP` ("rerun make gate"). Clarification of BR-104 (stays v1), meaning of the rule unchanged; the frontmatter waiver, granted until 2026-12-31 for this gap, is withdrawn |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

@@ -12,7 +12,7 @@ validated-by: "human:sstolz"
 ## Context and Problem Statement
 
 F-016 gives the operator a browser console over the rules the CLI already enforces. The prototype
-the operator validated on 2026-10-28 (#18) is a rich interactive client: three collapsible columns,
+the operator validated on 2026-10-28 (HULL-18) is a rich interactive client: three collapsible columns,
 drag and drop of connections onto roles, a map view, a live rights preview. The specification of
 the product (PDF p. 21) suggested server-rendered HTMX. The console also has to live with a strict
 Content-Security-Policy, stay out of the public listener (BR-068), add no Node to the runtime image

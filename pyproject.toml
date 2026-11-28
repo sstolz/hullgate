@@ -3,6 +3,7 @@ name = "hullgate"
 version = "1.0.0"
 description = "Compartmentalized MCP gateway (v1) — F-004 foundation: two listeners, probes, SQLite database, backup."
 readme = "README.md"
+license = "MIT"
 requires-python = "==3.13.*"
 dependencies = [
     # MCP SDK pinned by exact equality (ADR-001 condition 1, BR-036); any upgrade goes through

@@ -39,7 +39,7 @@ Produce a go / no-go verdict on ContextForge, based on running the 16 tests of t
 
 - 16 tests out of 16 played, each with a result (réussi, échoué or non jouable) and evidence.
 - A go / no-go verdict on a written criterion (BR-007), instead of a stack choice by preference.
-- A bench replayable with one command (BR-005), reusable against the Go POC (#5) and then v1 (BR-006).
+- A bench replayable with one command (BR-005), reusable against the Go POC (HULL-5) and then v1 (BR-006).
 
 ### Open Product Questions
 
@@ -59,7 +59,7 @@ Produce a go / no-go verdict on ContextForge, based on running the 16 tests of t
 
 - Fixing the gaps, fix prototype: only the cost is estimated (decision D); candidate: overlay ticket if the verdict is go.
 - Choice of the stack, writing `project.stack` (BR-008): decision of part 4 / of the maintainer.
-- Go POC (#5): the bench is reusable there, its implementation is out of scope.
+- Go POC (HULL-5): the bench is reusable there, its implementation is out of scope.
 - Behavior of real Claude clients (part 2) and matrix of official servers (part 3): the MCP clients of T15 are bench clients, not Claude.
 - Performance, high availability, hosting on the production server/Traefik (part 5).
 - Replaying the acceptance run on a later version of ContextForge or after a change of identity policy (the review asks for it): the bench allows it (BR-005), the trial plays only one.
@@ -192,9 +192,9 @@ The terms "chosen policy" (T04, T13) and "defined delay" (T12) are not chosen by
 > **Extracted on 2026-10-27.** Current version: [`business-rules/BR-006.md`](../business-rules/BR-006.md).
 > The content below reflects the state of this BR at the time of feature F-001 (v1).
 
-*`behavioral` · `warning` · Candidate state: `deferred` — ticket #5 (Go POC).*
+*`behavioral` · `warning` · Candidate state: `deferred` — ticket HULL-5 (Go POC).*
 
-**Rule** — The runner's tests reach the gateway only through HTTP/OAuth, with no dependency on ContextForge, so that they can be reused without modification against the Go POC (#5) and against v1.
+**Rule** — The runner's tests reach the gateway only through HTTP/OAuth, with no dependency on ContextForge, so that they can be reused without modification against the Go POC (HULL-5) and against v1.
 
 **Clarifications**
 - The administration actions that some tests require (provisioning, account addition T10, revocation T12, failure T13) go through a gateway adapter, the only ContextForge-specific component, replaced for the Go POC.
@@ -318,7 +318,7 @@ sequenceDiagram
 
 ### Dependencies (prerequisite features)
 
-- None. Feeds part 4 (Go POC, #5), which is conditional on the verdict.
+- None. Feeds part 4 (Go POC, HULL-5), which is conditional on the verdict.
 
 ### Technical Constraints
 
@@ -342,7 +342,7 @@ Sources consulted on 2026-10-27 (GitHub README and published documentation of IB
 | B. Which upstream? | Instrumented MCP server written for the bench, with its OAuth authorization server, two test accounts of the same provider, call log | Only a controlled upstream proves the absence of a call after a refusal (BR-002) and avoids the secrets of real services. |
 | C. What to do on a blocking gap? | Play the 16 tests anyway and document each gap | A complete report is worth more than a stop at the first failure; the total cost of the gaps decides the go. |
 | D. What to do with the gaps? | Estimate the cost of the fix only, without a prototype | Bounds the budget; the go/no-go criterion (BR-007) rests on an estimate, not on a fix carried out. |
-| E. What stays in the repository? | Report `docs/trials/contextforge.md`, bench and acceptance run in `poc/isolation-bench/`, merged to `main` | The bench serves the Go POC (#5) and v1; the report traces the decision. |
+| E. What stays in the repository? | Report `docs/trials/contextforge.md`, bench and acceptance run in `poc/isolation-bench/`, merged to `main` | The bench serves the Go POC (HULL-5) and v1; the report traces the decision. |
 | F. Duration? | No duration cap; constraint = the operator's token budget; bench and partial report committed early | Allows resuming the trial after an interruption. |
 
 ### Data Model Impact
@@ -419,7 +419,7 @@ Measurements of 2026-10-27 (ContextForge 1.1.0, pinned digest) against the hypot
 | run on a clean bench | BR-005 | `poc/isolation-bench/bench.sh` |
 | diff without `project.stack` | BR-008 | `poc/isolation-bench/runner/check_scope.py` (and PR review) |
 
-BR-006 (deferred, ticket #5) and BR-007 (judgment) are not tested mechanically.
+BR-006 (deferred, ticket HULL-5) and BR-007 (judgment) are not tested mechanically.
 
 ## 12. Risks & Watchpoints
 
@@ -467,3 +467,4 @@ Minors:
 | 2026-10-27 | Claude (product, stress-test) | Stress-test: BR-002, 003, 004, 006, 007, 008 reworded; BR-009, 010, 011 added; ready-for-freeze |
 | 2026-10-27 | Claude (implementation) | Closure: BR-001..011 extracted; BR-010 clarified (SHA-256 fingerprints kept, not reversible); §9 Pitfalls filled in; status `implemented` |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

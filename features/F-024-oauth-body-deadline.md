@@ -31,7 +31,7 @@ capabilities:
 
 Read on `main` at `50bd49e`:
 
-- **HULL-85.** BR-316 (`strict`) says that on both listeners a request body not received in full within 30 seconds gets 408 `request_timeout` and the connection is closed. PR #96 (`fd418ba`) put the shared reader `read_body` (`src/hullgate/body.py`) on the admin API and the MCP access point; the OAuth routes of the public listener (`authorize`, `consent`, `token`, `revoke`, `register`, POST) still read their body with `request.stream()`, bounded in size (64 KiB, `BODY_MAX`) but not in time (`src/hullgate/oauth.py:368-376`). The acceptance probe (`.cairn/runs/acts/HULL-85-acceptance-1-probe.py`, deadline patched to 1 s) got no answer in 6 s on a stalled `POST …/oauth/p/<role>/token`, while the access point of the same listener answered 408. The acceptance stopped on that gap (raise 1); the operator chose option (a): keep BR-316 as written and bring the OAuth routes under it.
+- **HULL-85.** BR-316 (`strict`) says that on both listeners a request body not received in full within 30 seconds gets 408 `request_timeout` and the connection is closed. PR HULL-96 (`fd418ba`) put the shared reader `read_body` (`src/hullgate/body.py`) on the admin API and the MCP access point; the OAuth routes of the public listener (`authorize`, `consent`, `token`, `revoke`, `register`, POST) still read their body with `request.stream()`, bounded in size (64 KiB, `BODY_MAX`) but not in time (`src/hullgate/oauth.py:368-376`). The acceptance probe (`.cairn/runs/acts/HULL-85-acceptance-1-probe.py`, deadline patched to 1 s) got no answer in 6 s on a stalled `POST …/oauth/p/<role>/token`, while the access point of the same listener answered 408. The acceptance stopped on that gap (raise 1); the operator chose option (a): keep BR-316 as written and bring the OAuth routes under it.
 
 Sources: `.cairn/runs/acts/HULL-85-acceptance-1.md` (raise 1) and its probe; BR-316; F-016 §3.15.
 
@@ -133,7 +133,7 @@ No design assets.
 
 ### Dependencies (prerequisite features)
 
-- HULL-85 — body deadline, PR #96 merged at `fd418ba` (ticket open, acceptance stopped on this gap): `read_body` and the access point's 408 are this spec's base.
+- HULL-85 — body deadline, PR HULL-96 merged at `fd418ba` (ticket open, acceptance stopped on this gap): `read_body` and the access point's 408 are this spec's base.
 
 ### Technical Constraints
 
@@ -213,3 +213,4 @@ Minors :
 | 2026-11-18 | human:sstolz (operator) | Freeze: operator go on the text shown in full. |
 | 2026-11-18 | Claude (implementation, model:claude-opus-5-5) | Close: status `implemented`, `capabilities` declared (INV-047), §9 pitfalls, §10 ticked, §11 tests named; BR-316 clarification extracted (no version) |
 | 2026-11-18 | Claude (product, model:claude-fable-5-2) | Acceptance (HULL-85): AC-11 to AC-14 met, §5 ticked; replayed on `main` `8a4a362` (comment 13486) |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

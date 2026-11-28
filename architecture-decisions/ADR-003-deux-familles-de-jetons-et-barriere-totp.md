@@ -11,14 +11,14 @@ validated-by: "human:sstolz"
 
 ## Context and Problem Statement
 
-"How a caller proves who it is" to an MCP access point of the gateway. Two client populations coexist: Claude Code and clients without OAuth, which accept a fixed `Authorization` header; Claude.ai, iOS and Desktop, which require OAuth 2.1 with an audience equal to the access point's URL. And no OAuth code must be issued unless the operator, the system's only human, has authorized it: the original specification (l. 773-774) asks for administrator authentication on the consent page, by passkey or TOTP; the passkey arrives with the web administration (#11). Decision taken at the freeze of F-005 and confirmed by the operator's arbitration of 2026-10-28 (decision 4a, barrier folded into this ADR).
+"How a caller proves who it is" to an MCP access point of the gateway. Two client populations coexist: Claude Code and clients without OAuth, which accept a fixed `Authorization` header; Claude.ai, iOS and Desktop, which require OAuth 2.1 with an audience equal to the access point's URL. And no OAuth code must be issued unless the operator, the system's only human, has authorized it: the original specification (l. 773-774) asks for administrator authentication on the consent page, by passkey or TOTP; the passkey arrives with the web administration (HULL-11). Decision taken at the freeze of F-005 and confirmed by the operator's arbitration of 2026-10-28 (decision 4a, barrier folded into this ADR).
 
 ## Considered Options
 
 - **A single family, JWT for everyone**: Claude Code's tokens would be long JWTs issued by the CLI; but a path token (`mpx/cairn`, spec l. 363) covers several access points and cannot have a single audience, and a JWT can only be revoked through a registry.
 - **A single family, opaque tokens for everyone**: contrary to RFC 9068, which the Claude clients expect, and the audience would no longer exist.
 - **Two families** (chosen): opaque operator tokens (`clo_` + 256 bits, SHA-256 fingerprint alone in the database, set on a node, coverage by segment prefix, refused in a sensitive environment above the role); OAuth access tokens as RFC 9068 JWTs signed ES256 (key in a mounted secret), exact audience, `jti` in the registry, renewal lineage with rotation.
-- For the barrier: **shared authorization secret** (POC); **TOTP RFC 6238** (chosen); **passkey** (#11).
+- For the barrier: **shared authorization secret** (POC); **TOTP RFC 6238** (chosen); **passkey** (HULL-11).
 
 ## Decision Outcome
 
@@ -29,8 +29,8 @@ Two families, judged by the same authorization order (F-005 BR-055) which plugs 
 - Good: Claude Code needs no interactive flow; the Claude clients get the OAuth they expect; no bearer secret in clear in the database (BR-072).
 - Good: the barrier depends on no web session or account; a code cannot be replayed.
 - Bad: two resolvers and two life cycles (CLI on one side, `/token` and `/revoke` on the other); `jeton lister` and `jeton revoquer` cover both.
-- Bad: global failure window (no reliable client address): a third party can block new authorizations without obtaining any (F-005 risk §12), lifted by the passkey (#11).
-- Bad: a single signing key; changing it invalidates the access tokens in flight (rotation: #23).
+- Bad: global failure window (no reliable client address): a third party can block new authorizations without obtaining any (F-005 risk §12), lifted by the passkey (HULL-11).
+- Bad: a single signing key; changing it invalidates the access tokens in flight (rotation: HULL-23).
 
 ### Confirmation
 

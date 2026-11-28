@@ -1,4 +1,4 @@
-"""Exigences socle v1 relevées sur le POC Go (#7), vérifiées par requête contre le POC Python (F-003, BR-026, ligne H-9),
+"""Exigences socle v1 relevées sur le POC Go (HULL-7), vérifiées par requête contre le POC Python (F-003, BR-026, ligne H-9),
 et sous-contrôle `dcr` (point de comparaison de BR-024). Hors des 16 tests, hors des lignes d'isolation (H9 de la spec).
 
 - N1 : le jeton d'accès porte `client_id` (RFC 9068 §2.2) ;

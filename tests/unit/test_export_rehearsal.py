@@ -71,6 +71,23 @@ def test_export_archive_has_one_clean_commit_and_only_two_cairn_files(source: Pa
         exporter.export(source, output, "HEAD")
 
 
+def test_export_with_tag_holds_the_tag_tree_beside_head(source: Path) -> None:
+    # F-025: the rehearsal of a commit after the switch carries tag v1.0.0, as the public
+    # repository does, so that BR-350's guard can read the tag's tree.
+    exporter.local_git(source, "tag", "v1.0.0")
+    (source / "later.txt").write_text("after the tag")
+    exporter.local_git(source, "update-ref", "HEAD", snapshot(source))
+    output = source.parent / "export"
+    exporter.export(source, output, "HEAD")
+    tree = exporter.add_tag(source, output, "v1.0.0")
+    assert exporter.local_git(output, "rev-parse", "v1.0.0^{tree}").decode().strip() == tree
+    assert exporter.local_git(output, "rev-list", "--count", "HEAD").strip() == b"1"
+    tagged = exporter.local_git(output, "ls-tree", "-r", "--name-only", "v1.0.0").decode()
+    assert "later.txt" not in tagged.split()
+    assert ".cairn/runs/private/fixture" not in tagged.split()
+    exporter.assert_boundary(output)
+
+
 def test_export_scratch_deleted_when_local_check_raises(
     source: Path,
     monkeypatch: pytest.MonkeyPatch,

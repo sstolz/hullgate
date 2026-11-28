@@ -12,7 +12,7 @@ validated-by: "human:sstolz"
 
 ## Context and Problem Statement
 
-The v1 must admit the Claude clients (Claude.ai, iOS, Desktop), which accept only OAuth 2.1 and require an audience equal to the MCP server's URL (RFC 8707), while guaranteeing that a token obtained for one role never holds for another (isolation acceptance run, T02, T05, T14). The gateway serves one access point per role (`/p/<client>/<projet>/<env>/<rôle>/mcp`, F-005 BR-044), potentially hundreds. Ticket #7 asks for "one authorization server per access point"; the original specification (l. 749-753) fixes the layout: one logical authorization server per access point, under `/oauth/p/<chemin>`, a single code base, parameterized URLs. Decision taken at the freeze of F-005 and confirmed by the operator's arbitration of 2026-10-28 (targeted stress test, decision 4a).
+The v1 must admit the Claude clients (Claude.ai, iOS, Desktop), which accept only OAuth 2.1 and require an audience equal to the MCP server's URL (RFC 8707), while guaranteeing that a token obtained for one role never holds for another (isolation acceptance run, T02, T05, T14). The gateway serves one access point per role (`/p/<client>/<projet>/<env>/<rôle>/mcp`, F-005 BR-044), potentially hundreds. Ticket HULL-7 asks for "one authorization server per access point"; the original specification (l. 749-753) fixes the layout: one logical authorization server per access point, under `/oauth/p/<chemin>`, a single code base, parameterized URLs. Decision taken at the freeze of F-005 and confirmed by the operator's arbitration of 2026-10-28 (targeted stress test, decision 4a).
 
 ## Considered Options
 

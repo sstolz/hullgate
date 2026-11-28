@@ -211,7 +211,7 @@ def test_br_104_scanner_mounts_only_what_it_reads_read_only(fakes: Fakes) -> Non
     assert not any(".cairn" in m or m.split(":")[1] == "/usr/src" for m in mounts)
 
 
-# --- #45: coverage.sha is written only on a clean tree, by the same definition as the guard ---
+# --- HULL-45: coverage.sha is written only on a clean tree, by the same definition as the guard ---
 
 
 def run_stamp(fakes: Fakes, **env: str) -> subprocess.CompletedProcess[str]:
@@ -250,7 +250,7 @@ def test_br_104_the_gate_leaves_coverage_sha_absent_on_a_dirty_tree(
 
 
 def test_br_104_dirty_gate_then_revert_ends_in_skip_not_in_a_stale_rate(fakes: Fakes) -> None:
-    # the scenario of #45: gate on a dirty tree, modifications reverted, HEAD unchanged
+    # the scenario of HULL-45: gate on a dirty tree, modifications reverted, HEAD unchanged
     run_stamp(fakes, FAKE_DIRTY=" M src/hullgate/app.py\n")
     proc = run_sonar(fakes, FAKE_DOCKER_MODE="ok")  # tree clean again
     assert proc.stdout.startswith("QA sonar info SKIP — coverage.sha absent")

@@ -1,7 +1,7 @@
 """BR-117, BR-116 (F-008 lot A, AC-21 at the library level): a call whose request was sent
 without a whole response is never replayed — `deadline_exceeded` at the deadline,
 `uncertain_outcome` on a cut before it; a refused connection returns `upstream_unavailable`
-without a request. The reason is measured over 5 executions (lesson of #36)."""
+without a request. The reason is measured over 5 executions (lesson of HULL-36)."""
 
 from __future__ import annotations
 

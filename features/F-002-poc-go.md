@@ -29,7 +29,7 @@ capabilities:
 
 ### Current State
 
-The ContextForge trial (F-001, HULL-2) returned a **no-go** verdict on 2026-10-27: 7 tests out of 16, three core gaps (E-02 authorization server for MCP clients, E-03 audience check, E-05 simultaneous renewals), 31.5 days of estimated gaps (28 d in-core, 3.5 d overlays) against 3 to 5 estimated days for a Go POC (gateway specification, estimate table). The operator decided the same day to launch the Go POC. What remains from F-001 is a reusable bench (`poc/isolation-bench/`: T01..T16 runner over HTTP/OAuth only, instrumented upstream, ContextForge-specific adapter) and three limits raised in the review of PR #14: N4 (incomplete upstream log: GET, DELETE and unknown paths not traced), N6 (the secrets scan detects but no hook blocks the commit), N9 (gap E-07 played with a single type of forged token).
+The ContextForge trial (F-001, HULL-2) returned a **no-go** verdict on 2026-10-27: 7 tests out of 16, three core gaps (E-02 authorization server for MCP clients, E-03 audience check, E-05 simultaneous renewals), 31.5 days of estimated gaps (28 d in-core, 3.5 d overlays) against 3 to 5 estimated days for a Go POC (gateway specification, estimate table). The operator decided the same day to launch the Go POC. What remains from F-001 is a reusable bench (`poc/isolation-bench/`: T01..T16 runner over HTTP/OAuth only, instrumented upstream, ContextForge-specific adapter) and three limits raised in the review of PR HULL-14: N4 (incomplete upstream log: GET, DELETE and unknown paths not traced), N6 (the secrets scan detects but no hook blocks the commit), N9 (gap E-07 played with a single type of forged token).
 
 Not one line of the gateway exists. The choice of language (Go proposed, Rust or Python mentioned by the specification) rests on estimates, not on a measurement; the maturity of `ory/fosite` (authorization server) and the exact APIs of the MCP `go-sdk` (relay) are explicitly "to be confirmed at the POC".
 
@@ -243,7 +243,7 @@ Texts written at closure from the overlap report above (C2: new version; C3: cla
 > **Extracted on 2026-10-27.** Current version: [`business-rules/BR-006.md`](../business-rules/BR-006.md).
 > The content below reflects the state of this BR at the time of feature F-002 (v2).
 
-**Rule** — The runner's tests reach the gateway only through HTTP/OAuth, with no dependency on ContextForge, so that they can be reused without modification against the Go POC (#5) and against v1.
+**Rule** — The runner's tests reach the gateway only through HTTP/OAuth, with no dependency on ContextForge, so that they can be reused without modification against the Go POC (HULL-5) and against v1.
 
 **Clarifications**
 - The administration actions that some tests require (provisioning, account addition T10, revocation T12, failure T13) go through a gateway adapter, the only ContextForge-specific component, replaced for the Go POC.
@@ -281,7 +281,7 @@ Texts written at closure from the overlap report above (C2: new version; C3: cla
 **Rule** — The instrumented upstream's log records every request received, whatever its method, path or result (catch-all), so that the absence of an entry proves the absence of a call; the bench runs this check before the first test, and an untraced request stops it.
 
 **Clarifications**
-- Fixes N4 (review of PR #14): the F-001 log does not trace GETs other than `/authorize` (including metadata and an SSE-stream GET `/mcp`), DELETEs, unknown paths (404), or an introspection refused before logging (`upstream/server.py`, `do_GET`, `do_DELETE`, `do_POST`).
+- Fixes N4 (review of PR HULL-14): the F-001 log does not trace GETs other than `/authorize` (including metadata and an SSE-stream GET `/mcp`), DELETEs, unknown paths (404), or an introspection refused before logging (`upstream/server.py`, `do_GET`, `do_DELETE`, `do_POST`).
 - Two logs: that of the bench upstream (authorization server and MCP server, read through the control port) and that of the front placed between the gateway and the Gitea MCP server, since the latter cannot be instrumented; the front exposes the same reading (`/now`, `/journal`). The exhaustiveness check covers both; a call from the Gitea MCP server to the Gitea instance necessarily follows a call logged at the front and is not logged.
 - The log contains no token or secret, only the truncated fingerprint of the token received (BR-003, BR-022).
 
@@ -675,3 +675,4 @@ Minors:
 | 2026-10-27 | Claude (implementation) | Implemented: acceptance run 16/16 (bench `9f8f2eb`), verdict "go, Claude.ai / iOS reservation open"; BR-012..018, 020..023 extracted; BR-001, 004, 008 to v2; BR-002, 003, 005, 006 clarified (v2); `capability-map.md` created; `implemented` |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

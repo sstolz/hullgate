@@ -35,7 +35,7 @@ Constat of 2026-11-01, commit `a8fa639`.
 - BR-130 closes every tool of a connection placed on at least one sensitive role, on all its roles: nothing can be opened on production, and `connection tools` refuses such a connection, so the operator cannot even read its tool names.
 - The per-tool bench reading of T09 waits for this feature (BR-071). The settings engine declares `token_duration` and `lock` only (BR-048). BR-049 announces that policy settings will obey the lock.
 - 3 of the 4 target services group several actions behind one tool: Gitea `method`, Notion `command`/`mode`, Work IQ `do_action` (`docs/trials/matrice-serveurs.md` l. 16, 152). A filter by tool name cannot separate commenting from merging there.
-- Of the five response guardrails of the specification (§Garde-fous sur les réponses), three are shipped: upstream timeouts (BR-107), error cleaning (BR-116), no automatic retry (BR-117). Rate limiting belongs to #12 (F-008 §Out of Scope). The per-role cap is the only one left.
+- Of the five response guardrails of the specification (§Garde-fous sur les réponses), three are shipped: upstream timeouts (BR-107), error cleaning (BR-116), no automatic retry (BR-117). Rate limiting belongs to HULL-12 (F-008 §Out of Scope). The per-role cap is the only one left.
 
 ### Objective
 
@@ -62,7 +62,7 @@ Confirmed at the freeze go of 2026-11-14: D2, D3, D5 and D9 as written.
 - **Lists per placement**: `open`, `deny`, `allowlist`, validated on entry (BR-176); inherited setting `mode` and per-placement override (BR-177).
 - **Argument rules**: an allow-list of values for one named argument per tool (BR-178), announced schema narrowed accordingly (BR-179).
 - **Definition pinning**: per setting, placement or tool, implied by an argument rule (BR-180); suspension on change (BR-181, BR-187); operator diff and validation (BR-182).
-- **Rights preview on the command line**, the instrument #11 will display (BR-183).
+- **Rights preview on the command line**, the instrument HULL-11 will display (BR-183).
 - **Per-role response cap** (BR-184).
 - **Audit** of refusal reasons (BR-185) and of every policy change (BR-188).
 - **Export** of the policy; bench T09 tightened to per-tool masking; runbook.
@@ -71,20 +71,20 @@ Confirmed at the freeze go of 2026-11-14: D2, D3, D5 and D9 as written.
 
 | Item | Destination |
 |---|---|
-| Admin screens: Role, Rights preview, Tools; one-click actions of the prototype | #11, on the evaluator and the commands of this feature |
+| Admin screens: Role, Rights preview, Tools; one-click actions of the prototype | HULL-11, on the evaluator and the commands of this feature |
 | Pushing `notifications/tools/list_changed` to connected clients | F-008 §Out of Scope stands (BR-121); the policy applies at the next request |
-| Rate limit per token and per connection | #12 (F-008 §Out of Scope) |
-| Alert delivery (webhook, ntfy) for a suspended tool | #12, which reads `suspended_at` (BR-181) |
+| Rate limit per token and per connection | HULL-12 (F-008 §Out of Scope) |
+| Alert delivery (webhook, ntfy) for a suspended tool | HULL-12, which reads `suspended_at` (BR-181) |
 | Upstream type `api-rest` and its HTTP-method classification source (source 2 of the specification) | ticket 1.1.0 (F-008 §Out of Scope); the source order leaves its place |
 | Tokens reduced to a connection or a mode (specification §Conventions de nommage, `dropbox-prod:lecture`; BR-050 clarification) | candidate ticket: changes tokens and the consent page, adds no exposure |
-| Rights preview **for a token** | #11: in v1 a token narrows no tool, so a token's rights are those of the role it opens (`tokenCheck` of the prototype) |
-| Declared ceiling of a connection's provider rights (prototype `Droits du fournisseur`) | #11; the provider enforces its own rights |
+| Rights preview **for a token** | HULL-11: in v1 a token narrows no tool, so a token's rights are those of the role it opens (`tokenCheck` of the prototype) |
+| Declared ceiling of a connection's provider rights (prototype `Droits du fournisseur`) | HULL-11; the provider enforces its own rights |
 | Rules on several arguments of one tool, nested arguments, non-string values, classification per argument value | candidate ticket. Every grouped argument of the matrix is a top-level string, but a one-argument rule cannot separate Notion's read from its write when a tool takes `command` and `mode`, nor Work IQ's actions behind one path argument |
 | Pruning the tool catalogue | candidate ticket: removed tools stay as rows (BR-173); `--purge-names` bounds the name table, not the catalogue |
 | Cap on `tools/list` size or on the catalogue weight in tokens | candidate ticket; the specification ties the cap to tool responses |
 | Rewriting tool descriptions (a description may still name a closed action) | not planned: pinning protects the definition, BR-179 touches one enum only |
 | Confirmation of a write (elicitation) | v2 (brief) |
-| Pinning `_meta` and `icons` of a tool definition (BR-181 hashes five fields; the relay forwards the rest unpinned) | #79, 1.1.0 |
+| Pinning `_meta` and `icons` of a tool definition (BR-181 hashes five fields; the relay forwards the rest unpinned) | HULL-79, 1.1.0 |
 
 ## 3. Functional Spec
 
@@ -424,8 +424,8 @@ The rule text quoted by number is the version in force when implementation start
 - The first baseline of a placement trusts what it reads: a definition changed before the pin is not detected (§12).
 - Detection happens when a listing is filled, so at most 300 s after the change (BR-112).
 - Suspension does not lift by itself, even when the upstream reverts: a tool that flips back and forth is the case to look at.
-- A suspension, of a changed tool or of a new one (BR-187), is a `pinned_definition` row with `suspended_at` set, written in its own transaction whatever becomes of the audit entry, and a failure of that write fails the listing closed; this column is the state of record for the evaluator, `tool diff` and #12.
-- Each change also writes one `tool.suspended` audit entry per (placement, tool, hash), a trace and never the state; #12's alert reads `suspended_at` (F-019).
+- A suspension, of a changed tool or of a new one (BR-187), is a `pinned_definition` row with `suspended_at` set, written in its own transaction whatever becomes of the audit entry, and a failure of that write fails the listing closed; this column is the state of record for the evaluator, `tool diff` and HULL-12.
+- Each change also writes one `tool.suspended` audit entry per (placement, tool, hash), a trace and never the state; HULL-12's alert reads `suspended_at` (F-019).
 - A baseline stays while the pin is lifted and is compared again if the pin returns: the direction of the surprise is a suspension.
 - A tool that disappears shows as `removed` in `tool diff`; validating drops its baseline.
 
@@ -641,7 +641,7 @@ erDiagram
 
 ## 7. States & Captures
 
-- **Package-status**: absent. No screen here; #11 carries them.
+- **Package-status**: absent. No screen here; HULL-11 carries them.
 
 ## 8. Design & Prototypes
 
@@ -676,14 +676,14 @@ All entries: *tranché en autonomie déléguée*, drafting of 2026-11-01. `techn
 | D3 | Sensitivity of a shared connection after BR-130 | The maximum of its placements (BR-186), not per role as the prototype does | The cause BR-130 gives stands: the same token holds the same rights on both sides. Stricter than the prototype, cost: a shared connection needs lists on its non-sensitive role too. **Worth a look at the freeze** |
 | D4 | Where a manual classification lives | On the service, as in the prototype; the specification's `classer` list is not repeated per placement | One fact, one place |
 | D5 | Tool without any classification source | Class `destructive`, visible under an explicit `destructive` mode or `open`, as the specification says. The prototype hides it everywhere | Following the prototype would make the operator classify every unannotated tool before `open` works, and leave source 4 meaningless. **To confirm at the freeze; HULL-11 aligns its text** |
-| D6 | Rate limit | Stays in #12 | F-008 §Out of Scope sent it there; only the per-role cap is left of the guardrails |
+| D6 | Rate limit | Stays in HULL-12 | F-008 §Out of Scope sent it there; only the per-role cap is left of the guardrails |
 | D7 | Refusal of an argument value on a listed tool | "Unknown tool", audited `argument_value` | BR-113 and §3.3 of F-008 froze it; the enum narrowing keeps honest clients away from it. Cost: a client that insists gets a misleading message |
 | D8 | Argument rule shape | One top-level string argument per tool per placement | Operator's scope (2026-10-28) and every case of the matrix |
 | D9 | Reads on a sensitive placement | Must be listed in `allowlist`, as the specification says. The prototype shows them by default | Annotations alone must not open a tool in production. Cost: HULL-13 lists its read tools, in one gesture with `allowlist --class read`; a read added later needs its own. No setting lifts it (X10). **Worth a look at the freeze** |
 | D10 | `tool classify` under a lock | Lowering a class is refused while a placement of the service lies under a locked node; raising passes | A lock freezes what a subtree exposes: lowering could expose a listed tool on a locked node with no act on that node. Raising can only hide |
-| D11 | Rights preview in this feature | On the command line | The AC needs an instrument, and #11 needs the same verdict |
-| D12 | Readiness of the ticket | `ready`, two parts plus a remainder: tool exposure (modes, lists, argument rules), definition pinning, and one setting of the guardrails | With 3 of 5 guardrails shipped and one in #12, the remainder is one setting on the same surface, not a feature accepted on its own. All are configuration of one placement read at one seam. Split in lots, §10 |
-| D13 | Are `_meta` and `icons` of a tool definition pinned (lot B review, Q10)? | No, out of scope of BR-181 for 1.0.0: operator, 2026-11-14: out of scope, ticket #79 | An icon or a metadata field does not change what the tool does; the five hashed fields, the safety annotations among them, stay pinned |
+| D11 | Rights preview in this feature | On the command line | The AC needs an instrument, and HULL-11 needs the same verdict |
+| D12 | Readiness of the ticket | `ready`, two parts plus a remainder: tool exposure (modes, lists, argument rules), definition pinning, and one setting of the guardrails | With 3 of 5 guardrails shipped and one in HULL-12, the remainder is one setting on the same surface, not a feature accepted on its own. All are configuration of one placement read at one seam. Split in lots, §10 |
+| D13 | Are `_meta` and `icons` of a tool definition pinned (lot B review, Q10)? | No, out of scope of BR-181 for 1.0.0: operator, 2026-11-14: out of scope, ticket HULL-79 | An icon or a metadata field does not change what the tool does; the five hashed fields, the safety annotations among them, stay pinned |
 
 ### Data Model Impact
 
@@ -878,6 +878,7 @@ Addendum 2026-11-01, retouch 6 (operator decision, no new pass played): HULL-57 
 | 2026-11-01 | model:claude-opus-5-5 | Draft, delegated drafting act HULL-10-drafting-1 |
 | 2026-11-01 | model:claude-opus-5-5 | Retouch act HULL-10-retouch-1: 26 findings of the stress-test applied per the arbitration of pass 1; BR-186, BR-187, BR-188 added; `gitea-mcp` annotations measured |
 | 2026-11-14 | model:claude-opus-5-5 | Closure after lot C (HULL-10-implementation-3): §9 deltas of lots A to C, BR-170 to BR-188 extracted, touched rules versioned, status implemented |
-| 2026-11-14 | model:claude-opus-5-5 | Review of lot C, round 1 (HULL-10-implementation-4): AC-2 control in the bench, N1 and N2 deltas; operator decision of 2026-11-14 recorded: `_meta` and `icons` out of scope (D13, #79) |
+| 2026-11-14 | model:claude-opus-5-5 | Review of lot C, round 1 (HULL-10-implementation-4): AC-2 control in the bench, N1 and N2 deltas; operator decision of 2026-11-14 recorded: `_meta` and `icons` out of scope (D13, HULL-79) |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

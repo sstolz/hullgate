@@ -108,7 +108,7 @@ export function lengthWidth(length: number): string {
 export type RowAct = 'select' | 'rename' | 'remove' | 'expand' | 'collapse' | 'next' | 'previous';
 
 /**
- * What a key pressed on a row of the tree does (BR-232, the keyboard paths of #18). In read-only
+ * What a key pressed on a row of the tree does (BR-232, the keyboard paths of HULL-18). In read-only
  * mode (§3.17) only moving and selecting remain.
  */
 export function rowKey(key: string, readOnly: boolean): RowAct | null {

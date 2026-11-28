@@ -1,6 +1,6 @@
 # Brief — hullgate (multi-project MCP gateway)
 
-Source: specification "Multi-project MCP gateway — initial specification" (revised on 26 and 27 October 2026) and OpenAI technical review of 26 October 2026, both attached to ticket #1.
+Source: specification "Multi-project MCP gateway — initial specification" (revised on 26 and 27 October 2026) and OpenAI technical review of 26 October 2026, both attached to ticket HULL-1.
 
 ## What we are building
 

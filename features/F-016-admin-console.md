@@ -34,7 +34,7 @@ Constat of 2026-11-01, commit `a8fa639`:
 - Everything is managed from `hullgate` inside the container: `src/hullgate/cli.py` declares 48 subparsers (`grep -c 'add_parser('`) over 9 groups: `tree`, `settings`, `token`, `audit`, `client`, `export`, `service`, `application`, `connection` and their verbs.
 - The admin listener serves `/healthz` and nothing else (`src/hullgate/app.py:112`, BR-068). On the production server it is published on `127.0.0.1:14791` only, with `ADMIN_URL: http://127.0.0.1:14791` (`deploy/compose.prod.yaml`), and BR-068's reason stands: inside the Traefik network the port answers to neighbouring containers.
 - The only human authentication is the TOTP barrier on the OAuth consent page (BR-060). There is no administrator account, no session, no cookie other than the consent one. Audit actor for an operator act is the constant `operator-cli` (`src/hullgate/audit.py:17`).
-- A prototype was validated by the operator on 2026-10-28 (#18): three-column view (library, tree, inspector), drag and drop placement, map view, rights preview, tokens, tools, audit, statistics. Everything in it is simulated. It has no sign-in, no organisation screen, no history, no import.
+- A prototype was validated by the operator on 2026-10-28 (HULL-18): three-column view (library, tree, inspector), drag and drop placement, map view, rights preview, tokens, tools, audit, statistics. Everything in it is simulated. It has no sign-in, no organisation screen, no history, no import.
 - Features that deferred work here: F-004 (public admin name and router), F-005 (web UI, passkey, undo, YAML import, prototype corrections), F-006 (Library screen, web OAuth return route, second `redirect_uri`), F-008 (`list_changed`, see §Out of Scope).
 
 ### Objective
@@ -59,7 +59,7 @@ None is left unanswered in the text: each is written on a default, recorded in �
 
 ## 2. Scope
 
-Ticket HULL-11 (step 6 of the plan of ticket #1) plus the deferrals listed in §1.
+Ticket HULL-11 (step 6 of the plan of ticket HULL-1) plus the deferrals listed in §1.
 
 - **Administrator and sign-in** (lot A): the instance's administrator, host-side bootstrap, passkey sign-in, enrolment links, short sessions, CSRF defence, Host check, attempt limits, reliable client address, optional IP allow-list, fresh re-authentication for security acts.
 - **JSON admin API and console shell** (lot A): `/admin/api/v1/…` on the admin listener, static SPA under `/admin`, build, gate, tests.
@@ -74,7 +74,7 @@ Ticket HULL-11 (step 6 of the plan of ticket #1) plus the deferrals listed in §
 - **Several administrators, invitation by e-mail, mail transport, recovery issued by a peer** — 1.1.0 (operator, 2026-11-01). The account tables can hold several.
 - **Administrator e-mail or name change, handover, removal** — 1.1.0, with the account management.
 - **Statistics screen** — HULL-68 (F-017), on this console's shell, §3.17; it reads the call events HULL-68 builds.
-- **Alert channels, upstream health** — HULL-69; F-008's "#11 / #12" row on upstream health lands there.
+- **Alert channels, upstream health** — HULL-69; F-008's "HULL-11 / HULL-12" row on upstream health lands there.
 - **`notifications/tools/list_changed` pushed to clients** — Q1; candidate ticket on incoming sessions.
 - **Recovery by e-mail** (PDF p. 6) — a mailbox would be enough to take over the gateway; held by BR-228, candidate ticket if the operator wants it, §9.
 - **Console without a passkey on a local URL** (PDF p. 17) — refused: a loopback `ADMIN_URL` proves nothing about who reaches the port, §9.
@@ -83,11 +83,11 @@ Ticket HULL-11 (step 6 of the plan of ticket #1) plus the deferrals listed in §
 - **Declared ceiling of a connection's provider rights** (prototype "Provider rights"; F-015 §Out of Scope sends it here) — not built: the sheet shows the scopes granted, and the provider enforces them. §9.
 - **Retention and purge of the audit, wider audit queries** — HULL-68; the Audit screen reads what exists.
 - **Domain change from the console** — URLs are configuration (PDF p. 17); the Organisation screen shows them read-only.
-- **French console and CSV export** — neither is needed for the objective of §1, and a second dictionary doubles the string work of every lot. Console strings stay in one dictionary, so French can be added later. Departs from #18's FR/EN decision; server refusal texts are English in any case (BR-131). Candidate for a later feature.
+- **French console and CSV export** — neither is needed for the objective of §1, and a second dictionary doubles the string work of every lot. Console strings stay in one dictionary, so French can be added later. Departs from HULL-18's FR/EN decision; server refusal texts are English in any case (BR-131). Candidate for a later feature.
 - **Other console languages.**
 - **Touch devices** — supported: current desktop Chromium, Firefox and Safari. Drag and drop and the three columns are not designed for touch; "Place in…" remains.
 - **Rate limiting of the API beyond sign-in** — only an authenticated administrator reaches it.
-- **`design/amaterasu/` fonts and assets** — not used (§8, #41).
+- **`design/amaterasu/` fonts and assets** — not used (§8, HULL-41).
 
 ## 3. Functional Spec
 
@@ -128,7 +128,7 @@ SCR-02 opens from an enrolment link: it shows the account's e-mail, asks for a p
 
 ### 3.4 Shell (SCR-03)
 
-Top bar: wordmark and organisation name, tabs (Tree, Tokens, Tools, Audit, Organisation), badge on Tools for the count to classify, theme switch (dark by default, #18), account menu (passkeys, sign out). A banner appears when the vault is unavailable (BR-064): the readiness reason travels in `GET /admin/api/v1/meta`, the admin listener having no `/readyz` and the CSP forbidding the public origin. Writes needing the vault are refused by the server and the screen says why.
+Top bar: wordmark and organisation name, tabs (Tree, Tokens, Tools, Audit, Organisation), badge on Tools for the count to classify, theme switch (dark by default, HULL-18), account menu (passkeys, sign out). A banner appears when the vault is unavailable (BR-064): the readiness reason travels in `GET /admin/api/v1/meta`, the admin listener having no `/readyz` and the CSP forbidding the public origin. Writes needing the vault are refused by the server and the screen says why.
 
 #### Visual States
 
@@ -139,7 +139,7 @@ Top bar: wordmark and organisation name, tabs (Tree, Tokens, Tools, Audit, Organ
 
 ### 3.5 Tree (SCR-04)
 
-Three collapsible columns (`[` and `]`), as validated in #18: Library on the left, tree in the centre, inspector on the right, with a List view and a Map view.
+Three collapsible columns (`[` and `]`), as validated in HULL-18: Library on the left, tree in the centre, inspector on the right, with a List view and a Map view.
 
 - Add, rename (double-click or F2), move and delete a node in place. Levels, segments and locks are the server's (BR-044, BR-049); the refusal text is the server's.
 - Drag a connection from the Library onto a role to place it. Dropped on a project or environment: a dialog asks which roles below. Every drag has a keyboard path, "Place in…" (BR-232).
@@ -471,7 +471,7 @@ Off topic, 26 lines (bench, quality tools, OAuth inbound, vault, upstream client
 
 **Clarifications**
 - uvicorn's default `proxy_headers` rewrites the client address from forwarded headers before this function runs, so both listeners set `proxy_headers=False`, in lot A.
-- F-005 deferred this to #12; the console needs it first. HULL-70 (`X-Forwarded-*` from declared proxies) reuses this function.
+- F-005 deferred this to HULL-12; the console needs it first. HULL-70 (`X-Forwarded-*` from declared proxies) reuses this function.
 - A peer in `TRUSTED_PROXIES` with no usable header gives the peer's address.
 
 ### BR-209 · An optional IP allow-list closes the console, without locking its author out
@@ -806,7 +806,7 @@ Off topic, 26 lines (bench, quality tools, OAuth inbound, vault, upstream client
 **Rule** — The sign-in, place a connection, issue a token and delete a node flows complete by keyboard alone, with visible focus; a flow that cannot fails the test. Every other act available by pointer is expected to do the same, and an axe audit run in `tests/browser` reports what it finds, as a warning.
 
 **Clarifications**
-- Inherits the keyboard paths of #18 ("Place in…", F2, Delete, `[`, `]`).
+- Inherits the keyboard paths of HULL-18 ("Place in…", F2, Delete, `[`, `]`).
 
 ### BR-238 · A connection that cannot renew itself is expiring within a threshold
 
@@ -1207,10 +1207,10 @@ erDiagram
 
 ## 8. Design & Prototypes
 
-- **Design package**: no package; references `design/prototype-admin/` and the artifact of #18.
+- **Design package**: no package; references `design/prototype-admin/` and the artifact of HULL-18.
 - **Package-status**: absent.
-- **Design brief**: dense console in the blue of #18, dark by default, a wordmark in capitals now reading HULLGATE, tooltips on model terms.
-- **Tokens**: colours and spacing are copied into `web/src/tokens.css` as project values. They come from the prototype's CSS, itself derived from `design/amaterasu/`; #41 forbids publishing that package as is, and the console depends on no file of it.
+- **Design brief**: dense console in the blue of HULL-18, dark by default, a wordmark in capitals now reading HULLGATE, tooltips on model terms.
+- **Tokens**: colours and spacing are copied into `web/src/tokens.css` as project values. They come from the prototype's CSS, itself derived from `design/amaterasu/`; HULL-41 forbids publishing that package as is, and the console depends on no file of it.
 - **Fonts**: Inter, Inter Tight, Space Grotesk, JetBrains Mono, all under the SIL Open Font License, the substitutes the prototype already uses (constat: its Google Fonts `<link>`), self-hosted with their licences. TWK Lausanne and Neo Sans Pro are not used.
 - **Non-prescriptive**: the implementer owns markup and component structure; the prototype source is a behaviour reference, `support.js` is not reused.
 
@@ -1225,7 +1225,7 @@ erDiagram
 
 ### Technical Constraints
 
-- Python 3.13, Starlette, SQLite, as `project.stack`. New dependencies are permissive-licence only (#41): `webauthn` (py_webauthn, BSD-3) for the ceremonies, a safe YAML parser for import (PyYAML, MIT).
+- Python 3.13, Starlette, SQLite, as `project.stack`. New dependencies are permissive-licence only (HULL-41): `webauthn` (py_webauthn, BSD-3) for the ceremonies, a safe YAML parser for import (PyYAML, MIT).
 - Console: Svelte 5, TypeScript, Vite, as a plain SPA (no SvelteKit, no server rendering). `web/` holds sources and `package-lock.json`; the `Dockerfile` gains a build stage; nothing built is committed.
 - Non-functional: first screen under 2 seconds on the tunnel, bundle under 500 KiB gzipped excluding fonts; API list routes paged; console lists held up to 2 000 nodes.
 - Dynamic styles (column widths, map highlights) go through CSSOM, never an inline `style` attribute: `style-src 'self'` blocks it silently (BR-212).
@@ -1259,9 +1259,9 @@ Every line below is **tranché en autonomie déléguée**, unless marked raised.
 | Undo scope | Closed list, BR-220 | "Can be undone" (PDF p. 6) cannot hold against BR-045 and BR-046; reversible acts undo, the others say why |
 | Rename in import | Never inferred | BR-046 cuts lineages; a guess must not do so |
 | CLI parity for import | `hullgate import` added | One rule set, and the CLI stays complete |
-| Audit screen in F-016, not HULL-68 | Read and export of the existing journal | Validated in #18, needed for undo; HULL-68 adds events and retention |
+| Audit screen in F-016, not HULL-68 | Read and export of the existing journal | Validated in HULL-18, needed for undo; HULL-68 adds events and retention |
 | Frontend tests | New category `browser` | WebAuthn, drag and drop and CSP cannot be proved otherwise |
-| Console languages | English only in 1.0.0, one dictionary | Stress-test m16; departs from #18, to be seen at the freeze |
+| Console languages | English only in 1.0.0, one dictionary | Stress-test m16; departs from HULL-18, to be seen at the freeze |
 | Declared provider-rights ceiling | Not built, granted scopes shown | It would be a second, unenforced statement of what the provider already enforces |
 | Foreign organisation identifier at import | Adopted on an empty instance, refused elsewhere | F-014 leaves it here; a restore must keep URLs, a merge must not change them |
 
@@ -1452,7 +1452,7 @@ Not part of any slice: `close-feature` cannot tick them, and start-feature step 
 - [x] AC-OP-01 — after slice 1, on the production server: runbook `docs/guides/admin.md` A1 to A6, P1 first when `.env` holds no `TRUSTED_PROXIES` — played 2026-11-18 (guide A2 to A6), evidence `.cairn/runs/acts/HULL-11-acop-evidence.md`
 - [x] AC-OP-02 without preview — after slice 2, on the production server: runbook `docs/guides/admin.md` B1 to B4 — played 2026-11-18 (B2 to B4, client Claude Code)
 - [x] AC-OP-02 — after slice 3, on the production server: runbook `docs/guides/admin.md` C1 to C3 — played 2026-11-18 (C2, C3; preview and clients agree at 36 and, at the higher mode, at 61)
-- [x] AC-OP-03 — after slice 4, on a fresh local instance on the operator's workstation: §5 protocol, `compose.yaml` under the project name `hullgate-acop03` — played 2026-11-18 at `97d0ef6`: 16 min 35 s (reading; target 15); the guide's step links did not open their screen, ticket #109
+- [x] AC-OP-03 — after slice 4, on a fresh local instance on the operator's workstation: §5 protocol, `compose.yaml` under the project name `hullgate-acop03` — played 2026-11-18 at `97d0ef6`: 16 min 35 s (reading; target 15); the guide's step links did not open their screen, ticket HULL-109
 - [x] AC-OP-05 — after slice 4, only if Q3 opens a public name — not opened: Q3 = (a), nothing to play
 
 ## 11. Tests
@@ -1535,7 +1535,7 @@ Minors :
 - **m13** · axe B · BR-204, BR-230 — cookie on public routes. Sort : corrigé — `Path=/admin`.
 - **m14** · axe F · §3.3 — no unsupported state on sign-in. Sort : corrigé — SCR-01.unsupported.
 - **m15** · axe A · BR-232, AC-20, AC-21 — instruments short of the population. Sort : corrigé — rule bounded to the four flows, axe report as warning; AC-20 asserts the strings; AC-21 read by hand; clause question re-asked.
-- **m16** · axe C · §3.4, BR-218 — French and CSV beyond the objective. Sort : corrigé — both to §Out of Scope; map view kept; departs from #18, flagged in §9.
+- **m16** · axe C · §3.4, BR-218 — French and CSV beyond the objective. Sort : corrigé — both to §Out of Scope; map view kept; departs from HULL-18, flagged in §9.
 - **m17** · axe C · §Out of Scope — Statistics leaving the ticket. Sort : corrigé — raised as Q4 (X16).
 - **m18** · axe D · §Out of Scope — silent gaps. Sort : corrigé — browsers, touch, API rate limit, refusal language in §Out of Scope; web URI re-registration in §12.
 - **m19** · axe E · §9, F-014 — lot D does wait for F-014. Sort : corrigé — stated; the note to F-014's author on "single origin" is carried by the report, outside this spec.
@@ -1585,7 +1585,7 @@ Addendum 2026-11-01, retouch 6 (operator decision, no new pass played): HULL-57 
 | 2026-11-01 | Claude (product, model:claude-opus-5-5) | Operator answers Q2 (b) and Q4 applied: BR-226, BR-227, BR-233, E5, AC-28, AC-OP-04 and peer recovery withdrawn; §3.17 added; provisions for pre-existing data dropped. Outcomes C1, M1 and m20 of the trace are superseded on these points. Beyond fixing a finding: back to `draft` |
 | 2026-11-01 | Claude (product, model:claude-opus-5-5) | Stress-test pass 2 applied by retouch (arbitration §Pass 4, A5, A12); `ready-for-freeze` |
 | 2026-11-14 | Claude (implementation, model:claude-opus-5-5) | Lot A: `in-development`, branch, migration 8, §9 deltas and pitfalls, `decisions` ADR-006 and ADR-007; rules stay inline until the feature closes after its last lot |
-| 2026-11-14 | Claude (orchestrator, model:claude-opus-5-5) | §10 restated as 5 canonical slices (BR-492) under the operator's go: lots A, B, C, E, D become slices 1 to 5 (history and import last, since it waits on F-014); BR-220 sits in slice 5 alone; slice 1 checked on `main` 721c391 (PR #77, review 571 approved, AC-34 16/16 at b76ae68); its runbook item restated to the delivered form (`ADMIN_URL` in the compose file, not `.env`) |
+| 2026-11-14 | Claude (orchestrator, model:claude-opus-5-5) | §10 restated as 5 canonical slices (BR-492) under the operator's go: lots A, B, C, E, D become slices 1 to 5 (history and import last, since it waits on F-014); BR-220 sits in slice 5 alone; slice 1 checked on `main` 721c391 (PR HULL-77, review 571 approved, AC-34 16/16 at b76ae68); its runbook item restated to the delivered form (`ADMIN_URL` in the compose file, not `.env`) |
 | 2026-11-14 | Claude (implementation, model:claude-opus-5-5) | Slice 2: branch `feat/HULL-11-admin-console-slice-2` (Metadata), migration 9, §9 deltas and pitfalls of slice 2; BR-214, BR-215, BR-216, BR-232 extracted, BR-053 v4 (v3 was taken by F-011), BR-061 v2, BR-078 v3, BR-082 v3 versioned, BR-079 and BR-086 clarified, all with banners in §4; BR-218 delivered but kept inline, F-017 carrying a clarification of it inline (INV-001); slice 2's `Rules:` line rewritten on the extraction; its criteria ticked except the operator's |
 | 2026-11-14 | Claude (orchestrator, model:claude-opus-5-5) | SCR-07.expiring moved from slice 2 to slice 4 under the operator's go (option a of review 575's raise 2): no server state, no threshold; threshold left to the operator before slice 4 |
 | 2026-11-15 | Claude (implementation, model:claude-opus-5-5) | Slice 3: branch `feat/HULL-11-admin-console-slice-3` (Metadata), no migration, §9 deltas of slice 3; BR-217 extracted with its banner in §4; slice 3's `Rules:` line rewritten on the extraction; its criteria ticked except the operator's |
@@ -1606,4 +1606,5 @@ Addendum 2026-11-01, retouch 6 (operator decision, no new pass played): HULL-57 
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
 | 2026-11-17 | Claude (product, model:claude-opus-5-5) | AC-OP-01 to AC-OP-03 protocols completed (M5): AC-OP-01 names guide steps A1 to A6 (P1 first), resolving §10's B1 to B4, which stay with AC-OP-02 without preview; AC-OP-02 names Claude Code with an `Authorization: Bearer` header carrying a console-issued token, with its command; AC-OP-03 gets a replayable workstation protocol on `compose.yaml` (project `hullgate-acop03`, connections key in the volume, BR-088); "lot A/C" read "slice 1/3"; operator go on the text shown |
 | 2026-11-18 | orchestrator (model:claude-opus-5-5) | Closure state: status implemented, closed 2026-11-18, index rendered, before acceptance (as for F-020). |
-| 2026-11-18 | Claude (product, model:claude-fable-5-2) | Acceptance (HULL-11): 41 criteria met, §5 and the §10 operator checks ticked; AC-OP-05 not opened (Q3 = a); the setup guide link defect seen at AC-OP-03 goes to #109 under the operator's decision |
+| 2026-11-18 | Claude (product, model:claude-fable-5-2) | Acceptance (HULL-11): 41 criteria met, §5 and the §10 operator checks ticked; AC-OP-05 not opened (Q3 = a); the setup guide link defect seen at AC-OP-03 goes to HULL-109 under the operator's decision |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

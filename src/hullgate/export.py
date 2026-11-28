@@ -8,7 +8,7 @@ English (BR-131); since F-015 (format 4, BR-070 v4), each placement is a mapping
 `pin`, `open`, `deny`, `allowlist`, `pinned_tools`, `arguments`, lists sorted) and each service
 carries `tools`, its catalogue names with their manual class when there is one, so that an import
 on a fresh instance writes the names before the lists that cite them (BR-176) — what the import
-with preview (#11) will read back; a reimport requires reauthenticating the connections and pins
+with preview (HULL-11) will read back; a reimport requires reauthenticating the connections and pins
 the definitions again; since F-014 (format 5, BR-070 v5), the organisation's public identifier
 (`id`, first key under `organisation:`, BR-160), so that a tree restored by import keeps its URLs.
 No token, no fingerprint, no secret, no inbound OAuth client (BR-061), no
@@ -26,7 +26,7 @@ from typing import Any
 from hullgate import connections, policy
 from hullgate.tree import Node, Tree
 
-FORMAT = 5  # format version, read by the import of #11 (S23); 5 since F-014 (BR-070)
+FORMAT = 5  # format version, read by the import of HULL-11 (S23); 5 since F-014 (BR-070)
 LISTS = ("open", "deny", "allowlist")
 CHILD_KEYS = {"org": "clients", "client": "projects", "project": "environments", "env": "roles"}
 LEVEL_KEYS = {

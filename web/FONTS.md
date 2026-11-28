@@ -13,4 +13,4 @@ ships the licence text with the fonts.
 
 Inter Tight and Space Grotesk, named by §8 as the prototype's other substitutes, are added with the
 screens that use them. TWK Lausanne and Neo Sans Pro are not used, and no file of
-`design/amaterasu/` is (#41).
+`design/amaterasu/` is (HULL-41).

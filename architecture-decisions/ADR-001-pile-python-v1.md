@@ -11,7 +11,7 @@ validated-by: "human:sstolz"
 
 ## Context and Problem Statement
 
-The original specification (attached to ticket #1) deferred the stack choice until after trials: Go proposed for a new development (single binary in a small image, official `go-sdk`, `ory/fosite`), a Python overlay on ContextForge if ContextForge held the isolation, and "Python acceptable for a throwaway POC, not for the target". BR-008 v2 reserves the decision to the operator: no trial or POC writes `project.stack`.
+The original specification (attached to ticket HULL-1) deferred the stack choice until after trials: Go proposed for a new development (single binary in a small image, official `go-sdk`, `ory/fosite`), a Python overlay on ContextForge if ContextForge held the isolation, and "Python acceptable for a throwaway POC, not for the target". BR-008 v2 reserves the decision to the operator: no trial or POC writes `project.stack`.
 
 Three trials were judged on the same isolation bench (`poc/isolation-bench/`, 16-test acceptance run, runner `bc87ce9` unchanged):
 
@@ -19,7 +19,7 @@ Three trials were judged on the same isolation bench (`poc/isolation-bench/`, 16
 - Go POC (F-002, HULL-5): **go, Claude.ai / iOS reservation open**, 16/16, 11/11 isolation lines; remaining gaps 3.5 d (2026-07-28 MCP entry written by hand 2 d, in-memory OAuth storage 1 d, renewal margin 0.5 d); core requirements N1, N2, N4, N13 not met.
 - Python POC (F-003, HULL-16): **go, Claude.ai / iOS reservation open**, 16/16, 11/11 isolation lines, strict comparison; remaining gaps 1.0 d (renewal margin 0.5 d, glue on SDK internals 0.5 d); N1, N2, N4, N13 met; checks outside the acceptance run N3 16/16 and nominal `/revoke` 14/14.
 
-The foundation (#6) and the core (#7) cannot start without a stack: tooling, image, quality gate and libraries depend on it.
+The foundation (HULL-6) and the core (HULL-7) cannot start without a stack: tooling, image, quality gate and libraries depend on it.
 
 ## Considered Options
 
@@ -39,7 +39,7 @@ Pinned version: Python 3.13, `uv` (project described by `pyproject.toml`, `uv.lo
 
 - Good, because the MCP entry of both generations (2024-11-05 to 2025-11-25 with session, 2026-07-28 without session) is a library function, not in-house code to maintain.
 - Good, because DCR (RFC 7591), `RequireAuthMiddleware` (403 `insufficient_scope`) and the audience check of the `BearerAuthBackend` come from the official SDK.
-- Good, because the POC's SQLite provider (codes, lineages, renewals as fingerprints, `jti`, `BEGIN IMMEDIATE`) is a measured starting point for the core (#7).
+- Good, because the POC's SQLite provider (codes, lineages, renewals as fingerprints, `jti`, `BEGIN IMMEDIATE`) is a measured starting point for the core (HULL-7).
 - Bad, because the gateway depends on internal behaviors of a young SDK: two internals are replaced at load time in the POC (`RevocationRequest`, `StreamableHTTPTransport.handle_get_stream`, gap E-02) and `TokenHandler` does not compare `resource` at renewal or at code exchange; a version upgrade can break the isolation with no visible error. Hence the conditions below.
 - Bad, because `/revoke` for an unknown client answers `unauthorized_client` instead of `invalid_client` (`fosite` held it): glue to keep.
 - Bad, because the image carries an interpreter and its dependencies: heavier than a static Go binary (order of magnitude from the original specification: 150 MB and more against 20 to 40 MB), not measured.
@@ -57,7 +57,7 @@ Pinned version: Python 3.13, `uv` (project described by `pyproject.toml`, `uv.lo
 ### Confirmation
 
 - The project's `pyproject.toml` declares `mcp==<version>` and `uv.lock` is committed; the quality gate fails on an out-of-sync lock (`uv lock --check` or `uv sync --locked`).
-- Every PR that changes the `mcp` version in `uv.lock` carries evidence of a replay of the isolation bench (16/16 and checks outside the acceptance run); implementing this guard is the object of the foundation (#6).
+- Every PR that changes the `mcp` version in `uv.lock` carries evidence of a replay of the isolation bench (16/16 and checks outside the acceptance run); implementing this guard is the object of the foundation (HULL-6).
 - `project.stack` of `.cairn/project-context.yaml` takes up this stack.
 
 ## More Information
@@ -66,4 +66,4 @@ Pinned version: Python 3.13, `uv` (project described by `pyproject.toml`, `uv.lo
 - Specs: `features/F-001-essai-contextforge.md`, `features/F-002-poc-go.md`, `features/F-003-poc-python.md`.
 - Rules: BR-008 (the stack decision belongs to the operator), BR-023 (POC verdict criterion).
 - Reference code: `poc/py-gateway/` (Python POC, glue marked `COLLE`), `poc/isolation-bench/` (isolation bench).
-- Tickets: #1 (original specification), #3 (Claude.ai / iOS reservation), #6 (foundation), #7 (core).
+- Tickets: HULL-1 (original specification), HULL-3 (Claude.ai / iOS reservation), HULL-6 (foundation), HULL-7 (core).

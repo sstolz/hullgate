@@ -31,9 +31,9 @@ capabilities:
 Constat of 2026-11-01, commit `309d0f0`.
 
 - The gateway tells nobody anything. Failures are visible only when the operator runs `hullgate connection status` or `hullgate audit tail`.
-- F-006 accepted three risks "until #12": a refresh token with an absolute life (Notion 180 days, Google test apps 7 days) surfaces only as `reauth_required`; a deployment that forgets the connections key looks healthy, `/readyz` green, every connection unusable; and no alert precedes an expiry (§12, §Out of Scope l. 75, 81).
-- F-008 left "upstream down alert" to #11 / #12. F-015 suspends a pinned tool and writes `tool.suspended`, leaving delivery to #12 (BR-181). F-018 (a private operations spec of the maintainer, not published) renews operator tokens by hand, weekly on a sensitive role, framed only by a date (BR-282 (a private operations spec of the maintainer, not published)).
-- F-004 left external monitoring of `/readyz` to #12.
+- F-006 accepted three risks "until HULL-12": a refresh token with an absolute life (Notion 180 days, Google test apps 7 days) surfaces only as `reauth_required`; a deployment that forgets the connections key looks healthy, `/readyz` green, every connection unusable; and no alert precedes an expiry (§12, §Out of Scope l. 75, 81).
+- F-008 left "upstream down alert" to HULL-11 / HULL-12. F-015 suspends a pinned tool and writes `tool.suspended`, leaving delivery to HULL-12 (BR-181). F-018 (a private operations spec of the maintainer, not published) renews operator tokens by hand, weekly on a sensitive role, framed only by a date (BR-282 (a private operations spec of the maintainer, not published)).
+- F-004 left external monitoring of `/readyz` to HULL-12.
 - No background task exists: F-006 D1 refused one for renewal, and `lifecycle` runs at use. The server process runs two uvicorn listeners and a lifespan hook (`src/hullgate/app.py`, `src/hullgate/__main__.py`).
 - Dates known to the store: `operator_token.expires_at`, `lineage.expires_at`, `application.secret_expires_at`. A connection's `expires_at` is its access token's, renewed at use; no provider refresh-token expiry is stored.
 - `connection.fail_count` counts failures since the last renewal. `audit` holds `access.refused`, `oauth.consent` and `relay.tool_call` with its `detail.issue`.
@@ -59,7 +59,7 @@ None is left unanswered in the text: each is written on a default, recorded in �
 
 ## 2. Scope
 
-Ticket HULL-69, split from #12 (comment 11261), and the deferrals of §1.
+Ticket HULL-69, split from HULL-12 (comment 11261), and the deferrals of §1.
 
 - **Alert model**: eight kinds, one open alert per key, fired, reminded, resolved, recorded.
 - **Evaluation**: a task of the server process, independent of traffic.
@@ -82,7 +82,7 @@ Ticket HULL-69, split from #12 (comment 11261), and the deferrals of §1.
 | A tool that disappears from a pinned placement | no suspension, so no alert; it shows `removed` in `tool diff` (BR-182) |
 | A definition change on an unpinned tool | no suspension, so no alert; `auto` leaves non-sensitive placements unpinned, and "frozen tool modified" means pinned tools |
 | A failed refusal with no verified credential: internet noise, barrier failures, `client_id`-only refusals | never alerts (A9); HULL-70 limits it |
-| Latency and error-rate thresholds, upstream health tables | HULL-68 (Statistics screen); F-008's "#11 / #12" row is split: the alert here, the screen there |
+| Latency and error-rate thresholds, upstream health tables | HULL-68 (Statistics screen); F-008's "HULL-11 / HULL-12" row is split: the alert here, the screen there |
 | Rate limiting, which a burst alert only reports | HULL-70 |
 | Per-channel routing, silences, acknowledgement, escalation, grouping of notifications | candidate ticket; every channel receives every notification |
 | HMAC signature of webhooks | candidate ticket; the optional bearer token covers both channels |
@@ -525,7 +525,7 @@ All below are *tranché en autonomie déléguée*, Phases 2 to 4 of a delegated 
 | D5 · Passive detection | From the journal for `upstream_down`, from the listing for a definition change, tranché en autonomie déléguée | A probe spends tokens and quota on every connection, and an upstream call from the evaluator would break BR-292's clarification. Cost: no traffic, no detection, hence `no_recent_traffic` |
 | D6 · OAuth health | `renewal_failing` on `fail_count`, `connection_failing` on the state, tranché en autonomie déléguée | The ticket names both; one is transient, one needs a human. Different severities |
 | D7 · `token expiring` covers | Operator tokens, lineages, application secrets, tranché en autonomie déléguée | The dates the store holds. A connection's access token renews at use: an alert would be noise. A lineage's expiry stops a Claude.ai connector, so it counts |
-| D8 · Added kind `key_unavailable` | In, tranché en autonomie déléguée | Not in the ticket; F-006 §12 sends exactly this risk to #12 |
+| D8 · Added kind `key_unavailable` | In, tranché en autonomie déléguée | Not in the ticket; F-006 §12 sends exactly this risk to HULL-12 |
 | D9 · Thresholds | Declared settings, tranché en autonomie déléguée | Inheritance, lock, audit, export and undo come for free, and the PDF asks for no threshold screen |
 | D10 · Default values | Those of §3.3, tranché en autonomie déléguée | 10 in 5 minutes is BR-253's figure, so that a finding on the Statistics screen and an alert agree by default. 2 days leaves room before BR-282 (a private operations spec of the maintainer, not published)'s day 6. The others have no source. Revisit after a month of use |
 | D11 · Bearer on both channels, no HMAC | Tranché en autonomie déléguée | One mechanism; ntfy supports it |
@@ -708,3 +708,4 @@ Addendum 2026-11-01, retouch 6 (operator decision, no new pass played): HULL-57 
 | 2026-11-15 | Claude (orchestrator, model:claude-opus-5-5) | §10 transcribed into canonical slices (start-feature step 7a), same content and order, dependencies renamed to F-016 slices; operator go |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

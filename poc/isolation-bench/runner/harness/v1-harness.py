@@ -1,4 +1,4 @@
-"""Harnais de révocation de la revue de la PR #15 (N3 et chemin nominal de /revoke), transposés à la v1 (F-005, BR-071).
+"""Harnais de révocation de la revue de la PR HULL-15 (N3 et chemin nominal de /revoke), transposés à la v1 (F-005, BR-071).
 
 Mêmes contrôles que HULL-5-review-2-n3-test.py et HULL-5-review-3-revoke-nominal-test.py, contre l'image v1 construite
 par le banc, lancée seule dans un conteneur jetable ; transpositions :

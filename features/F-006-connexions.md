@@ -33,18 +33,18 @@ The v1 gateway (F-004, F-005 `implemented`) has an organisation › client › p
 
 Today, a Cairn agent reaches Gitea with broad-scope service tokens left in clear text in a `.mcp.json` (brief): this is what the library must replace.
 
-**Sources.** Original specification (ticket #1, PDF extracted to `spec.txt`, 1,235 lines; the "spec l. N" references point to that extraction): objectives (l. 30-31), tree and library rules (l. 132-148), Library screen (l. 175-177), tool names and prefix (l. 494-498), outbound (l. 612-636), storage and backup (l. 668-684), threats (l. 760), tests (l. 1117-1135). To these are added F-005 (§2 Out of Scope, §3.2, BR-032, BR-047, BR-049, BR-066, BR-070, BR-072), `docs/trials/matrice-serveurs.md` (connection model, phase 2), `brief.md`, the F-005 learnings (bounds of a network exchange, single read-decision-write transaction, Sysbox and mounted secrets) and ticket #8. The body of #8 is one sentence: the framing is recorded in `.cairn/runs/acts/HULL-8-cadrage-1.md`, `-cadrage-2.md` and `-br-1.md`, and the operator's decisions in §9.
+**Sources.** Original specification (ticket HULL-1, PDF extracted to `spec.txt`, 1,235 lines; the "spec l. N" references point to that extraction): objectives (l. 30-31), tree and library rules (l. 132-148), Library screen (l. 175-177), tool names and prefix (l. 494-498), outbound (l. 612-636), storage and backup (l. 668-684), threats (l. 760), tests (l. 1117-1135). To these are added F-005 (§2 Out of Scope, §3.2, BR-032, BR-047, BR-049, BR-066, BR-070, BR-072), `docs/trials/matrice-serveurs.md` (connection model, phase 2), `brief.md`, the F-005 learnings (bounds of a network exchange, single read-decision-write transaction, Sysbox and mounted secrets) and ticket HULL-8. The body of HULL-8 is one sentence: the framing is recorded in `.cairn/runs/acts/HULL-8-cadrage-1.md`, `-cadrage-2.md` and `-br-1.md`, and the operator's decisions in §9.
 
 ### Objective
 
-Give the gateway a connection library: an account at a service, authorized once by outbound OAuth (declared application or dynamic registration) or supplied as a provided token, whose tokens are encrypted at rest, renewed under lock on use and placed on one or more roles of the tree under a short tool prefix. A connection cannot be shared outside its client, or between a sensitive and a non-sensitive role, without a confirmation traced at placement, and a change to the tree that creates such sharing is flagged. The relay (#9) gets from it a valid token or a typed error, never a clear-text secret in a database, an output or a log.
+Give the gateway a connection library: an account at a service, authorized once by outbound OAuth (declared application or dynamic registration) or supplied as a provided token, whose tokens are encrypted at rest, renewed under lock on use and placed on one or more roles of the tree under a short tool prefix. A connection cannot be shared outside its client, or between a sensitive and a non-sensitive role, without a confirmation traced at placement, and a change to the tree that creates such sharing is flagged. The relay (HULL-9) gets from it a valid token or a typed error, never a clear-text secret in a database, an output or a log.
 
 ### Expected Impact
 
-- An operator connects two Gitea accounts (dev, reviewer) through the CLI, places them on two roles, and reads their state without any secret value appearing (AC of #13 prepared).
+- An operator connects two Gitea accounts (dev, reviewer) through the CLI, places them on two roles, and reads their state without any secret value appearing (AC of HULL-13 prepared).
 - A concurrent renewal does not destroy a single-use-renewal grant (an uncertain outcome remains an accepted risk, §12); a transient provider outage does not ruin a healthy connection; a definitive refusal yields the visible "reauthentication required" state.
 - Upstream tokens are unreadable in the database and its backup, the key staying outside the database.
-- #9 (relay), #10 (policy), #11 (web administration), #12 (full audit) and #13 (Cairn cutover) start from an existing library, existing placements and an existing "valid token" contract.
+- HULL-9 (relay), HULL-10 (policy), HULL-11 (web administration), HULL-12 (full audit) and HULL-13 (Cairn cutover) start from an existing library, existing placements and an existing "valid token" contract.
 
 ### Open Product Questions
 
@@ -56,29 +56,29 @@ Q1 (stress-test M16, exit of a provided-token connection refused): settled by th
 
 - **Model**: service (declarative record), organisation's outbound OAuth application, connection `<client>/<nom>` with its client of origin, short tool prefix, placement on a role, forward migrations.
 - **Outbound authorization**: OAuth 2.1 with code and PKCE S256 for a hand-declared application **and** for a dynamic registration (RFC 7591) proven against a fake provider; authorization return pasted into the CLI, no new route.
-- **Provided-token connection** — *operator addition, outside specification #1* (decision A2 of 2026-10-29): same vault, same placement, no renewal.
+- **Provided-token connection** — *operator addition, outside specification HULL-1* (decision A2 of 2026-10-29): same vault, same placement, no renewal.
 - **Encrypted vault**: upstream tokens and secrets encrypted at rest (AES-256-GCM, versioned envelope) by the organisation's key, supplied through a mounted secret (`CONNECTIONS_KEY_FILE`); behavior without a key.
 - **Life cycle**: renewal on use under lock, write before use, "reauthentication required" state, transient errors, `Retry-After` and exponential fallback, revocation, removal.
 - **Sharing**: traced confirmation (`--confirme-partage`) for a placement outside the client of origin or between a sensitive and a non-sensitive role; flag when a tree change creates sharing.
 - **CLI** `hullgate service|application|connexion …`, usage view in `connexion etat`, YAML export of connections without secrets, audit.
-- **Internal contract** "valid token" for #9.
+- **Internal contract** "valid token" for HULL-9.
 - **Evidence**: fake OAuth provider in the tests and the bench, operator runbook and run against the real Gitea (AC-OP).
 
 ## Out of Scope
 
 | Item | Recipient |
 |---|---|
-| Tool calls: 429 and `Retry-After` on upstream calls, delay shared per connection, rate limiting per connection (spec l. 505, 636) | #9 (reuses the "not before" date of BR-094); rate limiting: #12 |
-| Name mapping table, truncation, filtered `tools/list`, `connection_id` of another role (l. 288, 494-496, 1119), cleaning of upstream errors (l. 504), caches, sessions | #9 |
-| A placement "can only restrict": modes, lists, pinning; writes closed in sensitive | #10 |
-| Library screen, OAuth return web route, passkey, YAML import with preview, history and undo | #11 |
-| Alert before deadline, OAuth health (failed renewals, upcoming expirations), statistics per connection | #12 |
-| Removal of tokens from the `.mcp.json` files, Gitea dev and reviewer served by the gateway | #13 |
+| Tool calls: 429 and `Retry-After` on upstream calls, delay shared per connection, rate limiting per connection (spec l. 505, 636) | HULL-9 (reuses the "not before" date of BR-094); rate limiting: HULL-12 |
+| Name mapping table, truncation, filtered `tools/list`, `connection_id` of another role (l. 288, 494-496, 1119), cleaning of upstream errors (l. 504), caches, sessions | HULL-9 |
+| A placement "can only restrict": modes, lists, pinning; writes closed in sensitive | HULL-10 |
+| Library screen, OAuth return web route, passkey, YAML import with preview, history and undo | HULL-11 |
+| Alert before deadline, OAuth health (failed renewals, upcoming expirations), statistics per connection | HULL-12 |
+| Removal of tokens from the `.mcp.json` files, Gitea dev and reviewer served by the gateway | HULL-13 |
 | Rotation of the encryption key (`kid`, `connexion rechiffrer`) | backlog candidate (versioned envelope ready, BR-087) |
 | Multi-account merge (`account` parameter) | v2 (brief) |
 | Blocking (rather than flagging) a tree change that creates sharing | to discuss with BR-047/BR-049 if the operator wants it |
 | Several organisations per instance, differentiated administration roles | v2 (brief) |
-| Background renewal task | not retained (D1 a); deadline alert: #12 |
+| Background renewal task | not retained (D1 a); deadline alert: HULL-12 |
 | Private certificate authority for an internal host: only the system certificate store of the image is used in v1 | backlog candidate (stress-test m10) |
 | Management of a dynamic registration through RFC 7592 (`registration_access_token`): not kept, not used | backlog candidate |
 
@@ -102,7 +102,7 @@ A connection belongs to the organisation (spec l. 139) and has only one token se
 | `gitea` | `/.well-known/openid-configuration` of the base URL | `preferred_username` read at the discovered `userinfo` endpoint; the model adds the `openid` scope | `revocation_endpoint` if announced, otherwise skipped and audited "not supported" | those of `--portees`, no default (a scope outside the list = full access at Gitea, §12) | not sent | 3600 s |
 | `generique` | RFC 9728 (`/.well-known/oauth-protected-resource`), then RFC 8414, then OpenID Connect | `preferred_username`, otherwise `sub`, at the `userinfo` endpoint if announced, otherwise "unknown" | same | those of `--portees` | sent with the `resource` value read through RFC 9728, only if that document was found | 3600 s |
 
-**`redirect_uri`** (BR-082): `http://127.0.0.1/oauth/retour`, a loopback address with no listener, registered with the application (to be entered as is at the provider for a declared application, sent to the dynamic registration). The operator's browser shows a connection error, and the operator copies the URL from its address bar. The web route of #11 will add a second URI to the application, without replacing the first (BR-083: a re-registered dynamic client orphans its grants).
+**`redirect_uri`** (BR-082): `http://127.0.0.1/oauth/retour`, a loopback address with no listener, registered with the application (to be entered as is at the provider for a declared application, sent to the dynamic registration). The operator's browser shows a connection error, and the operator copies the URL from its address bar. The web route of HULL-11 will add a second URI to the application, without replacing the first (BR-083: a re-registered dynamic client orphans its grants).
 
 ### 3.2 CLI (SCR-02)
 
@@ -136,7 +136,7 @@ mpx/gitea-rev   service gitea-rev   compte cairn-review   état réauthentificat
 
 ### 3.3 Internal contract to the relay (SCR-03)
 
-Asynchronous function provided to #9, indicative form (the exact name belongs to the implementation):
+Asynchronous function provided to HULL-9, indicative form (the exact name belongs to the implementation):
 
 `get_access(connexion_id, role_id) -> Accès | erreur typée`
 
@@ -145,8 +145,8 @@ Asynchronous function provided to #9, indicative form (the exact name belongs to
 - Both functions designate the connection and the role by their **id**, never by their name: a name changes when the client's segment is renamed (BR-074), and a re-created name designates another connection (BR-075).
 - `Accès` carries a ready-to-use `Authorization` header, valid for at least 60 s (BR-091), and the `generation` of the token set it comes from; its textual representation is redacted (never a value in a log or a trace).
 - Typed errors of `get_access`: `non_placee` (the connection is not placed on this role; no token read), `non_autorisee` (connection `en attente`, never authorized), `reauthentification_requise` (BR-092), `temporairement_indisponible(retry_after)` (BR-093, BR-094, BR-089), `cle_indisponible` (BR-088), `erreur_integrite` (a ciphertext that does not authenticate under a key whose check passes, BR-088: no state transition, audited).
-- `signaler_refus` is called by #9 when the provider answers 401 to a call made with an `Accès`. Effect: for a provided token, the connection moves to `réauthentification requise` (BR-085); for an OAuth connection, the access token of that generation is marked expired, and the next `get_access` renews (an `invalid_grant` then yielding BR-092). A signal carrying a generation that is no longer the current one is ignored: several 401s on the same token count only once. The signal is audited (BR-066 v2), without the raw upstream reason.
-- The relay never calls the provider to renew; it never receives a client's incoming token on this path (BR-022, on the #9 side).
+- `signaler_refus` is called by HULL-9 when the provider answers 401 to a call made with an `Accès`. Effect: for a provided token, the connection moves to `réauthentification requise` (BR-085); for an OAuth connection, the access token of that generation is marked expired, and the next `get_access` renews (an `invalid_grant` then yielding BR-092). A signal carrying a generation that is no longer the current one is ignored: several 401s on the same token count only once. The signal is audited (BR-066 v2), without the raw upstream reason.
+- The relay never calls the provider to renew; it never receives a client's incoming token on this path (BR-022, on the HULL-9 side).
 
 ### 3.4 No new HTTP route
 
@@ -154,7 +154,7 @@ The authorization return is pasted into the CLI (B1 b). The listeners stay those
 
 ## 4. Business Rules
 
-**Overlap scan** (`br-identifiers.md` §Overlap), index of 72 lines, filter on connection, encrypt-, secret, key, token, renew-, revoc-, prefix, sensitive, audit, export, lock, backup, configuration, bounded, upstream: **37 lines retained**. **11 overlaps**: BR-032, BR-066, BR-070 — new version (C2); BR-049, BR-072, BR-047, BR-039, BR-045 — clarification (C3); BR-053, BR-062, BR-065 — neighboring new rule (C1, for BR-086, BR-084, BR-090). Off-topic after reading: BR-002, 003, 010, 012 to 016, 021, 022 (#9 side), 026, 029, 035, 038, 040, 042, 044, 048, 050 to 052, 054, 055, 058, 059, 063, 068. Detail: `.cairn/runs/acts/HULL-8-br-1.md` §1. Operator: list BR-074 to BR-095 and `br-touched` validated on 2026-10-29, with the adjustment of BR-084 and the clarification of BR-045.
+**Overlap scan** (`br-identifiers.md` §Overlap), index of 72 lines, filter on connection, encrypt-, secret, key, token, renew-, revoc-, prefix, sensitive, audit, export, lock, backup, configuration, bounded, upstream: **37 lines retained**. **11 overlaps**: BR-032, BR-066, BR-070 — new version (C2); BR-049, BR-072, BR-047, BR-039, BR-045 — clarification (C3); BR-053, BR-062, BR-065 — neighboring new rule (C1, for BR-086, BR-084, BR-090). Off-topic after reading: BR-002, 003, 010, 012 to 016, 021, 022 (HULL-9 side), 026, 029, 035, 038, 040, 042, 044, 048, 050 to 052, 054, 055, 058, 059, 063, 068. Detail: `.cairn/runs/acts/HULL-8-br-1.md` §1. Operator: list BR-074 to BR-095 and `br-touched` validated on 2026-10-29, with the adjustment of BR-084 and the clarification of BR-045.
 
 **Complementary stress-test scan** (2026-10-29, two new rules born from findings M11 and M4). BR-096 — filter on account, reauthoriz-, silent change, identity: **3 lines retained out of 72** (BR-002, BR-010, BR-073), off-topic after reading; neighbors in the spec: BR-082 — overlap — new rule (C1: PKCE and `state` can be respected with a silent account change, and the reverse); BR-077 (its clarification concerns the placement, not the authorization) — off-topic. BR-097 — filter on metadata, discover-, provider, upstream, rediscover-: **6 lines retained out of 72** (BR-002, 010, 013, 022, 056, 062); BR-056 (incoming discovery) and BR-062 (incoming client document) — off-topic after reading; in the spec, BR-083 — overlap — new rule (C1: the dynamic client can stay fixed while the endpoints change, and the reverse), BR-084 — overlap — new rule (C1: a bounded call can target an endpoint silently rediscovered). Allocation: **BR-096, BR-097**.
 
@@ -198,7 +198,7 @@ The authorization return is pasted into the CLI (B1 b). The listeners stay those
 **Rule** — The prefix is 2 to 8 characters `[a-z0-9]`, unique in the organisation, and no longer changes once a placement exists; a prefix that is invalid, already taken or modified after placement is refused.
 
 **Clarifications**
-- Source: spec line 494 ("short prefix configurable per connection", example `gr`). The name mapping table and the truncation belong to #9. Length to be measured with Claude's clients (spec line 497).
+- Source: spec line 494 ("short prefix configurable per connection", example `gr`). The name mapping table and the truncation belong to HULL-9. Length to be measured with Claude's clients (spec line 497).
 
 ### BR-077 · A placement puts a connection on a role, once
 
@@ -325,8 +325,8 @@ The authorization return is pasted into the CLI (B1 b). The listeners stay those
 **Rule** — A provided-token connection keeps its value encrypted like any connection, is never renewed, goes to `réauthentification requise` only if the provider refuses it, and changes value only through `connexion reautoriser <c> --fichier <f|->`, which replaces the encrypted value while keeping name, prefix and placements and sets it back to `active`.
 
 **Clarifications**
-- **Operator addition, outside specification #1** (decision A2, 2026-10-29): fallback if a provider refuses an OAuth token.
-- The provider's refusal arrives through `signal_refusal` (§3.3), called by #9 on an upstream 401: one signal of the current generation is enough. Until #9, only the tests call it (AC-14).
+- **Operator addition, outside specification HULL-1** (decision A2, 2026-10-29): fallback if a provider refuses an OAuth token.
+- The provider's refusal arrives through `signal_refusal` (§3.3), called by HULL-9 on an upstream 401: one signal of the current generation is enough. Until HULL-9, only the tests call it (AC-14).
 - Value replacement (operator decision of 2026-10-29, Q1 a, stress-test M16): from `active` or `réauthentification requise`; the value is read from a file or standard input (BR-086), the old one is erased in the same transaction, `generation` is incremented (a `signaler_refus` for the old value is ignored), and the event is audited without the value (BR-066 v2). The labeled account (`--compte`) can be changed in the same command. `--fichier` on an OAuth connection, or without `--fichier` on a provided connection: code 2.
 
 ### BR-086 · A secret enters through a file, never through an argument
@@ -467,7 +467,7 @@ At `autoriser`, a definitive or transient outcome answers code 2 (definitive) or
 **Rule** — After a 429 or a transient or uncertain outcome of a renewal, no attempt takes place before a "not before" date kept in the database: `Retry-After` when the provider gives a valid one, capped at 15 min, otherwise a fallback of 1 s doubling at each failure up to 15 min; the date is shared by all processes, and the fallback returns to zero after a successful renewal or a successful `autoriser`.
 
 **Clarifications**
-- Source: spec l. 636. Scope: the renewal point (N1 a); tool calls fall under #9.
+- Source: spec l. 636. Scope: the renewal point (N1 a); tool calls fall under HULL-9.
 - `Retry-After` in seconds or as an HTTP date; an invalid value or a past date counts as an absent header (fallback).
 
 ### BR-095 · `revoquer` cuts access without losing the placements
@@ -484,7 +484,7 @@ At `autoriser`, a definitive or transient outcome answers code 2 (definitive) or
 - `revoquer` takes the lease of BR-089: it waits for the end of a renewal in progress, reads the **current** tokens, erases them, changes the state and increments `generation` in the same transaction, then revokes at the provider outside the transaction. A renewal result that arrives afterwards is discarded and revoked on a best-effort basis (BR-089): no revoked connection comes back to life.
 - The revocation at the provider uses the kept `revocation_endpoint` (BR-097); if not announced, it is skipped and audited "not supported". Without a key (BR-088), local erasure, revocation skipped and audited "key unavailable".
 - `revoquer` is outside the lock (BR-049: a revocation always remains possible).
-- An access token already returned to #9 stays valid at the provider until its deadline, unless the revocation reaches it (§12).
+- An access token already returned to HULL-9 stays valid at the provider until its deadline, unless the revocation reaches it (§12).
 
 ### BR-096 · A reauthorization does not silently change account
 
@@ -527,7 +527,7 @@ To be carried over into their files at extraction (`close-feature` Phase 3), whi
 | BR | Resolution | Exact delta |
 |---|---|---|
 | **BR-032** | v3 (C2) | Rule: add `CONNECTIONS_KEY_FILE` to the list of variables. Clarification: default `/run/secrets/connections_key`, a 32-byte file in base64; key missing, invalid or different (key check): the gateway starts and BR-088 applies; the secret is never generated by the session. |
-| **BR-066** | v2 (C2) | Rule: add to the audited events creation, authorization, reauthorization (with account and scopes before and after, BR-096), replacement of a provided token's value (BR-085), revocation and removal of a connection; declaration and rediscovery of a service (endpoints, and internal-host exception with the admitted addresses where applicable); declaration and re-registration of an application; placement and removal of placement; sharing confirmation (BR-078); outcome of a renewal (returned, definitive, transient, uncertain, anomaly); refusal flagged by #9; refusal of `autoriser`; key unavailable or different; integrity error; no entry contains a token value, secret, code or return URL, nor a full fingerprint, nor the body or `error_description` of a provider response (only the `error` code from the closed list of BR-092, truncated). Clarification: remove "#8 will write the confirmation there…", it is written. |
+| **BR-066** | v2 (C2) | Rule: add to the audited events creation, authorization, reauthorization (with account and scopes before and after, BR-096), replacement of a provided token's value (BR-085), revocation and removal of a connection; declaration and rediscovery of a service (endpoints, and internal-host exception with the admitted addresses where applicable); declaration and re-registration of an application; placement and removal of placement; sharing confirmation (BR-078); outcome of a renewal (returned, definitive, transient, uncertain, anomaly); refusal flagged by HULL-9; refusal of `autoriser`; key unavailable or different; integrity error; no entry contains a token value, secret, code or return URL, nor a full fingerprint, nor the body or `error_description` of a provider response (only the `error` code from the closed list of BR-092, truncated). Clarification: remove "HULL-8 will write the confirmation there…", it is written. |
 | **BR-070** | v2 (C2) | Rule: the export also carries the services, the applications (`client_id`, no secret) and the connections (name, service, prefix, application, state, placements); it stays free of tokens, fingerprints, secrets and audit entries. `format` becomes 2. Clarification: "nor OAuth client" concerns only the inbound clients of BR-061; a reimport requires reauthenticating the connections (spec l. 682-683); deterministic order by name. |
 | **BR-049** | clarification (C3) | Placing a connection on a role or removing that placement is a setting change (spec l. 155) refused under a locked node; `connexion retirer` is refused as long as a placement of the connection is under a locked node (parity with deleting an ancestor, BR-045); `connexion revoquer` is outside the lock (a revocation always remains possible); the refusal names the locking node. |
 | **BR-047** | clarification (C3) | The list of what the CLI displays before marking or unmarking grows by the connections that the change makes shared (BR-079). |
@@ -588,7 +588,7 @@ To be carried over into their files at extraction (`close-feature` Phase 3), whi
 - [ ] **AC-OP** (BR-032, BR-084, BR-087, BR-089, BR-091, BR-092) — the operator runs the runbook (`docs/guides/keys-and-upstreams.md`, to be delivered): creation of the mounted connections key secret, redeployment, declaration of the real Gitea service and application (`redirect_uri` `http://127.0.0.1/oauth/retour` entered at Gitea), `connexion ajouter` then `autoriser --retour -` for a Gitea account, `connexion placer` on a trial role, then `connexion lister`. The connection's name is **read back from the output of `connexion lister`**, never imposed.
   - **Instrument bounded to the batch**: `make verify-connexions CONNEXION=<nom relu>` (new target), which runs only the F-006 checks below and none of F-004's or F-005's. It prints one line per check in the exact form `VERIFY-CONNEXIONS <contrôle>: OK` or `VERIFY-CONNEXIONS <contrôle>: ÉCHEC <motif>`, then the banner `VERIFY-CONNEXIONS: n/4 OK` on every path. Checks: `etat` (state `active`, non-empty account); `jeton` (`get_access` returns a valid token ≥ 60 s, never displayed); `renouvellement` (`connexion renouveler` succeeds, deadline pushed back); `sortie` (no secret value generated during the run in the instrument's output). Expected banner: `VERIFY-CONNEXIONS: 4/4 OK`.
   - **Readings to post, not asserted** (seen once, with no known bound): the line `VERIFY-CONNEXIONS gitea-api: <code HTTP>` (the instrument presents the returned token to `GET <URL de base>/api/v1/user`, through BR-084's bounded fetcher, without displaying the token); `expires_in` observed at the exchange and at renewal; presence of a `refresh_token`; rotation of the `refresh_token` at renewal (yes / no); account displayed by `connexion etat`; Gitea version.
-  - **Hypothesis lifted**: `gitea-api: 200` establishes that Gitea accepts an OAuth access token as `Authorization: Bearer` (matrix, route 2); a 401 records the gap, and the provided-token connection (BR-085) becomes the fallback for #13.
+  - **Hypothesis lifted**: `gitea-api: 200` establishes that Gitea accepts an OAuth access token as `Authorization: Bearer` (matrix, route 2); a 401 records the gap, and the provided-token connection (BR-085) becomes the fallback for HULL-13.
 
 ## 6. Diagrams
 
@@ -739,11 +739,11 @@ erDiagram
 - **Freeze marker**: —
 - **Package-status**: absent
 
-No graphical interface: management is done through the CLI until #11, and the authorization return is pasted into the CLI. The visible states are those of §3.2.
+No graphical interface: management is done through the CLI until HULL-11, and the authorization return is pasted into the CLI. The visible states are those of §3.2.
 
 ## 8. Design & Prototypes
 
-- **Design package**: none. The "Connection library" screen (spec l. 175-177) is delivered by #11 on the `design/prototype-admin/` prototype.
+- **Design package**: none. The "Connection library" screen (spec l. 175-177) is delivered by HULL-11 on the `design/prototype-admin/` prototype.
 - **Design consideration**: no for F-006.
 
 ## 9. Implementation Notes
@@ -753,8 +753,8 @@ No graphical interface: management is done through the CLI until #11, and the au
 - F-005 (`implemented`): tree, inheritance (BR-048), lock (BR-049), sensitivity (BR-047), audit (BR-066), mounted secrets (BR-032 v2), `/readyz` and vault (BR-033, BR-064), export (BR-070), bounded fetcher (BR-062), CLI.
 - F-004 (`implemented`): image, `restore-check` (BR-039), deployment and backup on the production server; mounted secrets under Sysbox.
 - ADR-002 to ADR-004: `proposed` (index); no effect on F-006.
-- #3 (behavior of Claude clients): concerns only the inbound side; no effect here.
-- **Downstream**: #9 (calls the §3.3 contract, carries BR-022 and the upstream sessions), #10 (modes and lists on the placements), #11 (Library screen, OAuth return route, import), #12 (deadline alerts, rate limiting), #13 (Gitea dev and reviewer).
+- HULL-3 (behavior of Claude clients): concerns only the inbound side; no effect here.
+- **Downstream**: HULL-9 (calls the §3.3 contract, carries BR-022 and the upstream sessions), HULL-10 (modes and lists on the placements), HULL-11 (Library screen, OAuth return route, import), HULL-12 (deadline alerts, rate limiting), HULL-13 (Gitea dev and reviewer).
 - Session tools: toolbox `.cairn/runs/acts/HULL-6-toolbox.Dockerfile` if `make`, `uv` or `buildx` are missing (`missing-tool-handshake.md`).
 
 ### Technical Constraints
@@ -779,23 +779,23 @@ Framing decisions by the operator, **2026-10-29** (source: the operator's decisi
 
 | Question | Decision | Rationale |
 |----------|----------|-----------|
-| P1 · who carries the outbound dynamic registration | #8 carries both outbound OAuth client models (declared application, dynamic registration), DCR proven against the fake provider | Spec l. 631-634; the body of #9 does not cite it |
+| P1 · who carries the outbound dynamic registration | HULL-8 carries both outbound OAuth client models (declared application, dynamic registration), DCR proven against the fake provider | Spec l. 631-634; the body of HULL-9 does not cite it |
 | N2 · link to a client, sharing safeguards | The connection carries its client of origin (`<client>/<nom>`); a placement outside the client or between a sensitive and a non-sensitive role requires `--confirme-partage`, otherwise code 2 | A single mechanism for spec l. 147-148, 212 and the decision of 2026-10-28 |
-| A1 · providers | Generic + Gitea model, real run on the operator's Gitea (AC-OP) | Need of #13; settles "does Gitea accept an OAuth token through this channel?" |
-| A2 · connection without OAuth | Provided-token type, **operator addition outside #1** | Fallback if Gitea refuses the OAuth token; same vault |
+| A1 · providers | Generic + Gitea model, real run on the operator's Gitea (AC-OP) | Need of HULL-13; settles "does Gitea accept an OAuth token through this channel?" |
+| A2 · connection without OAuth | Provided-token type, **operator addition outside HULL-1** | Fallback if Gitea refuses the OAuth token; same vault |
 | A3 · shared application | `application` object referenced by N connections | Spec l. 136, 637; a single place for the secret |
 | A4 · prefix | Entered, form `[a-z0-9]{2,8}`, modifiable as long as there is no placement | Spec l. 494; a tool name does not vary |
-| B1 · authorization return | Pasted into the CLI, no new route | BR-068; the web route comes with #11 |
+| B1 · authorization return | Pasted into the CLI, no new route | BR-068; the web route comes with HULL-11 |
 | B2 · confidential client | Public PKCE, secret supplied by file encrypted, outbound DCR (with P1) | Spec l. 634; the vault is in the same batch |
 | C1 · encryption | AES-256-GCM, 32-byte base64 key in `CONNECTIONS_KEY_FILE`, versioned envelope, no rotation in v1 | Spec l. 670-671; same posture as the signing key in F-005 |
 | C2 · missing key | "c" read as reading B: gateway ready, connections `clé indisponible` | The inbound side does not need the connections (hypothesis H1) |
-| D1 · renewal trigger | On use, 60 s margin, under lock | Spec l. 466, 629-630; deadline alert: #12 |
+| D1 · renewal trigger | On use, 60 s margin, under lock | Spec l. 466, 629-630; deadline alert: HULL-12 |
 | D2 · 429 and transient errors | No state change; `Retry-After` respected, exponential fallback 1 s to 15 min | Spec l. 636 |
 | E1 · scope of the warning | At placement (blocking) and on a tree change (flag) | A placement alone can be bypassed through the tree |
 | E2 · deletion | Revocation at the provider on a best-effort basis, failure audited | An orphan token is a live secret |
 | F1 · commands | Full command set and usage view in `etat` | Without `placer` no evidence; without `reautoriser` a dead end |
 | G1 · evidence | Fake provider + bounded real run (AC-OP) | As F-005 |
-| N1 · scope of the 429 | Renewal point only; tool calls to #9 | Limit of #8's token |
+| N1 · scope of the 429 | Renewal point only; tool calls to HULL-9 | Limit of HULL-8's token |
 | N3 · revoke / remove | `revoquer` keeps the placements in `réauthentification requise`, `retirer` deletes | Answers the incident without losing the tree |
 | N4 · notion of service | Provided record (`gitea`, `generique`) or declared by the operator | Spec l. 625 (`--service`) |
 | N5 · export | Connections and applications in the export, without secrets; BR-070 v2 | Spec l. 682-683 |
@@ -926,18 +926,18 @@ The `v1` target (BR-071) is rerun without regression (AC-26). The bench's fake p
 
 ## 12. Risks & Watchpoints
 
-- **Functional — Gitea and the OAuth token**: the matrix (route 2) asks to validate that Gitea accepts an OAuth access token through the relay's channel; not verified. Lifted by: AC-OP; fallback: provided token (BR-085, outside #1).
+- **Functional — Gitea and the OAuth token**: the matrix (route 2) asks to validate that Gitea accepts an OAuth access token through the relay's channel; not verified. Lifted by: AC-OP; fallback: provided token (BR-085, outside HULL-1).
 - **Functional — renewal and Gitea scopes**: any scope outside the list falls back to full access (matrix); a confined "reviewer" role requires choosing the connection's scopes carefully and reading them in `etat`.
 - **Security — kept secrets**: a lost connections key makes all upstream tokens unreadable (reauthorization of each connection); keeping the key out of the backup is an operator action (runbook). No rotation in v1.
 - **Security — outbound calls**: fetching URLs declared by the operator (weak SSRF); BR-084 bounds and named internal-host exception; to be reviewed with a dedicated eye (sensitive review model).
 - **Security — logging a token**: a token in an exception trace or a `repr` is the most likely leak; the representation of `Accès` is redacted (§3.3) and AC-09, AC-15, AC-16 sweep the outputs.
 - **Usage — single-use renewals**: a double renewal destroys the grant (Notion: the whole grant); BR-089 and BR-090 are the counter; the provider's grace delay is not assumed.
-- **Usage — expirations that require a human**: absolute renewal token (180 days at Notion), Google applications in test (7 days): without an alert (#12), the operator sees them only in `etat` ("reauthentication required"); risk accepted until #12.
+- **Usage — expirations that require a human**: absolute renewal token (180 days at Notion), Google applications in test (7 days): without an alert (HULL-12), the operator sees them only in `etat` ("reauthentication required"); risk accepted until HULL-12.
 - **Technical — SQLite and two processes**: the SQLite write lock is global to the database; holding a transaction during a 10 s network call would put `/readyz` and incoming OAuth in 503 (BR-064). Counter: lease per connection and short transactions (BR-089), proven by AC-18. To watch: a lease left by a killed process is taken over only at its deadline (12 s).
 - **Usage — uncertain outcome** (accepted, stress-test M9): when a renewal went out and the response is lost (cut, deadline, write impossible), the provider may have rotated the renewal token; the following replay can destroy the grant at a provider with no grace (Notion: the whole grant; Canva). The outcome is audited and visible in `etat`; counter: reauthorization.
-- **Security — token already returned**: an access token returned to #9 remains valid at the provider until its deadline (1 h at Gitea by default) after `revoquer` or `retirer`, unless the revocation at the provider reaches it; a renewal rotated during an uncertain outcome may leave a token unknown to the gateway and alive at the provider.
-- **Operations — key forgotten at deployment** (accepted, stress-test m13): without a key, `/readyz` stays green (H1); a deployment that forgot the secret looks healthy while all the connections are `clé absente`, with no alert before #12. Counter: the runbook has `connexion etat` read after each deployment.
-- **Dependency — #9 for the end-to-end evidence**: until the relay, `get_access` is called only by the tests and the AC-OP instrument.
+- **Security — token already returned**: an access token returned to HULL-9 remains valid at the provider until its deadline (1 h at Gitea by default) after `revoquer` or `retirer`, unless the revocation at the provider reaches it; a renewal rotated during an uncertain outcome may leave a token unknown to the gateway and alive at the provider.
+- **Operations — key forgotten at deployment** (accepted, stress-test m13): without a key, `/readyz` stays green (H1); a deployment that forgot the secret looks healthy while all the connections are `clé absente`, with no alert before HULL-12. Counter: the runbook has `connexion etat` read after each deployment.
+- **Dependency — HULL-9 for the end-to-end evidence**: until the relay, `get_access` is called only by the tests and the AC-OP instrument.
 - **Dependency — the `generique` model is not proven**: only Gitea was run for real; Notion (dynamic registration) is proven only against the fake provider.
 
 ## Stress-test
@@ -955,7 +955,7 @@ Majors:
 - **M2** · axis F · §9 against §BR-084 — `httpx` against BR-062's fetcher. Sort : corrigé — `cimd.py` fetcher extended, `httpx` excluded from outbound calls (BR-084, §9).
 - **M3** · axis A · §AC-13 — sweep of `config.py` does not read the clause; mixed resolution and DNS rebind absent. Sort : corrigé — AC-13 sets `HTTPS_PROXY`, `ALL_PROXY`, `SSL_CERT_FILE`, adds mixed resolution, rebind, IP literals.
 - **M4** · axis B · §BR-084 / §3.1 — endpoints rediscovered at each call. Sort : corrigé — new rule BR-097 (fixed at declaration, `service redecouvrir`), §3.1, §3.2, §6.5; AC-29.
-- **M5** · axis A · §3.2 / §BR-082 — `redirect_uri` undefined. Sort : corrigé — `http://127.0.0.1/oauth/retour` registered with the application, #11 will add a second URI (§3.1, BR-082); AC-11, AC-OP.
+- **M5** · axis A · §3.2 / §BR-082 — `redirect_uri` undefined. Sort : corrigé — `http://127.0.0.1/oauth/retour` registered with the application, HULL-11 will add a second URI (§3.1, BR-082); AC-11, AC-OP.
 - **M6** · axis F · §3.2 against `autoriser --retour <url>` — the code goes through as an argument. Sort : corrigé — `--retour -` on standard input, argument form refused, refusal without URL or code (BR-086, §3.2); AC-11.
 - **M7** · axis B · §BR-086 — operator's file outside the container. Sort : corrigé — `-` for standard input, final newline removed, empty value refused (BR-086); AC-14.
 - **M8** · axis F · BR-039 delta against BR-088 — disposable key creates the "different key" case. Sort : corrigé — `restore-check` without a key, connections `clé absente` (BR-039 delta, §9, §11); AC-25.
@@ -991,13 +991,13 @@ Minors:
 - **m14** · axis B · §BR-087 — ciphertext not bound to its row. Sort : corrigé — AAD version ‖ table ‖ id ‖ field (BR-087); AC-16.
 - **m15** · axis A · §BR-076 / BR-075 — prefix of a removed connection. Sort : corrigé — freed, only the id is reserved (BR-075).
 - **m16** · axis A · §BR-090 / BR-066 v2 — audit and tokens in the same transaction. Sort : corrigé — same transaction, nothing returned otherwise (BR-090); AC-19.
-- **m17** · axis E · Gitea matrix — single use not enforced by default at Gitea: AC-18 is proven only against the fake. Sort : versé aux learnings — to carry for #13; the observed rotation is an AC-OP reading.
+- **m17** · axis E · Gitea matrix — single use not enforced by default at Gitea: AC-18 is proven only against the fake. Sort : versé aux learnings — to carry for HULL-13; the observed rotation is an AC-OP reading.
 
 ## 13. Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-10-29 | Claude (product, model:claude-sonnet-5-5) | Draft created from #8, specification #1 (extracted text), F-005, the phase 2 matrix and the operator's decisions of 2026-10-29 (framing 1 and 2, rules BR-074 to BR-095, BR-084 adjusted, BR-045 clarified, reading B of C2) |
+| 2026-10-29 | Claude (product, model:claude-sonnet-5-5) | Draft created from HULL-8, specification HULL-1 (extracted text), F-005, the phase 2 matrix and the operator's decisions of 2026-10-29 (framing 1 and 2, rules BR-074 to BR-095, BR-084 adjusted, BR-045 clarified, reading B of C2) |
 | 2026-10-29 | Claude (product, model:claude-opus-5-5) | Stress-test applied (41 findings): renewal lease (BR-089), key check (BR-088), new rules BR-096 (account) and BR-097 (endpoints), closed response table (BR-092), uncertain outcome, `--retour -`, `signaler_refus`, `renouveler`, `service redecouvrir`, models in §3.1, AC-OP fixed; Q1 open (M16) |
 | 2026-10-29 | Claude (product, model:claude-opus-5-5) | Q1 settled by the operator (option a): `reautoriser --fichier` for a provided token (BR-085), AC-14; moved to `ready-for-freeze` |
 | 2026-10-29 | human:sstolz (freeze) | Freeze: `ready-for-dev`. Capabilities: extends Access point tree, Audit log, Operator tokens, Gateway image, Backup and restore check; introduces Connection library, Outbound OAuth client, Encrypted connection vault. Vocabulary: "provided token". Merge: AI; Cut: yes, 2 PRs (batch A then batch B, §10). |
@@ -1007,3 +1007,4 @@ Minors:
 | 2026-10-29 | Claude (implementation, model:claude-opus-5-5) | HULL-32 fix (after delivery): fallback to the next admitted addresses in `getaddrinfo` order, under the single deadline (`outbound.py`, `cimd.py`); §9 row "Composed addresses". No rule modified |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

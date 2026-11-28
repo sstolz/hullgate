@@ -1,9 +1,9 @@
-# Prototype cliquable de l'administration (ticket #18)
+# Prototype cliquable de l'administration (ticket HULL-18)
 
 - Date : 2026-10-28
 - URL : https://claude.ai/artifact/4M3vN18F2YRD82oZQZoSSq
 - Statut : validé par l'opérateur (« on est bien pour cette base »)
-- Référence de design pour #11, avec `design/amaterasu/`.
+- Référence de design pour HULL-11, avec `design/amaterasu/`.
 
 ## Fichiers
 

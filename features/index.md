@@ -26,3 +26,4 @@
 | F-022 | Public tree for 1.0.0 — no operator infrastructure, no secret, no workshop | implemented | publication, operations | 9 | ./features/F-022-public-release-cleanup.md | HULL-98 |
 | F-023 | Setup guide links that land, and the admin guide aligned with F-016's operator protocols | implemented | administration, operations | 0 | ./features/F-023-console-guide-fixes.md | HULL-109 |
 | F-024 | OAuth routes read their body under BR-316's deadline | implemented | oauth, relay | 0 | ./features/F-024-oauth-body-deadline.md | HULL-85 |
+| F-025 | Public repository on GitHub — born from the 1.0.0 export, then the working repository | implemented | publication, operations | 18 | ./features/F-025-github-publication.md | HULL-80 |

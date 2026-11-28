@@ -84,7 +84,7 @@ test-categories:
   - browser
 tracker:
   project-id: sstolz/hullgate
-  ticket-prefix: HULL
+  ticket-prefix: GH
   statuses:
     - Backlog
     - To Do

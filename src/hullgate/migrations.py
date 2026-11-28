@@ -287,7 +287,7 @@ _M4 = (
 # Migration 5 (F-008 lot A; the spec announced "4", a number already taken by F-006 lot B): MCP
 # upstream of a service (BR-106), NULL for a service declared before F-008, and the table of the
 # public tool names (BR-110), unique per (connection, upstream name) and per (connection, public
-# name), without organisation (#42). No secret.
+# name), without organisation (HULL-42). No secret.
 _M5 = (
     "ALTER TABLE service ADD COLUMN upstream_type TEXT"
     " CHECK (upstream_type IS NULL OR upstream_type IN ('mcp-distant', 'mcp-local'))",

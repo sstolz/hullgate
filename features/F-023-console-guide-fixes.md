@@ -21,7 +21,7 @@ capabilities:
 
 | Field | Value |
 |-------|-------|
-| **Priority** | — (milestone 1.0.0; #109 is fixed before the tag, operator decision 2026-11-18 |
+| **Priority** | — (milestone 1.0.0; HULL-109 is fixed before the tag, operator decision 2026-11-18 |
 | **Branch** | `fix/HULL-109-setup-guide-links` |
 | **Last updated** | 2026-11-19 |
 
@@ -31,10 +31,10 @@ capabilities:
 
 F-016 (implemented, closed 2026-11-18) delivered the setup guide (SCR-14) and the runbook `docs/guides/admin.md`. Playing AC-OP-01 to AC-OP-03 on 2026-11-18 surfaced two defects, read on `main` at `50bd49e`:
 
-- **#109.** Clicking a step link of the setup guide shows a window that flashes and closes (Chrome 157, macOS); the step's screen never opens. The links are plain anchors (`web/src/screens/SetupGuide.svelte:43`); four of the five point to `/admin/tree` (`src/hullgate/admin/organisation.py:59-68`), the screen the guide already sits on; the only test counts the links and follows none (`tests/browser/test_ac_21_organisation.py:15`). F-016 §3.14 promised "each linking to the real screen"; no criterion read it.
-- **#107.** The admin guide diverges from F-016 §5 as retouched at `b18f429`: B4 names a **Remove placement** button where the console reads **Unplace** (`web/src/lib/i18n.ts:354`); B4 and C2 say "a Claude client" without naming Claude Code or how the token travels; D2 runs the production composition for what AC-OP-03 plays on `compose.yaml` under the project name `hullgate-acop03`. The guide's header holds multi-word arguments and commands in variables (`F="-f deploy/compose.prod.yaml --env-file .env"`, `C="docker compose $F exec …"`), which zsh, the default macOS shell, does not word-split. The guide writes `/opt/hullgate` as if it were the only clone path.
+- **HULL-109.** Clicking a step link of the setup guide shows a window that flashes and closes (Chrome 157, macOS); the step's screen never opens. The links are plain anchors (`web/src/screens/SetupGuide.svelte:43`); four of the five point to `/admin/tree` (`src/hullgate/admin/organisation.py:59-68`), the screen the guide already sits on; the only test counts the links and follows none (`tests/browser/test_ac_21_organisation.py:15`). F-016 §3.14 promised "each linking to the real screen"; no criterion read it.
+- **HULL-107.** The admin guide diverges from F-016 §5 as retouched at `b18f429`: B4 names a **Remove placement** button where the console reads **Unplace** (`web/src/lib/i18n.ts:354`); B4 and C2 say "a Claude client" without naming Claude Code or how the token travels; D2 runs the production composition for what AC-OP-03 plays on `compose.yaml` under the project name `hullgate-acop03`. The guide's header holds multi-word arguments and commands in variables (`F="-f deploy/compose.prod.yaml --env-file .env"`, `C="docker compose $F exec …"`), which zsh, the default macOS shell, does not word-split. The guide writes `/opt/hullgate` as if it were the only clone path.
 
-Sources: tracker bodies of #109 and #107 (verbatim copy, orchestrator, 2026-11-18); `.cairn/runs/acts/HULL-11-acceptance-1.md` (finding F1, raise 3; F3, F6); `.cairn/runs/acts/console-ux-review-1.md` (G1).
+Sources: tracker bodies of HULL-109 and HULL-107 (verbatim copy, orchestrator, 2026-11-18); `.cairn/runs/acts/HULL-11-acceptance-1.md` (finding F1, raise 3; F3, F6); `.cairn/runs/acts/console-ux-review-1.md` (G1).
 
 ### Objective
 
@@ -60,7 +60,7 @@ None. The scoping choices are in §9 Architecture Decisions.
 
 - **The other guides' word lists in variables.** `docs/guides/keys-and-upstreams.md` holds the same `F=` / `C=` / `A=` pattern (ten blocks, lines 440 to 685 at `50bd49e`); `install.md`, `update.md` and `backup-restore.md` were not swept. *Différé*: the same fix applied guide by guide, a ticket proposed at close-feature.
 - **F-016 §5's `$P` lines.** F-016 is a closed spec; its AC-OP-03 protocol stays as played. From F-023 on, the replay text is the guide's D2 (§3.2).
-- **The UX review's other guide items** (G2 to G7, #110, milestone 1.1.0): where the guide is shown, its ✓/Next marks, step 2's wording, the folded OAuth block, the Refresh button. F-023 changes where the links land, not how the guide looks.
+- **The UX review's other guide items** (G2 to G7, HULL-110, milestone 1.1.0): where the guide is shown, its ✓/Next marks, step 2's wording, the folded OAuth block, the Refresh button. F-023 changes where the links land, not how the guide looks.
 - **Browser history beyond the shell's existing behaviour** (Back, Forward after following a link).
 - **A reproduction in Chrome 157 on macOS.** The bench's Chromium is the instrument (§12).
 - **A new operator criterion.** No AC-OP: every criterion is replayed by a test.
@@ -120,7 +120,7 @@ No rule introduced.
 - The five targets are distinct and served by the server (BR-211); the table of §3.1 is the population.
 - A control the state cannot offer (placement with no connection) gives way to the act that must come first, focused (§3.1).
 - Landing writes nothing (BR-234). The guide renders no form: the opened dialog or field is the screen's own.
-- v1 → v2: "each links to the ordinary screen" is completed by where the link lands and how (#109, finding F1 of HULL-11's acceptance).
+- v1 → v2: "each links to the ordinary screen" is completed by where the link lands and how (HULL-109, finding F1 of HULL-11's acceptance).
 
 ### Rules touched
 
@@ -189,11 +189,11 @@ No design assets.
 |---|---|---|
 | D1 · New rule or version for the links? | BR-229 v2 | The rule already says each step links to the ordinary screen; the defect is that nothing said where it lands. |
 | D2 · D2 carries AC-OP-03's protocol or points to F-016 §5? | Carries it | The operator replays the guide; pointing to a closed spec's `$P` lines would keep the zsh defect. |
-| D3 · B4 and C2 both carry AC-OP-02's block? | B4 carries it, C2 refers to it | Two copies of one block drift, the defect #107 reports. |
-| D4 · Retouch F-016 §5's `$P` lines? | No | F-016 is closed; #107 leaves it to product. Its protocol is history; the guide is the replay text. |
+| D3 · B4 and C2 both carry AC-OP-02's block? | B4 carries it, C2 refers to it | Two copies of one block drift, the defect HULL-107 reports. |
+| D4 · Retouch F-016 §5's `$P` lines? | No | F-016 is closed; HULL-107 leaves it to product. Its protocol is history; the guide is the replay text. |
 | D5 · Shell portability as a BR-042 version? | No, feature-local (§3.2, AC-07) | BR-042 binds the server actions F-004 assumes; the defect was on workstation blocks. A rule for every guide waits for the deferred sweep (Out of Scope). |
 | D6 · Placement opens the place dialog? | Focuses the first connection's **Place in…** | Which connection to place is the operator's choice; opening one would choose it. |
-| D7 · Scope of the shell sweep | `admin.md` only | The two points of #109 and #107; `keys-and-upstreams.md` deferred. |
+| D7 · Scope of the shell sweep | `admin.md` only | The two points of HULL-109 and HULL-107; `keys-and-upstreams.md` deferred. |
 
 ### Data Model Impact
 
@@ -246,7 +246,7 @@ Feature delivered in one phase.
 
 | Test | BR / Concern | File |
 |---|---|---|
-| shell portability, button and client names, D2 protocol, header | #107 | `tests/unit/test_hull_109_admin_guide.py` |
+| shell portability, button and client names, D2 protocol, header | HULL-107 | `tests/unit/test_hull_109_admin_guide.py` |
 | route parser maps each target | BR-229 | the route parser's test under `web/` |
 
 ## 12. Risks & Watchpoints
@@ -278,10 +278,11 @@ Minors :
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-11-18 | Claude (product, model:claude-opus-5-5) | Spec creation (HULL-109, #107) |
+| 2026-11-18 | Claude (product, model:claude-opus-5-5) | Spec creation (HULL-109, HULL-107) |
 | 2026-11-18 | Claude (product, model:claude-opus-5-5) | Stress-test pass, 8 findings applied; status ready-for-freeze |
 | 2026-11-18 | Claude (product, model:claude-opus-5-5) | Slice 2 added (HULL-85, operator option (a) relayed by the orchestrator): §3.3, BR-316 clarification, AC-11 to AC-14; back to draft, second pass (6 findings applied); status ready-for-freeze |
 | 2026-11-18 | Claude (product, model:claude-opus-5-5) | Slice 2 moved to F-024 on the orchestrator's decision (raise 7, option (b)); F-023 back to its first-pass text, HULL-109 only |
 | 2026-11-18 | human:sstolz (operator) | Freeze: operator go on the text shown in full. |
 | 2026-11-18 | human:sstolz (operator) | Retouche 1: blocks promised under bash or zsh instead of a POSIX shell or zsh (§1, §3 Header, AC-10); `read -rs` is not POSIX (Codex implementation stop); operator go on the text shown. |
-| 2026-11-19 | Claude (product, model:claude-fable-5-2) | Acceptance (HULL-109, #107): AC-01 to AC-10 met, §5 ticked; replayed on `main` `2eb1aaa` (comments 13510 and 13513) |
+| 2026-11-19 | Claude (product, model:claude-fable-5-2) | Acceptance (HULL-109, HULL-107): AC-01 to AC-10 met, §5 ticked; replayed on `main` `2eb1aaa` (comments 13510 and 13513) |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

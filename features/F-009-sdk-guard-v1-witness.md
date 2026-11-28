@@ -151,7 +151,7 @@ Selection matrix: **userflow** and **sequence** skipped (a single script reading
 - F-008 — Relais (implemented 2026-10-31): lot B produced `results-v1.json` 16/16. Satisfied.
 - F-005 — Socle (implemented): the bench's `v1` target (BR-071).
 - F-004 — Fondation (implemented): BR-036, BR-037 v1, `sdk_guard.py`, `make bench-sdk`.
-- Downstream: none known. #10 (policy, per-tool masking) will tighten the T09 reading in the bench (BR-071); the guard is unaffected.
+- Downstream: none known. HULL-10 (policy, per-tool masking) will tighten the T09 reading in the bench (BR-071); the guard is unaffected.
 
 ### Technical Constraints
 
@@ -255,3 +255,4 @@ Minors :
 | 2026-10-31 | human:sstolz (freeze) | Freeze: `ready-for-dev`. Capabilities: extends Garde de version du SDK mcp. Merge: AI; Split: no, 1 PR. Q1 a, Q2 b, Q3 a, Q4 b, Q5 confirmed (no freshness check). |
 | 2026-10-31 | model:claude-sonnet-5-5 | Implementation and closure: BR-037 extracted to v2; AC-01 to AC-07 played; no bench run |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

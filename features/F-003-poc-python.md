@@ -29,7 +29,7 @@ capabilities:
 
 ### Current State
 
-The Go POC (F-002, HULL-5, PR #15 merged as `bc19e72`, accepted on 2026-10-28) returned "go, Claude.ai / iOS reservation open": acceptance run 16/16 on bench `bc87ce9`, eleven isolation lines passed, 3.5 d of remaining gaps (E-01 in-house MCP entry 2 d, E-02 in-memory OAuth storage 1 d, E-03 renewal margin 0.5 d; E-04 DCR/CIMD 1.5 d outside the sum), 1,030 lines of Go. The cost concentrated in the **glue** around the building blocks: `fosite` v0.49.0 ignores `resource` (RFC 8707) at renewal, does not touch JWT access tokens at revocation, provides only in-memory storage, has neither DCR nor CIMD, and answers 200 to `/revoke` when revocation fails or `token` is missing; the `go-sdk` v1.4.0 does not serve 2026-07-28. The review also deferred to the v1 core (#7) four requirements the Go POC does not meet: N1 (`client_id`), N2 (scope, `403 insufficient_scope`), N4 (recreated role) and N13 (`/revoke` without `token`).
+The Go POC (F-002, HULL-5, PR HULL-15 merged as `bc19e72`, accepted on 2026-10-28) returned "go, Claude.ai / iOS reservation open": acceptance run 16/16 on bench `bc87ce9`, eleven isolation lines passed, 3.5 d of remaining gaps (E-01 in-house MCP entry 2 d, E-02 in-memory OAuth storage 1 d, E-03 renewal margin 0.5 d; E-04 DCR/CIMD 1.5 d outside the sum), 1,030 lines of Go. The cost concentrated in the **glue** around the building blocks: `fosite` v0.49.0 ignores `resource` (RFC 8707) at renewal, does not touch JWT access tokens at revocation, provides only in-memory storage, has neither DCR nor CIMD, and answers 200 to `/revoke` when revocation fails or `token` is missing; the `go-sdk` v1.4.0 does not serve 2026-07-28. The review also deferred to the v1 core (HULL-7) four requirements the Go POC does not meet: N1 (`client_id`), N2 (scope, `403 insufficient_scope`), N4 (recreated role) and N13 (`/revoke` without `token`).
 
 On 2026-10-28 (around 00:50), the operator decided to launch a comparison Python POC, judged on the same bench: "it's a useful POC, we may discover useful things to carry back to Go for what follows". The stack decision remains his (BR-008 v2).
 
@@ -42,7 +42,7 @@ Build a throwaway Python POC with the **same functional scope** as the Go POC, j
 - 16 tests out of 16 played against the Python POC by **the same runner code** as the Go POC (strict test-by-test comparison, H6).
 - The Go POC's three checks outside the acceptance run replayed without any change of assertion (BR-025) and the four core requirements measured (BR-026).
 - A comparison in which every line carries the cited Go measurement and the proven Python measurement, on each of the points where `fosite` or the `go-sdk` required glue or in-house code (BR-024).
-- A "To carry over to Go" list (BR-027) tied to the Go POC's files or to #7's requirements, usable by HULL-7 (core) if Go is chosen.
+- A "To carry over to Go" list (BR-027) tied to the Go POC's files or to HULL-7's requirements, usable by HULL-7 (core) if Go is chosen.
 
 ### Open Product Questions
 
@@ -114,7 +114,7 @@ Outside the acceptance run:
 | Inbound OAuth (H-2) | `runner/oauth_checks.py` (unchanged) | réussi (`results-gateway.json`) |
 | Revocation and issuance on vault failure (N3) | harness `HULL-5-review-2-n3-test.py`, transposed copy (BR-025) | 16/16 after fix (`HULL-5-apply-findings-2-n3-results.json`) |
 | Nominal path of `/revoke` | harness `HULL-5-review-3-revoke-nominal-test.py`, transposed copy (BR-025) | 13/14, N13 not met (`HULL-5-review-3-revoke-nominal-results.json`) |
-| Core requirements N1, N2, N4 | `runner/socle_checks.py` (new, BR-026) | not met (review 397 of PR #15) |
+| Core requirements N1, N2, N4 | `runner/socle_checks.py` (new, BR-026) | not met (review 397 of PR HULL-15) |
 | Requirement N13 | assertion `sans_token_400_invalid_request` of the nominal harness (BR-026) | not met |
 | DCR (BR-024's comparison point) | `runner/socle_checks.py`, sub-check `dcr`: registration, then the registered client hits the authorization barrier | not measured (absent from `fosite`, E-04) |
 | Bench checks (BR-013, BR-015/BR-022, BR-022, BR-016, BR-003) | `run_bench.py`, like F-002 | passed |
@@ -228,7 +228,7 @@ Clarification added: for a following POC (Python POC), a previous POC's runbooks
 
 *`behavioral` · `blocking` · Candidate state: `verified` — `report_check.py --target py-gateway`: section "To carry over to Go" present; each entry cites an existing line of "Go vs Python" and a target, or the section writes "nothing" with its reason. Relevance is read by hand in PR review.*
 
-**Rule** — The report `docs/trials/poc-python.md` contains a "To carry over to Go" section in which each entry cites the "Go vs Python" line (BR-024) that grounds it, what is to be taken over (a way of doing things, a configuration, a test) and its target — a file of the Go POC or a core requirement (#7); a "Python better" line without an entry carries the reason for its absence; an empty section writes "nothing" with its reason. An entry without a line or without a target is a report structure error.
+**Rule** — The report `docs/trials/poc-python.md` contains a "To carry over to Go" section in which each entry cites the "Go vs Python" line (BR-024) that grounds it, what is to be taken over (a way of doing things, a configuration, a test) and its target — a file of the Go POC or a core requirement (HULL-7); a "Python better" line without an entry carries the reason for its absence; an empty section writes "nothing" with its reason. An entry without a line or without a target is a report structure error.
 
 **Clarifications**
 - Conditional on Go being kept, the section is not a stack recommendation (BR-008 v2); it feeds HULL-7 if Go is chosen.
@@ -237,7 +237,7 @@ Clarification added: for a following POC (Python POC), a previous POC's runbooks
 **Example**
 - **Given** the line "400 without `token` at `/revoke`" is "Python better" (building block) and "Go: not met (N13)"
 - **When** the report is written
-- **Then** an entry cites this line, takes over "presence check of `token` before `NewRevocationRequest`" and targets `poc/go-gateway/oauth.go` and requirement N13 of #7.
+- **Then** an entry cites this line, takes over "presence check of `token` before `NewRevocationRequest`" and targets `poc/go-gateway/oauth.go` and requirement N13 of HULL-7.
 
 ### BR-025 · The Go POC's checks outside the acceptance run are replayed against the Python POC
 
@@ -262,7 +262,7 @@ Clarification added: for a following POC (Python POC), a previous POC's runbooks
 
 *`behavioral` · `blocking` · Candidate state: `verified` — `runner/socle_checks.py`: one verification per request for N1, N2, N4, with a positive check; N13 read on the assertion `sans_token_400_invalid_request` of the nominal harness (BR-025); results in `results-py-gateway.json`.*
 
-**Rule** — The Python POC meets the v1 core requirements noted on the Go POC (#7): N1 — the access token carries the `client_id` claim (RFC 9068 §2.2); N2 — a token without scope `mcp` is refused at the access point with `403` and `WWW-Authenticate: Bearer error="insufficient_scope"` (RFC 6750 §3.1); N4 — a role deleted then recreated under the same identifier makes no access or renewal token issued before the deletion valid; N13 — `POST /revoke` without a `token` parameter answers `400 invalid_request` (RFC 7009 §2.1). An unmet requirement is a quantified gap (line H-9), counted in BR-023's sum.
+**Rule** — The Python POC meets the v1 core requirements noted on the Go POC (HULL-7): N1 — the access token carries the `client_id` claim (RFC 9068 §2.2); N2 — a token without scope `mcp` is refused at the access point with `403` and `WWW-Authenticate: Bearer error="insufficient_scope"` (RFC 6750 §3.1); N4 — a role deleted then recreated under the same identifier makes no access or renewal token issued before the deletion valid; N13 — `POST /revoke` without a `token` parameter answers `400 invalid_request` (RFC 7009 §2.1). An unmet requirement is a quantified gap (line H-9), counted in BR-023's sum.
 
 **Clarifications**
 - N2: the scope is carried by the `scope` claim (RFC 9068 §2.2.3, space-separated string); token forged by the adapter with the test key, with only `mcp` removed from `scope` (one property, BR-014 discipline); positive check: the reference token, re-signed, is accepted.
@@ -346,7 +346,7 @@ Not applicable: no interface.
 - **F-002 / HULL-5** — Go POC (implemented, accepted): bench `bc87ce9`, adapter, harnesses, reference Go measurement (H10).
 - **F-001 / HULL-2** — ContextForge trial (implemented): original bench.
 - **HULL-3** — Claude clients (open): operator step; planned, non-blocking.
-- **#7 (core)** — requirements N1, N2, N4, N13 (comments 9557 and 9582); downstream: "To carry over to Go" feeds it if Go is chosen.
+- **HULL-7 (core)** — requirements N1, N2, N4, N13 (comments 9557 and 9582); downstream: "To carry over to Go" feeds it if Go is chosen.
 - Tools: the session's dockerd; `uv` and Python **in a container** (no installation on the host); outbound network to PyPI during the image build (verified on 2026-10-28: `pypi.org` answers from the session).
 
 ### Python stack verifications (2026-10-28, `technical-proposals.md`)
@@ -506,3 +506,4 @@ Minors:
 | 2026-10-28 | human:sstolz (freeze) | Freeze: `ready-for-dev`. Arbitration: core requirements (H-9) measured and carried into the comparison, outside BR-023's sum, as for the Go POC; BR-025, BR-026, BR-027 and the rewordings of BR-004, BR-018 v2, BR-020, BR-023 accepted. Merge: AI; Cut: no. |
 | 2026-10-28 | Claude (implementation) | Implemented (HULL-16): acceptance run 16/16 at `a8faea7`, ten checks passed, verdict "go, Claude.ai / iOS reservation open", gaps 1.0 d. BR-024..027 extracted; BR-018 v2; BR-004, BR-020, BR-023 clarified. Correction at extraction: the last sentence of rule BR-026 ("counted in BR-023's sum") contradicted the freeze arbitration and BR-023's clarification (H-9 outside the sum); extracted "outside the sum", in line with the freeze. `capabilities` written in the frontmatter (proposed in §9, absent at the freeze). |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

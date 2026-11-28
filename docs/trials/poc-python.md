@@ -102,7 +102,7 @@ No H-9 gap.
 
 ## Go vs Python
 
-Go measure: `docs/trials/poc-go.md`, `evidence/results-gateway.json` and the harnesses of the PR #15 review at `7287af4` (H10), never replayed. Python measure: `results-py-gateway.json` (`a8faea7`), harnesses and checks above. Means: "library" = configuration of the building block; "glue" = code that fixes or completes the building block; "in-house" = code in place of the building block (BR-024). Comparison of the tests is **strict** (identical runner, H6). A row "Python better" is not a stack recommendation (BR-008 v2).
+Go measure: `docs/trials/poc-go.md`, `evidence/results-gateway.json` and the harnesses of the PR HULL-15 review at `7287af4` (H10), never replayed. Python measure: `results-py-gateway.json` (`a8faea7`), harnesses and checks above. Means: "library" = configuration of the building block; "glue" = code that fixes or completes the building block; "in-house" = code in place of the building block (BR-024). Comparison of the tests is **strict** (identical runner, H6). A row "Python better" is not a stack recommendation (BR-008 v2).
 
 | Id | Point | Go measure | Python measure | Evidence | Means (Python) | Direction |
 |----|-------|-----------|---------------|--------|----------------|------|
@@ -143,15 +143,15 @@ Go measure: `docs/trials/poc-go.md`, `evidence/results-gateway.json` and the har
 
 ## To carry over to Go
 
-Conditional on keeping Go; not a stack recommendation (BR-008 v2). Feeds HULL-7 (core, #7) if Go is chosen.
+Conditional on keeping Go; not a stack recommendation (BR-008 v2). Feeds HULL-7 (core, HULL-7) if Go is chosen.
 
-- **R-01** · GP-N2 — check the `scope` claim at the access point and answer `403` with `WWW-Authenticate: Bearer error="insufficient_scope", resource_metadata=…` (form of `RequireAuthMiddleware`); keep the check of `socle_checks.py` (forged token with one property + positive check). Target: `poc/go-gateway/mcp.go` (`handleMCP`, after `verify`) and requirement N2 of #7.
-- **R-02** · GP-N1 — add `client_id` to the access token's claims (`JWTClaims.Extra`) in `newSession`. Target: `poc/go-gateway/oauth.go` and requirement N1 of #7.
-- **R-03** · GP-N4 — when a role is deleted, revoke all lineages (or `jti`) issued for it, rather than marking the role: the Python POC's "lineage per authorization" model (table `lineages`, revoked per role, per reused code, per reused renewal) covers N4 and RFC 7009 revocation in one place. Target: `poc/go-gateway/admin.go` (`DELETE /admin/roles/{id}`) and `revStore` of `oauth.go`; requirement N4 of #7.
-- **R-04** · GP-REVOKE-400 — presence check of `token` before `NewRevocationRequest`, 400 `invalid_request`. Target: `poc/go-gateway/oauth.go` (`POST /revoke` handler) and requirement N13 of #7.
-- **R-05** · GP-REVOKE-CLIENT — keep the nominal harness's assertion `client_inconnu_invalid_client` in the core: `fosite` holds it, another building block (the Python SDK) does not hold it without glue. Target: core tests of #7 (harness `HULL-5-review-3-revoke-nominal-test.py`).
-- **R-06** · GP-STORE — store codes, renewal tokens (as SHA-256 fingerprints) and lineages in SQLite, one `BEGIN IMMEDIATE` transaction per issuance or rotation (a failed record issues nothing): this is the fix for E-02 of the Go POC, of which the schema of `poc/py-gateway/gateway/store.py` is a starting point. Target: `poc/go-gateway/oauth.go` (`fosite` storage) and core #7.
-- **R-07** · GP-DCR — if dynamic registration is kept, subject it to the same operator barrier as `claude-operator` (no code without the secret, refusal if no secret is configured) and keep the sub-check `dcr`. Target: client registration requirement of core #7.
+- **R-01** · GP-N2 — check the `scope` claim at the access point and answer `403` with `WWW-Authenticate: Bearer error="insufficient_scope", resource_metadata=…` (form of `RequireAuthMiddleware`); keep the check of `socle_checks.py` (forged token with one property + positive check). Target: `poc/go-gateway/mcp.go` (`handleMCP`, after `verify`) and requirement N2 of HULL-7.
+- **R-02** · GP-N1 — add `client_id` to the access token's claims (`JWTClaims.Extra`) in `newSession`. Target: `poc/go-gateway/oauth.go` and requirement N1 of HULL-7.
+- **R-03** · GP-N4 — when a role is deleted, revoke all lineages (or `jti`) issued for it, rather than marking the role: the Python POC's "lineage per authorization" model (table `lineages`, revoked per role, per reused code, per reused renewal) covers N4 and RFC 7009 revocation in one place. Target: `poc/go-gateway/admin.go` (`DELETE /admin/roles/{id}`) and `revStore` of `oauth.go`; requirement N4 of HULL-7.
+- **R-04** · GP-REVOKE-400 — presence check of `token` before `NewRevocationRequest`, 400 `invalid_request`. Target: `poc/go-gateway/oauth.go` (`POST /revoke` handler) and requirement N13 of HULL-7.
+- **R-05** · GP-REVOKE-CLIENT — keep the nominal harness's assertion `client_inconnu_invalid_client` in the core: `fosite` holds it, another building block (the Python SDK) does not hold it without glue. Target: core tests of HULL-7 (harness `HULL-5-review-3-revoke-nominal-test.py`).
+- **R-06** · GP-STORE — store codes, renewal tokens (as SHA-256 fingerprints) and lineages in SQLite, one `BEGIN IMMEDIATE` transaction per issuance or rotation (a failed record issues nothing): this is the fix for E-02 of the Go POC, of which the schema of `poc/py-gateway/gateway/store.py` is a starting point. Target: `poc/go-gateway/oauth.go` (`fosite` storage) and core HULL-7.
+- **R-07** · GP-DCR — if dynamic registration is kept, subject it to the same operator barrier as `claude-operator` (no code without the secret, refusal if no secret is configured) and keep the sub-check `dcr`. Target: client registration requirement of core HULL-7.
 - GP-2026: no entry — the gain comes from the Python SDK, which serves 2026-07-28; in Go, the entry point stays in-house as long as the `go-sdk` does not serve it (E-01 of the Go POC), nothing transposable to the code.
 - GP-TOOLS: no entry — same reason: in Go, the per-role tool list is already written (`mcp.go`); the Python gain comes from the SDK's entry point.
 - GP-ECARTS: no entry — the lower sum results from the rows above (R-01 to R-07, E-01 of the Go POC), not from a distinct way of doing things.

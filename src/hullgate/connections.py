@@ -1751,7 +1751,7 @@ async def get_access(
     out: Outbound,
     clock: Clock = time.time,
 ) -> Access:
-    """Asynchronous form given to the relay (#9): `get_access(connection_id, role_id)`. The
+    """Asynchronous form given to the relay (HULL-9): `get_access(connection_id, role_id)`. The
     process's database lock is held only during the short transactions, never during the call to
     the provider (BR-089)."""
     from hullgate import lifecycle
@@ -1768,7 +1768,8 @@ async def signal_refusal(
     *,
     clock: Clock = time.time,
 ) -> None:
-    """`signal_refusal(connection_id, generation, cause)` (§3.3), called by #9 on upstream 401."""
+    """`signal_refusal(connection_id, generation, cause)` (§3.3), called by HULL-9 on upstream
+    401."""
     from hullgate import lifecycle
 
     await lifecycle.signal_refusal(db, key, connection_id, generation, cause, clock=clock)

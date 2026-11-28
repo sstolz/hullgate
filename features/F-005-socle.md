@@ -22,7 +22,7 @@ validated-by: human:sstolz
 | Field | Value |
 |-------|-------|
 | **Priority** | P2 |
-| **Branch** | one branch per batch (§10): `feat/HULL-7-socle-lot-a` (batch A, PR #20), `feat/HULL-7-socle-lot-b` (batch B) |
+| **Branch** | one branch per batch (§10): `feat/HULL-7-socle-lot-a` (batch A, PR HULL-20), `feat/HULL-7-socle-lot-b` (batch B) |
 | **Last updated** | 2026-10-28 |
 
 ## 1. Context & Objective
@@ -35,7 +35,7 @@ The Python POC (F-003, accepted 16/16) showed that the `mcp==2.3.0` SDK (pinned,
 
 The F-004 review measured that the administration port 4791 answers any container of the production server's shared Traefik network (`.cairn/learnings/inbox/F-004-review.md`): harmless as long as it serves only `/healthz`.
 
-**Source.** The original specification (PDF v3, attachment 45 of ticket #1), whose text was extracted after the first draft; the references "spec line N" point to the lines of that extraction (`scratchpad/spec/spec.txt` of the drafting session, 1,545 lines, not committed). To it are added `brief.md`, the validated prototype #18 (`design/prototype-admin/`), the POCs (`poc/py-gateway/`, `docs/trials/poc-*.md`), F-004 (§Out of Scope), ticket #7 and its comments. The assumptions of the first draft were checked against the specification (§9, assumptions table).
+**Source.** The original specification (PDF v3, attachment 45 of ticket HULL-1), whose text was extracted after the first draft; the references "spec line N" point to the lines of that extraction (`scratchpad/spec/spec.txt` of the drafting session, 1,545 lines, not committed). To it are added `brief.md`, the validated prototype HULL-18 (`design/prototype-admin/`), the POCs (`poc/py-gateway/`, `docs/trials/poc-*.md`), F-004 (§Out of Scope), ticket HULL-7 and its comments. The assumptions of the first draft were checked against the specification (§9, assumptions table).
 
 ### Objective
 
@@ -45,18 +45,18 @@ Give the gateway its isolation model: a tree organisation › client › project
 
 - Ticket criterion: a token placed on `mpx/cairn` is refused on every role of `mpx/cairn/prod` (sensitive environment) — integration test and bench line.
 - The requirements carried over from the POCs (N1, N2, N4, N13, N1 of the F-003 review, R-01 to R-07) are met by the v1, each by a test named `test_br_NNN_*`.
-- The isolation bench has a `v1` target; in F-005 the OAuth checks, the core requirements and the revocation harnesses succeed against the v1, and none of the 16 tests fails (those with a step that calls a relayed tool are proven « non jouables », BR-009, pending #9).
-- Features #8 to #13 start from an existing tree, inheritance engine, audit log and authorization order, without going back to them.
+- The isolation bench has a `v1` target; in F-005 the OAuth checks, the core requirements and the revocation harnesses succeed against the v1, and none of the 16 tests fails (those with a step that calls a relayed tool are proven « non jouables », BR-009, pending HULL-9).
+- Features HULL-8 to HULL-13 start from an existing tree, inheritance engine, audit log and authorization order, without going back to them.
 
 ### Open Product Questions
 
-No blocking question. Two gaps between the specification and the validated prototype are settled here and flagged to #11: the prototype's test message ("token issued on the environment or below") contradicts the specification (spec line 407-409), which prevails (BR-051); the prototype's "frozen" (lock of the subtree) is not the specification's "pinning" (tool definitions, spec line 415, 952-953): the core calls it **lock** (BR-049) and leaves "pinning" to #10.
+No blocking question. Two gaps between the specification and the validated prototype are settled here and flagged to HULL-11: the prototype's test message ("token issued on the environment or below") contradicts the specification (spec line 407-409), which prevails (BR-051); the prototype's "frozen" (lock of the subtree) is not the specification's "pinning" (tool definitions, spec line 415, 952-953): the core calls it **lock** (BR-049) and leaves "pinning" to HULL-10.
 
 ## 2. Scope
 
 - **Tree**: five fixed levels, one organisation per instance, segments validated on input, URL per role `/p/<client>/<projet>/<env>/<rôle>/mcp`, creation, renaming, moving, deletion, sensitive marking of environments, lock, inherited settings with origin.
 - **Storage**: SQLite schema in the F-004 database, forward migrations at startup.
-- **CLI management** in the container (`hullgate admin …`): tree, settings, operator tokens, OAuth clients, dynamic registration, audit (minimal reading), YAML export. No HTTP administration route (the web interface is #11).
+- **CLI management** in the container (`hullgate admin …`): tree, settings, operator tokens, OAuth clients, dynamic registration, audit (minimal reading), YAML export. No HTTP administration route (the web interface is HULL-11).
 - **Operator tokens**: opaque tokens placed on a node, value displayed once, only the fingerprint kept, inherited duration, revocable.
 - **Inbound OAuth 2.1, one authorization server per access point**: RFC 9728 and RFC 8414 metadata, PKCE S256, RFC 8707 `resource` at authorization, at code exchange and at renewal, operator barrier, pre-registered clients, CIMD, DCR behind the barrier (disabled by default), RFC 9068 JWT access tokens (`typ at+jwt`, `client_id`, `scope`), rotation and reuse detection, RFC 7009 revocation.
 - **Authorization order** at the access point, refusal by default under a vault or key outage (explicit 503).
@@ -68,20 +68,20 @@ No blocking question. Two gaps between the specification and the validated proto
 
 ## Out of Scope
 
-- **Connections and placements** (#8): connection library, outbound OAuth, short tool prefix per connection unique in the organisation, placement of a connection on a role, **warning and traced confirmation of a connection shared between a sensitive and a non-sensitive environment** (operator decision of 2026-10-28). Boundary: the core provides the effective sensitivity of a role (BR-047), the lock of the lock (BR-049) and an audit log that accepts administration events carrying a confirmation (BR-066); #8 writes the placement, the warning and the confirmation trace.
-- **Relay** (#9): tool aggregation, prefixed renaming, upstream sessions, upstream types. The **16/16 of the acceptance run against the v1** is a criterion of #9 (BR-071).
-- **Action policy** (#10): read / write / destructive modes, allow / deny lists, writes closed by default in sensitive environments and opened tool by tool, **rules on an argument's value** (advanced in v1 by the operator), grouped tools. The "mode" setting will plug into the inheritance engine of BR-048; the core does not declare it.
-- **Web administration** (#11): interface of prototype #18, passkey authentication, public administration name and Traefik router; YAML import.
-- **Full audit** (#12): filtered consultation, statistics, alerts, retention, structured logging, client address (trust in the `X-Forwarded-*` headers of the declared proxies, referred to the core by F-004: **deferred to #12**, the core needs no client address nor any URL derived from the request, `PUBLIC_URL` being authoritative).
+- **Connections and placements** (HULL-8): connection library, outbound OAuth, short tool prefix per connection unique in the organisation, placement of a connection on a role, **warning and traced confirmation of a connection shared between a sensitive and a non-sensitive environment** (operator decision of 2026-10-28). Boundary: the core provides the effective sensitivity of a role (BR-047), the lock of the lock (BR-049) and an audit log that accepts administration events carrying a confirmation (BR-066); HULL-8 writes the placement, the warning and the confirmation trace.
+- **Relay** (HULL-9): tool aggregation, prefixed renaming, upstream sessions, upstream types. The **16/16 of the acceptance run against the v1** is a criterion of HULL-9 (BR-071).
+- **Action policy** (HULL-10): read / write / destructive modes, allow / deny lists, writes closed by default in sensitive environments and opened tool by tool, **rules on an argument's value** (advanced in v1 by the operator), grouped tools. The "mode" setting will plug into the inheritance engine of BR-048; the core does not declare it.
+- **Web administration** (HULL-11): interface of prototype HULL-18, passkey authentication, public administration name and Traefik router; YAML import.
+- **Full audit** (HULL-12): filtered consultation, statistics, alerts, retention, structured logging, client address (trust in the `X-Forwarded-*` headers of the declared proxies, referred to the core by F-004: **deferred to HULL-12**, the core needs no client address nor any URL derived from the request, `PUBLIC_URL` being authoritative).
 - **Signing key rotation** (several active keys, `kid`, JWKS publication): a single key in v1; changing it invalidates all OAuth access tokens in progress (they renew).
-- **Per-organisation encryption key**: its supply mode is that of BR-032 v2 (mounted secret), the key itself arrives with the connections (#8), which alone have secrets to encrypt.
+- **Per-organisation encryption key**: its supply mode is that of BR-032 v2 (mounted secret), the key itself arrives with the connections (HULL-8), which alone have secrets to encrypt.
 - **Differentiated administration roles**, several organisations per instance, several operators: v2 (brief).
 - **SDK guard witness** (BR-037): it remains the Python POC; switching the witness to the bench's `v1` target is a backlog candidate, not a deliverable of F-005.
-- **Undoing a change** (spec line 334-335: "can be undone") and **YAML import with a diff preview** (spec line 336-337): #11; the core logs before / after (BR-066) and exports what the import will read back (BR-070).
+- **Undoing a change** (spec line 334-335: "can be undone") and **YAML import with a diff preview** (spec line 336-337): HULL-11; the core logs before / after (BR-066) and exports what the import will read back (BR-070).
 - **Configurable `/p` prefix** (spec line 218): deferred; `/p` fixed in F-005, backlog candidate (new variable of BR-032).
-- **"Last use" of a token** (Tokens screen, spec line 293-295): #12 (a write per request has no place in the core).
-- **`list_changed` notification on every change** (immediate application, spec line 332-333): #9; the core applies immediately (no cache, BR-055).
-- **Rate limiting** anywhere but at the barrier (BR-073): none at the access point or at `/token` (256-bit tokens, PKCE); to reconsider with #12.
+- **"Last use" of a token** (Tokens screen, spec line 293-295): HULL-12 (a write per request has no place in the core).
+- **`list_changed` notification on every change** (immediate application, spec line 332-333): HULL-9; the core applies immediately (no cache, BR-055).
+- **Rate limiting** anywhere but at the barrier (BR-073): none at the access point or at `/token` (256-bit tokens, PKCE); to reconsider with HULL-12.
 - **Performance objectives**: none in F-005 (load measurement outside the foundation, ADR-001 "Neutral").
 - **Carrying over the POC data**: none; the v1 starts from an empty database.
 - **Change of `PUBLIC_URL`**: invalidates all OAuth authorizations (audience and issuer change); no migration planned, the clients reauthorize (§12).
@@ -102,7 +102,7 @@ No blocking question. Two gaps between the specification and the validated proto
 
 - Each node has an **immutable identifier** (never reused), a free **display name** (1–80 characters) and a **segment** (the "slug") that forms the path. The segment is derived from the name (lowercase, accents removed, any run of other characters becomes `-`, `-` at the edges removed — prototype rule) or given explicitly.
 - **Path** of a node: its segments from client to itself, joined by `/` (e.g. `mpx/cairn/prod/dev`). **Access point URL** of a role: `${PUBLIC_URL}/p/<chemin>/mcp`.
-- **Inherited settings** declared by the core: `duree_jetons` (default `30d` on the organisation) and `verrou` (default false). The engine is generic: #8 and #10 will declare their settings there (`mode`, …).
+- **Inherited settings** declared by the core: `duree_jetons` (default `30d` on the organisation) and `verrou` (default false). The engine is generic: HULL-8 and HULL-10 will declare their settings there (`mode`, …).
 
 ### 3.2 Administration CLI (SCR-02)
 
@@ -114,7 +114,7 @@ Entry point: `hullgate <groupe> <commande>` (the specification names `passerelle
 | `settings` | `get <chemin>` (effective value + origin of each setting), `set <chemin> <clé> <valeur>`, `unset <chemin> <clé>` (restore inheritance) |
 | `jeton` | `creer --chemin <chemin|/> --label <libellé> [--duree <n>h|<n>d]` (value printed once; `/` designates the organisation, as for `tree add`), `lister [<chemin>] [--client <segment>]` (operator tokens **and** OAuth lineages: identifier, type, client or label, path, dates, state), `revoquer <id>` (operator token or whole OAuth lineage) |
 | `client` | `add <client_id> --chemin <nœud> --redirect-uri <uri>…` (public client: no secret exists or is set; bound to the node and its roles, BR-061), `list`, `remove <client_id>` (revokes the client's lineages, BR-061); `dcr on|off` |
-| `audit` | `tail [-n N]` (minimal reading; full consultation is #12) |
+| `audit` | `tail [-n N]` (minimal reading; full consultation is HULL-12) |
 | `export` | YAML of the tree on standard output (BR-070) |
 
 `tree show` displays, for each role, its access point URL, its effective sensitivity and the origin of the lock if it is locked.
@@ -230,7 +230,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 - Marking or unmarking an environment is an audit event (BR-066); it is refused if the environment or an ancestor is locked.
 - Unmarking reopens the environment to tokens placed higher up (BR-051 is read on every request): the CLI displays before acting the number of active tokens placed on the ancestors that will become accepted, and the audit entry carries it.
 - Marking sensitive revokes or shortens nothing (same posture as unmarking): the CLI displays before acting, and the audit entry carries, (i) the number of active operator tokens placed on the environment itself, which will stop being accepted (BR-051), and (ii) the number of active operator tokens and OAuth lineages of the environment's roles whose expiry exceeds 7 days (they keep their duration, BR-052). Operator decision of 2026-10-28 (S3), delivered in batch B.
-- Function exposed to the following features: effective sensitivity of a role (#8 for the shared-connection warning, #10 for writes closed by default).
+- Function exposed to the following features: effective sensitivity of a role (HULL-8 for the shared-connection warning, HULL-10 for writes closed by default).
 
 ### BR-048 · Settings are inherited, with their origin
 
@@ -257,11 +257,11 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 
 **Clarifications**
 - Guard of locked descendants: deleting (BR-045), renaming or moving (BR-046, amendment of 2026-10-28) an ancestor of a locked node is refused. Deletion already is (batch A); rename and move are delivered in batch B. Tests: `test_br_046_rename.py` (case "locked descendant") and `test_br_049_freeze.py`.
-- Origin: validated prototype #18 ("frozen"). The specification lists "pinning" among the inherited settings (spec line 315) in the sense of **pinned tool definitions** (spec lines 415, 844, 952-953), which belong to #10. The two notions are distinct: the core names its own "lock" and #10 will declare "pinning" on BR-048's engine.
+- Origin: validated prototype HULL-18 ("frozen"). The specification lists "pinning" among the inherited settings (spec line 315) in the sense of **pinned tool definitions** (spec lines 415, 844, 952-953), which belong to HULL-10. The two notions are distinct: the core names its own "lock" and HULL-10 will declare "pinning" on BR-048's engine.
 - Locking is `settings set <chemin> verrou true` (or `tree lock`); unlocking a node locked by an ancestor is refused, naming the ancestor.
 - Compatibility with BR-048: no `verrou=false` override exists below the organisation (it would mask the lock of an ancestor placed afterwards, the nearest override winning); unlocking a node therefore removes its override instead of writing `false`, and only the organisation carries a `false` value.
 - **Outside the lock** (H11): issuing or revoking an operator token, authorizing an OAuth client, adding or removing a client (`client add` / `remove`) or registering it dynamically (RFC 7591), revoking a lineage. The lock protects the tree and its settings, not access; admitting a client is a matter of access (operator decision of 2026-10-28, S5), and a revocation must always remain possible.
-- Placements (#8) and policy settings (#10) will be subject to the same lock.
+- Placements (HULL-8) and policy settings (HULL-10) will be subject to the same lock.
 
 ### BR-050 · A token covers its node and its descendants, segment by segment
 
@@ -276,7 +276,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 - The comparison follows the tree's identifiers (equivalent to a whole-segment prefix): a token placed on `mpx/cai` does not cover `mpx/cairn/…`.
 - An OAuth access token is placed on its access point's role and covers only it.
 - An operator token is placed on any node, organisation included (root token `*`, spec lines 356-357: all clients outside sensitive environments, "reserved for administration, not recommended for an agent"); the CLI asks for `--confirm '*'` for the root token and the audit marks it; the organisation is designated by `--chemin /`.
-- Tokens under the role (connection + mode, spec lines 370-371) and tokens reduced to a mode (spec line 351): out of scope (#8, #10).
+- Tokens under the role (connection + mode, spec lines 370-371) and tokens reduced to a mode (spec line 351): out of scope (HULL-8, HULL-10).
 
 ### BR-051 · Under a sensitive environment, only a token placed on the role gets through
 
@@ -288,7 +288,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 **Rule** — On a sensitive role, a token is accepted only if it is placed on that role itself; a token placed on the environment, the project or the client is refused (ticket criterion: a `mpx/cairn` token is refused on `mpx/cairn/prod/<rôle>`).
 
 **Clarifications**
-- Spec lines 395-396 and 407-409: "a client- or project-level token never covers them: a token issued at role level or below is needed. An environment-level token is refused there too: it would cover dev and reviewer at once, i.e., the self-approval one wants to prevent." The prototype's test message ("on the environment or below") is to be corrected in #11.
+- Spec lines 395-396 and 407-409: "a client- or project-level token never covers them: a token issued at role level or below is needed. An environment-level token is refused there too: it would cover dev and reviewer at once, i.e., the self-approval one wants to prevent." The prototype's test message ("on the environment or below") is to be corrected in HULL-11.
 - The refusal is a 401 `invalid_token` (same form as an out-of-scope token, BR-055); the audit distinguishes the reason `sensitive_requires_role_token`.
 - Consequence under H4: issuing an operator token on a sensitive environment is refused at issuance (code 2, "a token placed on a sensitive environment is accepted on none of its roles"); on a project or a client, issuance remains allowed and the CLI names the sensitive environments the token will not cover.
 
@@ -357,7 +357,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 - Step 1 before authentication: a nonexistent URL answers 404 even without a token (H13, existence of a path revealed, risk accepted §12; T14 expects the root to give 404).
 - The state (revocation, node, sensitivity) is read on every request, without cache: a revocation or deletion takes effect from the next request.
 - Operator tokens implicitly carry the scope `mcp`.
-- Correspondence with the specification (spec lines 376-400): its steps 1 (validity: signature, issuer, expiry, revocation, type), 2 (single audience), 3 (segment-wise prefix), 4 (sensitive) = steps 4 to 6 here; its steps 5 (effective rights = URL ∩ token ∩ policy) and 6 (connection placed in this role) belong to #10 and #9. The specification requires an audience equal to the access point for any token; a path token (`mpx/cairn`, spec line 363) covers several access points and cannot have a single one: the core applies the audience to OAuth tokens and the path prefix to all (reading confirmed at the freeze by the operator, option 1).
+- Correspondence with the specification (spec lines 376-400): its steps 1 (validity: signature, issuer, expiry, revocation, type), 2 (single audience), 3 (segment-wise prefix), 4 (sensitive) = steps 4 to 6 here; its steps 5 (effective rights = URL ∩ token ∩ policy) and 6 (connection placed in this role) belong to HULL-10 and HULL-9. The specification requires an audience equal to the access point for any token; a path token (`mpx/cairn`, spec line 363) covers several access points and cannot have a single one: the core applies the audience to OAuth tokens and the path prefix to all (reading confirmed at the freeze by the operator, option 1).
 - The two token families plug in at step 4 through resolvers (operator token by its fingerprint, OAuth JWT by signature then the registry of `jti`); step 2 reads the vault then the key (delivered in two batches, §10).
 - If the database cannot be read for step 1, the response is 503 (BR-064), never a 404 caused by the failure.
 
@@ -396,7 +396,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 **Clarifications**
 - `resource` missing, multiple (including the same value twice) or different: refusal (T04 "A+B", glue 3 of H-5). The SDK reads the form with `dict()`: the check reads all the values before the handler.
 - At authorization, the refusal does not redirect to the client if the resource is unknown (no access point): 400 on an error page; if the resource is known but different from the access point called: `invalid_target` redirect to an already verified `redirect_uri`.
-- **Dependency #3 (HULL-3, open)**: it is not yet known whether the Claude clients send `resource` at renewal. The rule follows the acceptance run (T04, policy frozen by BR-011: refusal of ambiguous requests). If HULL-3 shows that a Claude client omits it, every renewal of that client will fail: a new version of BR-058 and of BR-011 will be needed (for example, a missing `resource` read as that of the lineage), an operator decision, not an implementation one.
+- **Dependency HULL-3 (HULL-3, open)**: it is not yet known whether the Claude clients send `resource` at renewal. The rule follows the acceptance run (T04, policy frozen by BR-011: refusal of ambiguous requests). If HULL-3 shows that a Claude client omits it, every renewal of that client will fail: a new version of BR-058 and of BR-011 will be needed (for example, a missing `resource` read as that of the lineage), an operator decision, not an implementation one.
 
 ### BR-059 · Single-use code, rotation, reuse = lineage revocation
 
@@ -423,7 +423,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 **Rule** — Whatever the client's admission mode, the authorization server issues a code only after the operator has entered, on the barrier page, a valid TOTP code (RFC 6238), never twice a code from the same time step; without a configured TOTP secret, every authorization is refused at `/authorize`, after verification of the client and of the `redirect_uri`: `access_denied` by redirect to a verified `redirect_uri`, error page otherwise (same form as BR-058).
 
 **Clarifications**
-- Spec lines 773-774: authentication of the administrator on the consent page by passkey or TOTP. The core delivers TOTP (30 s step, 6 digits, ±1 step tolerance); the passkey comes with the web administration (#11).
+- Spec lines 773-774: authentication of the administrator on the consent page by passkey or TOTP. The core delivers TOTP (30 s step, 6 digits, ±1 step tolerance); the passkey comes with the web administration (HULL-11).
 - The TOTP secret is a mounted secret (BR-032 v2, `AUTHORIZE_TOTP_SECRET_FILE`), enrolled by the operator in their authenticator application (runbook); neither it nor a code appears in a response, a log or an audit entry.
 - A pending request is identified by a random value of at least 192 bits (256 in v1, the database keeps only its fingerprint), single-use, and expires in 10 min; a failed code does not consume it; a denial ("Deny", which redirects `access_denied`) and a success consume it.
 - A wrong code, one outside the tolerance or from a step already accepted redisplays the page (200, generic message) and counts as a failure (BR-073).
@@ -522,9 +522,9 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 
 **Clarifications**
 - Actor: `operator-cli`, the OAuth `client_id`, or the identifier of an operator token (never its value). Registering or removing a client: actor `operator-cli` (CLI) or `anonymous` (dynamic registration, RFC 7591), `after.client_id` at registration and `before.client_id` at removal, never a secret.
-- Append-only table: no command modifies or deletes an entry (retention: #12).
+- Append-only table: no command modifies or deletes an entry (retention: HULL-12).
 - A refusal is served even if its audit entry could not be written (the failure is logged on the error output); an issuance is not (BR-065). This is the explicit exception to BR-064, which exempts that one write only.
-- Open to the following features: #8 will write there the confirmation of a prod / non-prod shared connection, #9 the tool calls.
+- Open to the following features: HULL-8 will write there the confirmation of a prod / non-prod shared connection, HULL-9 the tool calls.
 
 ### BR-067 · A role's MCP access point serves the protocol without tools
 
@@ -536,7 +536,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 **Rule** — After the authorization order, the access point serves stateless MCP through the SDK for versions 2024-11-05, 2025-03-26, 2025-06-18, 2025-11-25 and 2026-07-28, answers `ping` in every version that defines it, returns an empty tool list and refuses every tool call as an unknown tool; a version not served receives 400 whose `error.data.supported` lists the five versions.
 
 **Clarifications**
-- The tool list will be filled with the relay (#9).
+- The tool list will be filled with the relay (HULL-9).
 - The pinned SDK (2.3.0) defines `ping` only for the four handshake versions; in 2026-07-28 the method answers `-32601`, and the version is proved by `server/discover`, `tools/list` and `tools/call` (lot A, §9). Any probe "by the `ping` method" therefore sends a handshake version (v1 bench, BR-071).
 - The glue for `supported` (12 lines in the POC) is written as an explicit extension, not as a replacement of an object of the module.
 
@@ -550,7 +550,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 **Rule** — No listener serves a route that reads or modifies the tree, the settings, the tokens, the clients or the audit without authenticating the operator; in F-005, the administration listener serves only `/healthz`, the public listener serves only its probes, the `/p/…` routes and the `/.well-known/…` metadata, and management goes through the CLI in the container.
 
 **Clarifications**
-- Reason: port 4791 answers to the neighboring containers of the production server's Traefik network (F-004 review). Authentication of the web administration arrives with #11 (passkey).
+- Reason: port 4791 answers to the neighboring containers of the production server's Traefik network (F-004 review). Authentication of the web administration arrives with HULL-11 (passkey).
 - No test route (signing key, simulated failure) exists in the image: the bench injects its failures from outside (BR-071).
 
 ### BR-069 · The schema migrates forward at startup, or the gateway is not ready
@@ -577,9 +577,9 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 **Rule** — `hullgate export` writes to standard output a YAML of the tree (format version, levels, names, segments, sensitivity, organisation values and setting overrides) which, for the same tree, is identical byte for byte, and which contains no token, no fingerprint, no OAuth client, no secret, and no audit entry.
 
 **Clarifications**
-- A `format` key (integer, 1 in F-005) opens the document: the import of #11 will read it. The values carried by the organisation are defaults, not overrides (BR-048), but the operator can change them (`settings set / duree_jetons 60d`): the export carries them so that the import reads them back. If lot A does not emit them, lot B adds them.
+- A `format` key (integer, 1 in F-005) opens the document: the import of HULL-11 will read it. The values carried by the organisation are defaults, not overrides (BR-048), but the operator can change them (`settings set / duree_jetons 60d`): the export carries them so that the import reads them back. If lot A does not emit them, lot B adds them.
 - Order: children sorted by segment; keys in a fixed order; internal identifiers excluded.
-- Spec lines 336-337: the tree is exported as YAML "for backup, review and versioning, and re-imports with a preview of the differences". The import with preview is deferred (#11); from F-005 the export contains everything the import will read back (structure, names, segments, sensitivity, locks, overrides).
+- Spec lines 336-337: the tree is exported as YAML "for backup, review and versioning, and re-imports with a preview of the differences". The import with preview is deferred (HULL-11); from F-005 the export contains everything the import will read back (structure, names, segments, sensitivity, locks, overrides).
 
 ### BR-071 · The isolation bench judges v1
 
@@ -591,12 +591,12 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 **Rule** — The isolation bench has a `v1` target that builds the image from the root `Dockerfile` and plays a full pass: the checks outside the OAuth acceptance run (`H-2`), the core requirements (N1, N2, N4, N13 and the new `sensible` check of BR-051) and the N3 and nominal revocation harnesses all succeed, and none of the 16 tests transposed to the role (BR-012) is `échoué`; a test is « non jouable » only if one of its steps calls a relayed tool, evidence cited (BR-009).
 
 **Clarifications**
-- Most tests of the acceptance run call the relayed tool `whoami`, including in their positive controls (T05, T06, T12, T13, T15): without a relay (#9), they are « non jouable ». Those that do not call it (T03, T04, T14 at least) must succeed. The exact split is read from `results-v1.json`, not predicted here.
+- Most tests of the acceptance run call the relayed tool `whoami`, including in their positive controls (T05, T06, T12, T13, T15): without a relay (HULL-9), they are « non jouable ». Those that do not call it (T03, T04, T14 at least) must succeed. The exact split is read from `results-v1.json`, not predicted here.
 - The `oauth_checks.py` and `socle_checks.py` checks probe the POC through a **tool** named `ping`; against v1, the adapter has them probe through the MCP **method** `ping` (no tool in F-005, BR-067); the expected statuses (200, 401, 403) do not change. The POC targets stay unchanged.
 - Barrier: the adapter computes the TOTP code from the bench's throwaway TOTP secret (BR-010), as it used to enter the authorization secret of the POCs.
 - Provisioning by the CLI in the bench container (`docker exec`), failures injected from outside (database file made non-writable or lock held on the throwaway volume; key file removed), tokens forged with the throwaway signing key generated by the bench and mounted as a secret (BR-010): no test route in the image (BR-068).
 - The checks that require the relay (BR-013, BR-015/BR-022, BR-016) are « non jouable » against v1 in F-005.
-- 16/16 réussis against v1: acceptance criterion of #9 (relay), not of F-005.
+- 16/16 réussis against v1: acceptance criterion of HULL-9 (relay), not of F-005.
 - An `--only` pass is not conclusive (bench README): acceptance reads a full pass.
 
 ### BR-072 · The database keeps no bearer secret in clear
@@ -675,7 +675,7 @@ Layout fixed by the specification (spec line 749-753: one logical authorization 
 
 ### On the production server (operator, after merging batch B)
 
-- [ ] **AC-OP** (BR-032, BR-033, BR-056, BR-068) — the operator plays the core runbook (`docs/guides/keys-and-upstreams.md`): creation of the two mounted secrets, redeployment, creation of a test tree through the CLI. **Instrument bounded to the batch**: `make verify-socle ROLE=<chemin>` (new target, plays only the core's checks, never those of F-004), where `<chemin>` is reread from the output of `hullgate admin tree show` that the runbook has displayed, never imposed. It prints one line per check `VERIFY-SOCLE <id> OK|KO <valeur>` — `key-loaded` (`/readyz` 200 through Traefik), `admin-routes` (`http://127.0.0.1:${ADMIN_LOCAL_PORT}/admin` 404), `discovery` (the role's RFC 9728 metadata, 200, `resource` equal to the role's URL), `challenge` (POST without a token on the role: 401 with `resource_metadata`) — then the banner `VERIFY-SOCLE: n/4 OK`, on every exit path, refusal included. **To paste on #7**: from the first line `VERIFY-SOCLE ` to the banner. **Readings to record, no threshold**: connection of a Claude.ai client (and iOS if available) to the role through OAuth, traced by the runbook (BR-020), never simulated — `client_id` seen in `hullgate admin token list`, presence of `resource` at renewal if observable (feeds #3). A banner `VERIFY-SOCLE: 4/4 OK` counts as the criterion met; any other refers to the runbook step named in the `KO` line.
+- [ ] **AC-OP** (BR-032, BR-033, BR-056, BR-068) — the operator plays the core runbook (`docs/guides/keys-and-upstreams.md`): creation of the two mounted secrets, redeployment, creation of a test tree through the CLI. **Instrument bounded to the batch**: `make verify-socle ROLE=<chemin>` (new target, plays only the core's checks, never those of F-004), where `<chemin>` is reread from the output of `hullgate admin tree show` that the runbook has displayed, never imposed. It prints one line per check `VERIFY-SOCLE <id> OK|KO <valeur>` — `key-loaded` (`/readyz` 200 through Traefik), `admin-routes` (`http://127.0.0.1:${ADMIN_LOCAL_PORT}/admin` 404), `discovery` (the role's RFC 9728 metadata, 200, `resource` equal to the role's URL), `challenge` (POST without a token on the role: 401 with `resource_metadata`) — then the banner `VERIFY-SOCLE: n/4 OK`, on every exit path, refusal included. **To paste on HULL-7**: from the first line `VERIFY-SOCLE ` to the banner. **Readings to record, no threshold**: connection of a Claude.ai client (and iOS if available) to the role through OAuth, traced by the runbook (BR-020), never simulated — `client_id` seen in `hullgate admin token list`, presence of `resource` at renewal if observable (feeds HULL-3). A banner `VERIFY-SOCLE: 4/4 OK` counts as the criterion met; any other refers to the runbook step named in the `KO` line.
 
 ## 6. Diagrams
 
@@ -814,12 +814,12 @@ A deleted node keeps its row (`deleted = 1`): its identifier stays reserved (BR-
 - **Freeze marker**: —
 - **Package-status**: absent
 
-No graphical interface in F-005 except the barrier page (SCR-04.consent), a minimal page without a design package; the administration interface and its design (prototype #18, `design/amaterasu/`) are #11.
+No graphical interface in F-005 except the barrier page (SCR-04.consent), a minimal page without a design package; the administration interface and its design (prototype HULL-18, `design/amaterasu/`) are HULL-11.
 
 ## 8. Design & Prototypes
 
 - **Design package**: none for F-005.
-- **Model reference**: validated prototype #18, `design/prototype-admin/` (artifact `https://claude.ai/artifact/4M3vN18F2YRD82oZQZoSSq`): levels, URLs, inheritance with origin, lock, sensitivity, tokens placed on a node. Accepted gap: H4 (sensitive = role token), empty derived segment refused instead of `x`.
+- **Model reference**: validated prototype HULL-18, `design/prototype-admin/` (artifact `https://claude.ai/artifact/4M3vN18F2YRD82oZQZoSSq`): levels, URLs, inheritance with origin, lock, sensitivity, tokens placed on a node. Accepted gap: H4 (sensitive = role token), empty derived segment refused instead of `x`.
 
 ## 9. Implementation Notes
 
@@ -827,8 +827,8 @@ No graphical interface in F-005 except the barrier page (SCR-04.consent), a mini
 
 - F-004 — Foundation (`implemented`): skeleton, gate, image, deployment, backup.
 - ADR-001 — SDK `mcp==2.3.0` pinned (BR-036, BR-037): an SDK upgrade remains subject to the bench.
-- #3 / HULL-3 — Behavior of the Claude clients (open): `resource` sent or not at renewal, acceptance of CIMD. Not blocking for the implementation; its result may require a new version of BR-058 (§4) and make CIMD a priority or useless.
-- Downstream: #8 (connections, placements), #9 (relay, 16/16 against the v1), #10 (policy), #11 (web administration), #12 (full audit) build on the tree, the inheritance, the audit and the authorization order.
+- HULL-3 / HULL-3 — Behavior of the Claude clients (open): `resource` sent or not at renewal, acceptance of CIMD. Not blocking for the implementation; its result may require a new version of BR-058 (§4) and make CIMD a priority or useless.
+- Downstream: HULL-8 (connections, placements), HULL-9 (relay, 16/16 against the v1), HULL-10 (policy), HULL-11 (web administration), HULL-12 (full audit) build on the tree, the inheritance, the audit and the authorization order.
 - Session tools: `make`, `uv`, `buildx` absent from the cairn container depending on the session; toolbox `.cairn/runs/acts/HULL-6-toolbox.Dockerfile` (planned dependency, `missing-tool-handshake.md`).
 
 ### Technical Constraints
@@ -845,35 +845,35 @@ No graphical interface in F-005 except the barrier page (SCR-04.consent), a mini
 
 | Question | Decision | Rationale |
 |----------|----------|-----------|
-| Tree management in F-005 | CLI in the container, no HTTP route | Port 4791 is reachable by the Traefik neighbors; no administration authentication before #11 (BR-068) |
+| Tree management in F-005 | CLI in the container, no HTTP route | Port 4791 is reachable by the Traefik neighbors; no administration authentication before HULL-11 (BR-068) |
 | Two token families | Opaque tokens placed by the operator on a node; OAuth JWTs placed on the role | Claude Code accepts a fixed header; Claude.ai / iOS require OAuth and an audience = access point URL |
 | Issuer | One per access point | Requested by the ticket ("authorization server per access point"); prevents a code or token of one access point from serving another |
 | Authorization barrier | TOTP (mounted secret), pending the passkey | Spec line 773-774 (passkey or TOTP); mounted secrets = mode fixed by F-004 and the specification (line 1019) |
 | Failure window | Global | No reliable client address without `X-Forwarded-*` (deferred) |
 | Split | Two batches, two PRs (§10) | Size (28 rules); each batch is accepted on its own |
 
-**ADRs to write** at the `close-feature` of batch B, by the implementation (this spec writes none; verdicts of the targeted stress-test, operator ruling of 2026-10-28, decision 4a): (1) authorization server per access point (BR-056); (2) two token families — hashed opaque operator tokens, RFC 9068 JWTs —, with the TOTP barrier folded into that same ADR ("how a caller proves who it is"; the passkey of #11 will complete it); (3) SDK extension by subclasses and own handlers, never by replacing a module object — optional, separate ADR linked to ADR-001 by `More Information`. Do not qualify: "option 1" reading of the audience (BR-055, H18), CLI management without an HTTP route (BR-068), global failure window (BR-073), split into two batches.
+**ADRs to write** at the `close-feature` of batch B, by the implementation (this spec writes none; verdicts of the targeted stress-test, operator ruling of 2026-10-28, decision 4a): (1) authorization server per access point (BR-056); (2) two token families — hashed opaque operator tokens, RFC 9068 JWTs —, with the TOTP barrier folded into that same ADR ("how a caller proves who it is"; the passkey of HULL-11 will complete it); (3) SDK extension by subclasses and own handlers, never by replacing a module object — optional, separate ADR linked to ADR-001 by `More Information`. Do not qualify: "option 1" reading of the audience (BR-055, H18), CLI management without an HTTP route (BR-068), global failure window (BR-073), split into two batches.
 
 ### Hypotheses (checked against the original specification)
 
 | Id | Decision taken | Alternative | Source of the decision |
 |----|----------------|-------------|-----------------------|
-| H1 | Model taken from the brief, prototype #18 and the POCs | — | **corrected** — specification read (PDF v3); comparison below |
+| H1 | Model taken from the brief, prototype HULL-18 and the POCs | — | **corrected** — specification read (PDF v3); comparison below |
 | H2 | One organisation per instance | several | **confirmed** (spec line 224-225) |
 | H3 | Segment `[a-z0-9-]`, 1–40, reserved `oauth`, `mcp`, `well-known` | other alphabet / length | **corrected** (spec line 216-217) → no reserved segment, the `/p` prefix isolates the technical routes; format and length not covered by the specification (prototype) |
-| H4 | Sensitive: token placed on the role only | env or below | **confirmed** (spec line 395-396, 407-409); the prototype is to be corrected (#11) |
+| H4 | Sensitive: token placed on the role only | env or below | **confirmed** (spec line 395-396, 407-409); the prototype is to be corrected (HULL-11) |
 | H5 | No operator token on the organisation | allowed | **corrected** (spec line 356-357) → root token `*` allowed, outside sensitive ones, not recommended for an agent, `--confirm '*'` |
 | H6 | OAuth access 1 h; `duree_jetons` 30 d by default, cap 7 d in sensitive | other values | **confirmed** (spec line 410, 425; inherited setting line 315); completed: `--duree` at issuance (line 446) |
 | H7 | Opaque operator token `clo_` + 256 bits | JWT | not covered (spec line 844 confirms fingerprint only, BR-072) |
 | H8 | Key and secret as mounted `*_FILE` secrets | variables, database | **confirmed** for the mode (spec line 845, 1019); **corrected** for the barrier (spec line 773-774) → TOTP, not a shared secret |
-| H9 | Management by CLI | protected HTTP API | **confirmed** as a channel (spec line 423, 446-448, 345); the web interface is #11; command names aligned (`jeton creer`…) |
+| H9 | Management by CLI | protected HTTP API | **confirmed** as a channel (spec line 423, 446-448, 345); the web interface is HULL-11; command names aligned (`jeton creer`…) |
 | H10 | 5 failures / 15 min, global sliding window (BR-073) | per address | **confirmed** in principle ("limits attempts", spec line 342, 984); values not covered |
 | H11 | The lock blocks neither issuance, nor revocation, nor client admission (S5) | block everything | not covered: the lock comes from the prototype; the specification's "pinning" concerns tool definitions (line 415, 952-953) → notion renamed "lock" |
 | H12 | Changing a path revokes the OAuth lineages, keeps the operator tokens | keep all / revoke all | not covered; **completed**: moving a node is in the specification (line 276), same rule (BR-046) |
 | H13 | Unknown path → 404 before authentication | 401 everywhere | not covered |
-| H14 | 16/16 against the v1 as a criterion of #9 | in F-005 | not covered (the plan, line 1418, places inbound OAuth with a "ping" tool in the POC) |
-| H15 | YAML export only | export + import | **corrected** (spec line 336-337) → import with preview required by the specification, deferred to #11; the export contains everything the import will reread |
-| H16 | Audit in the database, append-only, without retention | separate file | **confirmed** (spec line 843-845, 1120: SQLite, append-only); before / after added (line 334); retention (1 year configuration, 90 d events) to #12 |
+| H14 | 16/16 against the v1 as a criterion of HULL-9 | in F-005 | not covered (the plan, line 1418, places inbound OAuth with a "ping" tool in the POC) |
+| H15 | YAML export only | export + import | **corrected** (spec line 336-337) → import with preview required by the specification, deferred to HULL-11; the export contains everything the import will reread |
+| H16 | Audit in the database, append-only, without retention | separate file | **confirmed** (spec line 843-845, 1120: SQLite, append-only); before / after added (line 334); retention (1 year configuration, 90 d events) to HULL-12 |
 | H17 | OAuth routes under `/p/<chemin>/oauth/…` | other layout | **corrected** (spec line 749-753) → `/oauth/p/<chemin>/…`, issuer `${PUBLIC_URL}/oauth/p/<chemin>` |
 | H18 | Audience: "option 1" reading — exact audience for OAuth tokens, path prefix for all (BR-055 step 6) | audience for any token (spec line 384-385) | not covered: **operator decision at the freeze** (§12, §13) |
 | H19 | Renaming or moving an ancestor of a locked node is refused (BR-046, BR-049) | allowed | not covered: **operator decision of 2026-10-28** (review 407, option b), delivered in batch B |
@@ -885,10 +885,10 @@ No graphical interface in F-005 except the barrier page (SCR-04.consent), a mini
 | **Access point** | MCP URL of a role, `/p/<chemin>/mcp`. | endpoint (in French prose), profile | BR-044 |
 | **Segment** | Part of the path specific to a node, unique among siblings. | slug (outside code), identifier | BR-044 |
 | **Sensitive environment** | Marked environment, whose roles accept only tokens placed on them. | prod (as a status), protected environment | BR-047 |
-| **Lock** | Blocking of a node and its subtree: structure, settings, sensitivity. | frozen, pinning (reserved for tool definitions, #10), freeze | BR-049 |
+| **Lock** | Blocking of a node and its subtree: structure, settings, sensitivity. | frozen, pinning (reserved for tool definitions, HULL-10), freeze | BR-049 |
 | **Operator token** | Opaque token placed by the operator on a node. | static token, API key, PAT | BR-053 |
 | **Lineage** | Sequence of OAuth tokens issued from a single authorization, revoked as a block. | token family, OAuth session | BR-059 |
-| **Authorization barrier** | Page where the operator authenticates (TOTP in F-005, passkey with #11) before any code. | consent (alone), operator page | BR-060 |
+| **Authorization barrier** | Page where the operator authenticates (TOTP in F-005, passkey with HULL-11) before any code. | consent (alone), operator page | BR-060 |
 | **Authorization order** | Fixed sequence of the access point's checks. | auth pipeline, verification chain | BR-055 |
 
 ### Data Model Impact
@@ -1045,33 +1045,33 @@ Rules: BR-054, BR-055 (JWT branch and key), BR-056 to BR-063, BR-064 (OAuth rout
 
 ## 12. Risks & Watchpoints
 
-- **Functional — gaps with the prototype**: prototype #18 (reference of #11) says "frozen" for the lock and accepts an environment token in a sensitive environment; #11 must align with BR-049 and BR-051.
+- **Functional — gaps with the prototype**: prototype HULL-18 (reference of HULL-11) says "frozen" for the lock and accepts an environment token in a sensitive environment; HULL-11 must align with BR-049 and BR-051.
 - **Functional — reading of the audience** (BR-055): the specification asks for a per-token audience equal to the access point; the core applies it only to OAuth tokens (operator decision at the freeze, option 1: operator tokens remain path tokens, checked by prefix and refused in a sensitive environment above the role).
-- **Security — barrier blocking**: global window (H10, BR-073): a third party who knows the public URL can prevent any new authorization as long as they renew their failures. No access obtained. Lifted by: passkey (#11) or reliable client address (#12).
-- **Dependency — `resource` at renewal** (#3 open): if a Claude client omits it, BR-058 refuses each of its renewals (reauthorization every hour). Operator decision to take once #3 gives its result.
+- **Security — barrier blocking**: global window (H10, BR-073): a third party who knows the public URL can prevent any new authorization as long as they renew their failures. No access obtained. Lifted by: passkey (HULL-11) or reliable client address (HULL-12).
+- **Dependency — `resource` at renewal** (HULL-3 open): if a Claude client omits it, BR-058 refuses each of its renewals (reauthorization every hour). Operator decision to take once HULL-3 gives its result.
 - **Usage — concurrent renewals**: without a grace period (BR-059), a client that renews twice in parallel loses its lineage and reauthorizes; to watch in the audit (`reuse_detected`).
 - **Usage — change of `PUBLIC_URL`**: all OAuth authorizations fall (audience, issuer); operator tokens remain.
 - **Performance — availability predicate per request** (BR-064): a write lock taken and released, and the key file checked (`stat`), on each request; acceptable for one operator and a few agents, to measure if the load grows.
 - **Security — enumeration**: a nonexistent path answers 404, an existing path 401 (H13): the tree's structure (client names) can be probed without a token.
 - **Security — CIMD**: fetching a URL supplied by a third party (SSRF); bounds of BR-062; to revisit in review with a dedicated eye (sensitive review model).
-- **Security — saturation of CIMD fetches** (review 415, m6): a sustained anonymous stream of slow-resolving names keeps the 16 fetch slots full; legitimate CIMD clients receive `cimd_busy` (audited), pre-registered clients and the rest of the gateway are not affected. Same class as the barrier blocking; lifted by: rate limiting (#12).
+- **Security — saturation of CIMD fetches** (review 415, m6): a sustained anonymous stream of slow-resolving names keeps the 16 fetch slots full; legitimate CIMD clients receive `cimd_busy` (audited), pre-registered clients and the rest of the gateway are not affected. Same class as the barrier blocking; lifted by: rate limiting (HULL-12).
 - **Security — backups**: the backed-up database contains only fingerprints (BR-072); the signing key is a mounted secret, outside the database and outside the backup. Losing it invalidates the OAuth access tokens in progress; the renewals, in the database, remain valid and obtain new ones signed by the new key.
 - **Technical — in-house OAuth** (ADR-004, proposed): the OAuth handlers are written in `oauth.py` instead of extending the SDK's; more security code to maintain. Comparison with a specialized library and the SDK fixed upstream planned after the v1; BR-037 still imposes the bench at each SDK upgrade (MCP entry point).
 - **Technical — concurrent CLI and server** on SQLite: bounded `BEGIN IMMEDIATE` locks; a long CLI command can make an issuance wait (≤ delay, otherwise 503).
-- **Dependency** — #9 carries the 16/16 against the v1: until then, most of the 16 tests are « non jouables » against the v1 (relayed tool `whoami`); the core's isolation evidence rests on the checks outside the acceptance run and the core checks.
+- **Dependency** — HULL-9 carries the 16/16 against the v1: until then, most of the 16 tests are « non jouables » against the v1 (relayed tool `whoami`); the core's isolation evidence rests on the checks outside the acceptance run and the core checks.
 
 ## Stress-test
 
-**Passe du 2026-10-28** — Claude (model:claude-opus-5-5), adversarial role, separate pass after the draft, six axes; acceptance run and bench checks reread (`runner/recette.py`, `socle_checks.py`, `evidence/results-py-gateway.json`), ticket #3 read.
+**Passe du 2026-10-28** — Claude (model:claude-opus-5-5), adversarial role, separate pass after the draft, six axes; acceptance run and bench checks reread (`runner/recette.py`, `socle_checks.py`, `evidence/results-py-gateway.json`), ticket HULL-3 read.
 **22 findings — 1 critical, 7 major, 14 minor ; 20 retenus, 2 écartés.**
 
 Critical:
-- **C1** · axis E · §BR-071, AC-08 — the draft expected T02 to T06 and T12 to T15 `réussi` against the v1; but these tests call the relayed tool `whoami`, including in their positive checks (T05, T06, T12, T13, T15), and `socle_checks.py` probes a `ping` **tool** that the v1 does not have: untenable criterion before #9. Sort : corrigé — BR-071 requires the checks outside the acceptance run and the core checks to succeed and no `échoué` test, « non jouable » proven by the step that calls a relayed tool; checks probe through the MCP `ping` method on the v1 side; AC-08 rewritten with its instrument.
+- **C1** · axis E · §BR-071, AC-08 — the draft expected T02 to T06 and T12 to T15 `réussi` against the v1; but these tests call the relayed tool `whoami`, including in their positive checks (T05, T06, T12, T13, T15), and `socle_checks.py` probes a `ping` **tool** that the v1 does not have: untenable criterion before HULL-9. Sort : corrigé — BR-071 requires the checks outside the acceptance run and the core checks to succeed and no `échoué` test, « non jouable » proven by the step that calls a relayed tool; checks probe through the MCP `ping` method on the v1 side; AC-08 rewritten with its instrument.
 
 Majors:
 - **M1** · axis A · §BR-055, BR-064 — "vault available" undefined; an outage injected by a lock leaves reads served, T13 would not see it. Sort : corrigé — availability = `/readyz` predicate, evaluated on each request; 503 never replaced by a 404 under outage.
 - **M2** · axis D · §3.2, BR-063 — the operator could cut a compromised OAuth authorization only by deleting the role. Sort : corrigé — `token list` / `token revoke` cover the OAuth lineages.
-- **M3** · axis E · §BR-058 — #3 (behavior of the Claude clients) is open: if a client omits `resource` at renewal, it never renews. Sort : corrigé — dependency declared (§9), risk (§12), way out named (new version of BR-058 and BR-011, operator decision); the rule remains the acceptance run's.
+- **M3** · axis E · §BR-058 — HULL-3 (behavior of the Claude clients) is open: if a client omits `resource` at renewal, it never renews. Sort : corrigé — dependency declared (§9), risk (§12), way out named (new version of BR-058 and BR-011, operator decision); the rule remains the acceptance run's.
 - **M4** · axis A · §5 AC-OP — instrument not bounded to the batch (`make verify` mixed in F-004), imposed role identifier. Sort : corrigé — `make verify-socle ROLE=` reread from `tree show`, banner `VERIFY-SOCLE: n/4 OK` on every path, readings frozen.
 - **M5** · axis A · §BR-053, BR-060, BR-065, BR-046 — rules joining two obligations that can be violated separately. Sort : corrigé — fingerprints moved out into BR-072, failure window into BR-073, BR-053 reduced to "shown once", BR-046 reworded on the sole scope of the revocation.
 - **M6** · axis A · glossary — the batch coins declaration terms and no criterion held their entry. Sort : corrigé — AC-10 and proposed glossary (§9), creation subject to the operator's go at the freeze.
@@ -1088,8 +1088,8 @@ Minors:
 - **m8** · axis B · §BR-044 — deletion of the organisation. Sort : corrigé — refused.
 - **m9** · axis A · §BR-056 — scopes of the authorization server (`offline_access` of the operator walkthrough). Sort : corrigé.
 - **m10** · axis D · §Out of Scope — rate limiting, performance, POC carry-over, change of `PUBLIC_URL` unsaid. Sort : corrigé — four lines added, `PUBLIC_URL` risk in §12.
-- **m11** · axis C · §BR-062 — CIMD costs ~1 d and opens an SSRF surface whereas #3 does not yet say whether Claude uses it. Sort : accepté — the ticket names it; detachable as a third PR (§10), risk §12.
-- **m12** · axis C · §BR-070 — YAML export of low value before #11. Sort : accepté — section of the original specification flagged for this ticket; low cost, batch A.
+- **m11** · axis C · §BR-062 — CIMD costs ~1 d and opens an SSRF surface whereas HULL-3 does not yet say whether Claude uses it. Sort : accepté — the ticket names it; detachable as a third PR (§10), risk §12.
+- **m12** · axis C · §BR-070 — YAML export of low value before HULL-11. Sort : accepté — section of the original specification flagged for this ticket; low cost, batch A.
 - **m13** · axis F · §BR-061 — took over the barrier obligation of BR-060. Sort : corrigé — removed from BR-061.
 - **m14** · axis A · §5 AC-02 — counting instrument to extend to the added rules. Sort : corrigé — pattern and total (31) updated.
 
@@ -1126,7 +1126,7 @@ ADRs (R3, operator decision 4a): authorization server per access point; two toke
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-10-28 | Claude (product, model:claude-opus-5-5) | Draft created from #7 (body and comments 9557, 9582, 9622), `brief.md`, prototype #18, `docs/trials/poc-python.md`, F-004; original specification not read (hypotheses H1 to H17) |
+| 2026-10-28 | Claude (product, model:claude-opus-5-5) | Draft created from HULL-7 (body and comments 9557, 9582, 9622), `brief.md`, prototype HULL-18, `docs/trials/poc-python.md`, F-004; original specification not read (hypotheses H1 to H17) |
 | 2026-10-28 | Claude (product, model:claude-opus-5-5) | Stress-test (22 findings); BR-072 and BR-073 split off from BR-065 and BR-060; BR-071 and AC-08 rewritten; AC-OP bounded; AC-10 |
 | 2026-10-28 | Claude (product, model:claude-opus-5-5) | Comparison with the original specification (PDF v3): H2, H4, H6, H16 confirmed; H1, H3, H5, H8 (barrier), H15, H17 corrected; BR-044, BR-046, BR-049, BR-050, BR-051, BR-052, BR-055, BR-056, BR-060, BR-061, BR-066, BR-070, BR-032 touched up (role `principal`, move, lock distinct from pinning, root token, `--duree`, OAuth audience, `/oauth/p/<chemin>`, TOTP, client bound to the path, before / after, reimportable export) |
 | 2026-10-28 | Claude (implementation, model:claude-opus-5-5) | Batch A delivered on `feat/HULL-7-socle-lot-a`: `status: in-development`; `capabilities` declaration added (absent at the freeze, required by INV-047 from `ready-for-dev`); §9 Pitfalls and implementation choices; §10 Phase 1 checked. Extraction of the rules and `implemented` at the `close-feature` of batch B |
@@ -1137,3 +1137,4 @@ ADRs (R3, operator decision 4a): authorization server per access point; two toke
 | 2026-10-29 | Claude (implementation, model:claude-opus-5-5) | HULL-31 (production bug): §9 Pitfalls — CSP `form-action` of the barrier page extended to the origin of the `redirect_uri`; no rule modified, check of BR-060 completed |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

@@ -91,7 +91,8 @@ REQUIRED_SOCLE = ("**Expected result**", "**If the result differs**")
 
 
 def test_br_042_socle_runbook_steps_are_complete() -> None:
-    """F-005 (AC-OP): same form, reports on #7; S1 to S12, verify-auth read back from tree show."""
+    """F-005 (AC-OP): same form, reports on HULL-7; S1 to S12, verify-auth read back from tree
+    show."""
     text = SOCLE.read_text(encoding="utf-8")
     steps = _steps(text)
     assert [x for x in steps if x.startswith("S")] == [f"S{n}" for n in range(1, 13)]
@@ -111,7 +112,7 @@ REQUIRED_CONNEXIONS = (
 
 
 def test_br_042_connexions_runbook_steps_are_complete() -> None:
-    """F-006 (AC-OP, review 417 o1 and o2): same form, reports on #8; C1 to C13; the key is
+    """F-006 (AC-OP, review 417 o1 and o2): same form, reports on HULL-8; C1 to C13; the key is
     created before the deployment, `connection status` read back after it, the name read back from
     `connection list`, the recovery gesture after a key loss written down."""
     text = CONNEXIONS.read_text(encoding="utf-8")
@@ -142,10 +143,10 @@ REQUIRED_RELAIS = (
 
 
 def test_br_042_relais_runbook_steps_are_complete() -> None:
-    """F-008 (AC-OP): same form, reports on #9; R1 to R9 (lot B) and R10 (lot C); gitea-mcp
+    """F-008 (AC-OP): same form, reports on HULL-9; R1 to R9 (lot B) and R10 (lot C); gitea-mcp
     pinned on the upstreams network, upstream declared as an internal host, `verify-relay` with the
-    tokens on standard input, stdio bridge without 401. Feedback from lot B's AC-OP (#9): played as
-    `claude`, `<…>` template detected in `.env`, blocks in short lines with variables, one-token
+    tokens on standard input, stdio bridge without 401. Feedback from lot B's AC-OP (HULL-9): played
+    as `claude`, `<…>` template detected in `.env`, blocks in short lines with variables, one-token
     form, identifier of the token to revoke."""
     text = RELAIS.read_text(encoding="utf-8")
     steps = _steps(text)

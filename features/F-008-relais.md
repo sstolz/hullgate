@@ -35,27 +35,27 @@ Production fact (2026-10-30): the Claude.ai connector is connected to the public
 
 The existing outbound client (`hullgate.outbound`) is designed for short OAuth exchanges (10 s deadline, 256 KiB, 16 threads, one thread per exchange); it does not fit tool calls as is. Review 419 (m2) noted that `Outbound()` is instantiated at every `get_access`: 10.8 ms per call and a thread cap with no effect, which the relay, calling `get_access` on every tool request, would turn into a denial of service.
 
-**Sources.** Original specification (ticket #1, extracted PDF, "spec. l. N"): MCP aggregation (lines 444-470), sessions and versions (lines 479-490), tool names (lines 492-498), guardrails on responses (lines 500-505), upstream types (lines 526-540), stdio servers (lines 844-846), tests (lines 1117-1135), plan, step 4 (lines 1199-1200). To these are added F-005 (BR-022, BR-055, BR-064, BR-067, BR-071, §2 Out of Scope), F-006 (§3.3, BR-077, BR-084, BR-088, BR-091, BR-094, BR-095, BR-097, §2 Out of Scope), `docs/trials/matrice-serveurs.md` (gitea-mcp 1.11.0: stateless HTTP, one Gitea host per process, token in `Authorization: Bearer` on every request), ADR-001 to ADR-004, reviews 417 and 419 (m2) and the learnings of F-005 and F-006.
+**Sources.** Original specification (ticket HULL-1, extracted PDF, "spec. l. N"): MCP aggregation (lines 444-470), sessions and versions (lines 479-490), tool names (lines 492-498), guardrails on responses (lines 500-505), upstream types (lines 526-540), stdio servers (lines 844-846), tests (lines 1117-1135), plan, step 4 (lines 1199-1200). To these are added F-005 (BR-022, BR-055, BR-064, BR-067, BR-071, §2 Out of Scope), F-006 (§3.3, BR-077, BR-084, BR-088, BR-091, BR-094, BR-095, BR-097, §2 Out of Scope), `docs/trials/matrice-serveurs.md` (gitea-mcp 1.11.0: stateless HTTP, one Gitea host per process, token in `Authorization: Bearer` on every request), ADR-001 to ADR-004, reviews 417 and 419 (m2) and the learnings of F-005 and F-006.
 
 ### Objective
 
-Have a role's access point serve the tools of the connections placed on that role, and only those: `tools/list` aggregated and renamed `<préfixe>__<outil>`, `tools/call` rechecked then routed to the upstream of the right connection with that connection's token, without the client's token or another role's context crossing over. The upstream is an MCP server (types `mcp-distant` and `mcp-local`), reached over Streamable HTTP in the protocol generation it negotiates, the client being in its own; progress and cancellation are relayed. Before announcing and before calling, the relay consults a policy hook that #10 will fill.
+Have a role's access point serve the tools of the connections placed on that role, and only those: `tools/list` aggregated and renamed `<préfixe>__<outil>`, `tools/call` rechecked then routed to the upstream of the right connection with that connection's token, without the client's token or another role's context crossing over. The upstream is an MCP server (types `mcp-distant` and `mcp-local`), reached over Streamable HTTP in the protocol generation it negotiates, the client being in its own; progress and cancellation are relayed. Before announcing and before calling, the relay consults a policy hook that HULL-10 will fill.
 
 ### Expected Impact
 
 - An operator declares the MCP URL of their Gitea service, places two connections (dev, reviewer) on two roles, and each role URL exposes exactly the tools of its connection (`gd__issue_read`, ...): the Claude.ai/iOS connector stops being empty.
-- The acceptance criterion that F-005 left to #9 is met: the 16 tests of the isolation acceptance run, transposed to the role, **pass** against v1 (BR-071), including those with a step that calls a relayed tool, "not playable" today.
+- The acceptance criterion that F-005 left to HULL-9 is met: the 16 tests of the isolation acceptance run, transposed to the role, **pass** against v1 (BR-071), including those with a step that calls a relayed tool, "not playable" today.
 - No upstream call leaves for a tool outside the list, outside the placement or outside the policy; the upstream log proves it (BR-002).
-- #10 (policy), #12 (full audit, rate limiting) and #13 (Cairn cutover) start from an existing relay, hook and call log.
+- HULL-10 (policy), HULL-12 (full audit, rate limiting) and HULL-13 (Cairn cutover) start from an existing relay, hook and call log.
 
 ### Open Product Questions
 
 Q1 to Q4 were settled by the operator on 2026-10-30 ("ok for the recommendations", recommendation a for each); the adversarial stress test refines Q3 (M1, BR-106) and Q4 (C2, BR-130). Q5 was settled at the freeze on 2026-10-30, option a (H22, confirmed).
 
-- **Q1 · Client-side sessions.** The access point stays stateless (BR-067; `Mcp-Session-Id` never issued) and the upstream session is held per (role, connection), rather than per client session as #1 writes (line 480). Consequence: an explicit `notifications/cancelled` cannot be correlated in stateless mode; it is relayed only as **closing the request's stream** (2026-07-28 generation: that is the intended form); `notifications/tools/list_changed` is not pushed (F-005 had sent it back here). Options: a) stateless (recommended); b) inbound sessions bound to (role, token lineage), with a session table, expiry, cut-off at revocation, GET stream for `list_changed`.
-- **Q2 · `api-rest` type.** The title of #9 puts it in v1. It requires an adapter framework (Microsoft Graph, Dropbox), a ranking of modes by HTTP method, tools written by the gateway: a product of its own, with no user before #13 (Gitea is enough). Options: a) deferred to a 1.1.0 ticket, the upstream type remaining an extensible enumeration (recommended); b) a witness adapter in #9; c) the whole in #9 (the ticket would be `split`).
-- **Q3 · Plain HTTP to an internal host.** `gitea-mcp` and the stdio bridges listen over HTTP on the Docker network; BR-084 (OAuth) requires https. Options: a) `http://` allowed for the MCP URL **alone**, and only toward an internal host that the operator names at declaration, **all** of whose resolved addresses are private (a public address requires https, flag or not), audited (recommended); b) https required everywhere (a TLS sidecar per upstream, private certificate: candidate #28 not carried out); c) free `http://` (rejected: bypasses the public address check).
-- **Q4 · Transitional policy until #10.** The brief closes writes by default on a sensitive environment, but #10 does not exist yet. Options: a) a connection placed on at least one **sensitive** role announces no tool and calls none, **on all its roles**, as long as the policy does not exist; other connections announce everything (recommended); b) announce everything everywhere (production writes would be open between #9 and #10); c) nothing anywhere (the connector would stay empty, which #9 must fix).
+- **Q1 · Client-side sessions.** The access point stays stateless (BR-067; `Mcp-Session-Id` never issued) and the upstream session is held per (role, connection), rather than per client session as HULL-1 writes (line 480). Consequence: an explicit `notifications/cancelled` cannot be correlated in stateless mode; it is relayed only as **closing the request's stream** (2026-07-28 generation: that is the intended form); `notifications/tools/list_changed` is not pushed (F-005 had sent it back here). Options: a) stateless (recommended); b) inbound sessions bound to (role, token lineage), with a session table, expiry, cut-off at revocation, GET stream for `list_changed`.
+- **Q2 · `api-rest` type.** The title of HULL-9 puts it in v1. It requires an adapter framework (Microsoft Graph, Dropbox), a ranking of modes by HTTP method, tools written by the gateway: a product of its own, with no user before HULL-13 (Gitea is enough). Options: a) deferred to a 1.1.0 ticket, the upstream type remaining an extensible enumeration (recommended); b) a witness adapter in HULL-9; c) the whole in HULL-9 (the ticket would be `split`).
+- **Q3 · Plain HTTP to an internal host.** `gitea-mcp` and the stdio bridges listen over HTTP on the Docker network; BR-084 (OAuth) requires https. Options: a) `http://` allowed for the MCP URL **alone**, and only toward an internal host that the operator names at declaration, **all** of whose resolved addresses are private (a public address requires https, flag or not), audited (recommended); b) https required everywhere (a TLS sidecar per upstream, private certificate: candidate HULL-28 not carried out); c) free `http://` (rejected: bypasses the public address check).
+- **Q4 · Transitional policy until HULL-10.** The brief closes writes by default on a sensitive environment, but HULL-10 does not exist yet. Options: a) a connection placed on at least one **sensitive** role announces no tool and calls none, **on all its roles**, as long as the policy does not exist; other connections announce everything (recommended); b) announce everything everywhere (production writes would be open between HULL-9 and HULL-10); c) nothing anywhere (the connector would stay empty, which HULL-9 must fix).
 - **Q5 · First 401 of a provided-token connection.** A provided token is not renewed: BR-127 keeps the F-006 behavior (BR-085): an upstream 401 calls `signaler_refus` and the connection goes to `réauthentification requise`, the operator supplies a new token. Problem: an upstream that answers 401 for another reason (an unauthenticated stdio bridge) thus disables the connection at the first call, whereas the operator's decision (M3) sets a "not before" date instead of a disabling for an OAuth connection. Options: a) keep BR-085 for the provided token, the disabling being the intended signal (recommendation **applied**, H22: nothing else ever detects the revocation of a provided token, and an unauthenticated `mcp-local` bridge must never answer 401, which the runbook says); b) extend the "not before" date (BR-128) to the provided token, the connection staying active and every call returning `connexion_a_reautoriser`; cost: a truly revoked token no longer shows in the state.
 
 ## 2. Scope
@@ -74,24 +74,24 @@ Q1 to Q4 were settled by the operator on 2026-10-30 ("ok for the recommendations
 | Item | Addressee |
 |---|---|
 | Upstream type `api-rest` (Microsoft Graph, Dropbox adapters; mode per HTTP method) | 1.1.0 ticket to create if Q2 = a; the upstream type enumeration is extensible (BR-106) |
-| Tool modes, lists, pinning of definitions, rules on argument value (#10, comment of 2026-10-28), response cap **per role**, "to classify" queue | #10, on the hook of BR-123 |
-| Rate limiting per token and per connection; audit retention; statistics per connection; deadline alert | #12 |
+| Tool modes, lists, pinning of definitions, rules on argument value (HULL-10, comment of 2026-10-28), response cap **per role**, "to classify" queue | HULL-10, on the hook of BR-123 |
+| Rate limiting per token and per connection; audit retention; statistics per connection; deadline alert | HULL-12 |
 | Multi-account merge (`account` parameter), presentation merged by service prefix | v2 (brief) |
 | Types `openapi`, `wasm`; resources, prompts, completions, logging, sampling, elicitation, roots (MCP) | v2 (brief); BR-121 refuses them |
-| Multiplexing of an upstream session shared between roles | v2 (#1, line 480); refused by BR-119 |
+| Multiplexing of an upstream session shared between roles | v2 (HULL-1, line 480); refused by BR-119 |
 | Inbound sessions, standalone GET stream, pushed `notifications/tools/list_changed` | Q1 = b only; otherwise backlog candidate |
-| Rewriting of tool schemas or annotations; cleaning of descriptions (instruction injection) | #10 (pinning on the upstream definition) |
-| Logging of call arguments and results | #12, if the operator wants it (H9) |
-| Upstream health screen, upstream failure alert | #11 / #12 |
-| Private certificate authority for an internal upstream over https | #28 (1.1.0) |
-| Staggered "Happy Eyeballs" attempts of the outbound client | #35 (1.1.0); the relay takes over the sequential fallback of HULL-32 |
-| Per-organisation tightness: cache keys, upstream sessions, name table and audit actor carry the role and the connection, never the organisation | #42 (to review at its framing); BR-110, BR-112, BR-119 |
+| Rewriting of tool schemas or annotations; cleaning of descriptions (instruction injection) | HULL-10 (pinning on the upstream definition) |
+| Logging of call arguments and results | HULL-12, if the operator wants it (H9) |
+| Upstream health screen, upstream failure alert | HULL-11 / HULL-12 |
+| Private certificate authority for an internal upstream over https | HULL-28 (1.1.0) |
+| Staggered "Happy Eyeballs" attempts of the outbound client | HULL-35 (1.1.0); the relay takes over the sequential fallback of HULL-32 |
+| Per-organisation tightness: cache keys, upstream sessions, name table and audit actor carry the role and the connection, never the organisation | HULL-42 (to review at its framing); BR-110, BR-112, BR-119 |
 | Bound on reading the **raw body** of an access point request (any method); BR-129 bounds only the arguments of a `tools/call` | backlog candidate on F-005 (BR-067) |
 | Global bound on the memory of the definition caches (at most 10 MiB per (role, connection) key, i.e. 10 pages of 1 MiB, BR-109) | not set in v1 (4 or 5 clients); to review if the number of roles grows |
-| Deterministic refusal reason "connection interrupted" / "deadline exceeded" (OAuth client) | #36 (1.1.0); BR-117 holds the case for tool calls |
-| Lineage displayed "active" before the exchange (`jeton lister`) | #38 (1.1.0), unrelated to the relay |
+| Deterministic refusal reason "connection interrupted" / "deadline exceeded" (OAuth client) | HULL-36 (1.1.0); BR-117 holds the case for tool calls |
+| Lineage displayed "active" before the exchange (`jeton lister`) | HULL-38 (1.1.0), unrelated to the relay |
 | Objective for the latency added by the relay | measured by AC-OP (reading), not set in v1; to set if the reading justifies it |
-| Stdio without a bridge, or a bridge embedded in the gateway image | refused (#1, lines 530-532): one container per stdio server, outside the image |
+| Stdio without a bridge, or a bridge embedded in the gateway image | refused (HULL-1, lines 530-532): one container per stdio server, outside the image |
 
 ## 3. Functional Spec
 
@@ -105,7 +105,7 @@ Q1 to Q4 were settled by the operator on 2026-10-30 ("ok for the recommendations
 
 A service declared before F-008 (for example the real Gitea of F-006) has `upstream_type` NULL: its connections have no tool and `connexion etat` says so ("upstream MCP not declared").
 
-**Upstream types.** `mcp-distant`: the service exposes an MCP server that accepts a third-party client (Notion, Canva, `gitea-mcp` over HTTP). `mcp-local`: a stdio server behind a stdio → Streamable HTTP bridge, in its own container (#1, lines 530-532); the gateway treats it as an `mcp-distant`; the type is **declarative** and additionally requires the MCP URL to be that of an internal host and the connection to be provided-token (H7). Neither has type-specific code.
+**Upstream types.** `mcp-distant`: the service exposes an MCP server that accepts a third-party client (Notion, Canva, `gitea-mcp` over HTTP). `mcp-local`: a stdio server behind a stdio → Streamable HTTP bridge, in its own container (HULL-1, lines 530-532); the gateway treats it as an `mcp-distant`; the type is **declarative** and additionally requires the MCP URL to be that of an internal host and the connection to be provided-token (H7). Neither has type-specific code.
 
 ### 3.2 CLI (SCR-02)
 
@@ -129,7 +129,7 @@ Same convention as F-006 §3.2 (actor `operator-cli`, codes 0, 2, 1, `--json` on
 - `tools/call`: chain of BR-113 to BR-117, BR-127 to BR-130; a gateway failure is rendered as an `isError: true` result carrying a code from the closed list of BR-116; a name outside the list stays the F-005 JSON-RPC "unknown tool" error (`-32602`).
 - any other method (`resources/*`, `prompts/*`, `completion/*`, `logging/*`): `-32601`.
 
-Policy contract (hook of #10, indicative form, exact name at implementation): `decider(rôle, connexion, nom_amont, définition_amont, arguments | None) -> autoriser | masquer | refuser(motif)`; called for each tool at announcement (`arguments` absent) and for each call (`arguments` present, so that #10 can judge an argument value). The relay never reads a `masquer` or a `refuser` other than as "unknown tool" for the client.
+Policy contract (hook of HULL-10, indicative form, exact name at implementation): `decider(rôle, connexion, nom_amont, définition_amont, arguments | None) -> autoriser | masquer | refuser(motif)`; called for each tool at announcement (`arguments` absent) and for each call (`arguments` present, so that HULL-10 can judge an argument value). The relay never reads a `masquer` or a `refuser` other than as "unknown tool" for the client.
 
 **Order of a `tools/call`** (BR-113), in two stages. Stage 0: size of the arguments (BR-129). **Stage 1, without token or network**, read from the database alone: name in the table → connection → placement on the role of the URL → state → effective sensitivity of the connection (BR-130, which needs no definition). **Stage 2**: `get_access` → upstream `tools/list` if the cache is cold or stale → presence of the name in the list → policy with definition and arguments → upstream `tools/call`. A stage 1 refusal costs neither `get_access` nor an exchange; a stage 2 refusal never costs a `tools/call`.
 
@@ -179,7 +179,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 
 **Clarifications**
 - Same mechanism as BR-084 (checked address tried, name used for the SNI and the certificate, `http.client`/`socket`/`ssl`), with a bounds profile of its own; the choice between extending `hullgate.outbound` and an SDK client is the implementation's under this rule (ADR expected, H12): any option that reads the environment, follows a redirect or does not try the checked address is excluded.
-- The bounds of 15 s, 60 s, 1 MiB are technical ceilings of v1 (H6); the response ceiling **per role** belongs to #10 and can only be lower. No configuration option lifts them; the tests inject their clock, their resolver and their `dial`, a single test playing the real 60 s value.
+- The bounds of 15 s, 60 s, 1 MiB are technical ceilings of v1 (H6); the response ceiling **per role** belongs to HULL-10 and can only be lower. No configuration option lifts them; the tests inject their clock, their resolver and their `dial`, a single test playing the real 60 s value.
 - No header of the incoming client (cookie, `Origin`, `X-Forwarded-*`, the client's `Authorization`) is forwarded; no response header of the upstream is forwarded to the client (`Set-Cookie`, `WWW-Authenticate`, `Mcp-Session-Id`).
 - An upstream response is a JSON or an SSE stream, read under the same bounds (handshake and `tools/list` included).
 - The 1 MiB ceiling applies to the response **body** (stream included), not to its headers. The response headers are bounded by the hard deadline of the exchange (15 s or 60 s) and by the ceilings of `http.client` (at most 100 lines of 64 KiB); they do not count in the 1 MiB (operator decision, 2026-10-31, n1 of review 449).
@@ -232,10 +232,10 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 - At most 1,000 names are kept per connection; beyond that, that connection's list is treated as unavailable (BR-111, reason "more than 1,000 names", distinct from an outage).
 - Remedy: `connexion outils <c> --role <chemin> --purger-noms --confirm <c>` erases from the table the names absent from the upstream's current list (the names present keep theirs); the operation is audited with the actor and the number of names erased. An erased name that returns receives a new name, stable afterward. It is not played without a current list (connection down or beyond BR-109's ceiling: refusal, code 2).
 - An empty upstream name, or one reduced to `_` after cleaning, is ignored and audited (reason "invalid name").
-- The uniqueness of the public name is that of (connection, public name): between connections it follows from the prefix, unique per organisation (BR-076) and without `_`. The table does not carry the organisation (out of scope, #42).
+- The uniqueness of the public name is that of (connection, public name): between connections it follows from the prefix, unique per organisation (BR-076) and without `_`. The table does not carry the organisation (out of scope, HULL-42).
 - A connection's table is erased with it (BR-075); the prefix no longer changes once a placement exists (BR-076), so the name does not vary.
 - The prefix contains no `_`: the first `__` unambiguously separates prefix and tool. The relay nevertheless relies on the table, never on a split of the name.
-- 64 characters for the **whole** name and `[A-Za-z0-9_-]` come from the Anthropic API's constraint on tool names (`^[a-zA-Z0-9_-]{1,64}$`); not measured on the clients (#3: name length open), nor the case (`Foo` and `foo` are two public names that a client folding the case would confuse), H5. With a prefix of 8 characters, the upstream part has 54 characters, or 45 plus the suffix when truncated.
+- 64 characters for the **whole** name and `[A-Za-z0-9_-]` come from the Anthropic API's constraint on tool names (`^[a-zA-Z0-9_-]{1,64}$`); not measured on the clients (HULL-3: name length open), nor the case (`Foo` and `foo` are two public names that a client folding the case would confuse), H5. With a prefix of 8 characters, the upstream part has 54 characters, or 45 plus the suffix when truncated.
 
 ### BR-111 · An upstream outage does not erase the tools of the role's other connections
 
@@ -276,7 +276,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — A tool call reaches an upstream only if its name is the public name of a tool, announced for a connection **placed and active on the role of the URL** at the time of the call, that BR-130 does not close, and accepted by the policy; any other name (unknown, of another role, of a connection not placed, of a connection closed by BR-130, absent from the upstream list, hidden or refused by the policy) receives the same "unknown tool" error, without upstream `tools/call`; and every refusal that is decided without an upstream definition (name outside the table, connection not placed on the role, not in state, closed by BR-130) is decided **before** any `get_access` and any exchange with an upstream.
 
 **Clarifications**
-- The list the client saw is not an authorization (#1, l. 465). The chain has two stages (§3.3). **Stage 1**, in the database only, without token or network: name → name table → connection → placement on the role of the URL → state → effective sensitivity (BR-130). **Stage 2**: `get_access` → `tools/list` if the cache is cold or stale → name present in the list → policy with definition and arguments → `tools/call`. The policy receives the upstream definition, which exists only after stage 2: a policy refusal therefore costs at most one `get_access` and one `tools/list`, never a `tools/call`.
+- The list the client saw is not an authorization (HULL-1, l. 465). The chain has two stages (§3.3). **Stage 1**, in the database only, without token or network: name → name table → connection → placement on the role of the URL → state → effective sensitivity (BR-130). **Stage 2**: `get_access` → `tools/list` if the cache is cold or stale → name present in the list → policy with definition and arguments → `tools/call`. The policy receives the upstream definition, which exists only after stage 2: a policy refusal therefore costs at most one `get_access` and one `tools/list`, never a `tools/call`.
 - The proof by absence (BR-002) reads: 0 upstream `tools/call` for every refusal; 0 exchange and 0 `get_access` for stage-1 refusals; at most one `tools/list` for a stage-2 refusal.
 - A name absent from the table never triggers a list fetch. A name present in the table but absent from the fresh list is unknown.
 - A call already sent is not interrupted when the placement is removed or the incoming token revoked during its execution: it ends at the latest at the 60 s deadline (BR-107); the following calls are refused (§12).
@@ -306,7 +306,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — The arguments of a call are forwarded to the upstream of the connection named by the public name, value for value, with no addition, removal or rewriting; the relay reads from the arguments no connection, role or account identifier; the identifier of a connection of another role presented as an argument opens no exchange with that connection.
 
 **Clarifications**
-- This is the acceptance run's test "role A's token supplies a `connection_id` placed in role B" (#1, l. 1119): A's upstream receives the argument as an ordinary value, B's upstream receives nothing.
+- This is the acceptance run's test "role A's token supplies a `connection_id` placed in role B" (HULL-1, l. 1119): A's upstream receives the argument as an ordinary value, B's upstream receives nothing.
 - The client's progress token (`_meta.progressToken`) is the only field rewritten, and outside the arguments (BR-120).
 
 ### BR-116 · The gateway's errors come from a closed list, with no token, URL or upstream body
@@ -319,7 +319,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — Every failure produced by the gateway or by the transport (handshake, HTTP, JSON-RPC, deadline, size, saturation, connection to reauthorize) is returned to the client as an `isError: true` result whose code is in the closed list `amont_indisponible`, `amont_occupe` (with optional delay), `echeance_depassee`, `issue_incertaine`, `reponse_trop_grande`, `requete_trop_grande`, `connexion_a_reautoriser`, `erreur_interne`, and whose text repeats neither a token, nor the upstream's URL, nor a body, nor an `error_description` of the upstream.
 
 **Clarifications**
-- "Never a token or upstream URL in error messages" (#1, l. 504) holds for what the gateway itself writes (H11); the content of a tool result falls under BR-126.
+- "Never a token or upstream URL in error messages" (HULL-1, l. 504) holds for what the gateway itself writes (H11); the content of a tool result falls under BR-126.
 - `erreur_interne`: any unexpected exception of the gateway, without detail.
 - A policy refusal is not in the list: it is "unknown tool" (BR-113, BR-123).
 - Three phases, three codes: request not fully sent (resolution, connection, TLS, interrupted send; BR-093: transient) → `amont_indisponible`; request fully sent and the **deadline** (15 s or 60 s, BR-107) reached without a whole response → `echeance_depassee`; request fully sent and a **cut** or interrupted stream before the deadline → `issue_incertaine`. The client acts the same for the last two (it does not know whether the tool acted); the distinction serves diagnosis.
@@ -335,7 +335,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — When a tool call's request has been sent and the response is missing or incomplete (deadline, cut, interrupted stream), the relay returns `issue_incertaine` (cut) or `echeance_depassee` (deadline), according to BR-116, and sends no second request for that call; the relay's only retry is that of a 401 received before any content (BR-127).
 
 **Clarifications**
-- A write tool whose response is missing may have acted: only the caller decides to replay it (#1, l. 505).
+- A write tool whose response is missing may have acted: only the caller decides to replay it (HULL-1, l. 505).
 - Failures before sending (resolution, refused TCP connection, TLS) are not replayed either; they return `amont_indisponible` and the caller decides.
 
 ### BR-118 · The relay speaks to each party in the protocol generation it negotiates
@@ -348,7 +348,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — For each request, the relay serves the client in the version it asks for among the five of BR-067 and reaches the upstream in the most recent one it accepts among those the gateway can speak (handshake and session for 2024-11-05 to 2025-11-25, sessionless for 2026-07-28); the two choices are independent, and an upstream that accepts no proposed version returns `amont_indisponible`, audited with the reason "version".
 
 **Clarifications**
-- The gateway does not rewrite JSON-RPC identifiers: it carries the state of each side separately (this is "translated if needed", #1 l. 486).
+- The gateway does not rewrite JSON-RPC identifiers: it carries the state of each side separately (this is "translated if needed", HULL-1 l. 486).
 - The four crossings client {2025-11-25, 2026-07-28} × upstream {with session, sessionless} are proven; the client's three other versions are proven for `tools/list` and `tools/call`.
 - The version negotiated with the upstream is kept with the upstream session (BR-119) and is read in the call audit.
 
@@ -362,7 +362,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — When the upstream opens a session (`Mcp-Session-Id`), the relay holds it for the key (role, connection) and for that key alone; a session that the upstream declares expired is reopened once, and the call resumes, without the client seeing it; the deletion of the role, the removal of the placement, the sensitive marking (BR-130), the revocation or removal of the connection, the removal of the upstream and a change of URL close its sessions (explicit end sent to the upstream, without waiting for its response more than 2 s); the server notices this at **every request served**, whatever the role or the key: it checks all the keys of its sessions and caches against the database (existing role, placement, state, URL, sensitivity) and closes what no longer holds; the upstream's session identifier is never returned to a client.
 
 **Clarifications**
-- The key includes the role: two roles sharing a connection open two upstream sessions, and an upstream state does not pass from one role to the other (same rule as the cache, BR-112). Accepted gap from #1 ("one per client session") since the access point is stateless (H1).
+- The key includes the role: two roles sharing a connection open two upstream sessions, and an upstream state does not pass from one role to the other (same rule as the cache, BR-112). Accepted gap from HULL-1 ("one per client session") since the access point is stateless (H1).
 - Resuming after an expired session concerns the **session**, not a call with an uncertain outcome (BR-117): it happens only if the upstream refused the request for an unknown session before executing it.
 - A deleted role receives no more requests: closing its sessions therefore cannot wait for a request of its key. Checking all the keys against the database is done at every request served (negligible cost for 4 or 5 clients); the 15 min inactivity safety net holds only if the server serves no request any more. The CLI holds no session.
 - A session that expires while several calls of the key are in flight is reopened only **once** (same guard as BR-112); the other calls wait for that reopening.
@@ -384,7 +384,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 - Cancellation by an explicit `notifications/cancelled` in stateless mode cannot be correlated with a request in progress: only closing the stream can (Q1, H1).
 - Returning progress requires streamed responses (SSE) where F-005 returns JSON; this change is isolated to batch C (§10) and holds only for `tools/call` carrying a `progressToken`.
 - Progress is counted in the 1 MiB bound and in the 60 s deadline: it does not extend them.
-- Closing the response (operator decision, 2026-10-31, #9 comment 10771): the client's closing of a `tools/call` response, whether served as an SSE stream or as JSON, counts as cancellation. The relay cuts the exchange, sends `notifications/cancelled` to the upstream on the BR-108 slot of the cancelled call (ceded to the notice, not a new slot, hence never refused at saturation), with a hard deadline of 2 s for the notice, audits "cancelled" and never replays the call (BR-117). In the worst case, where the cut has no effect on a blocked name resolution, the slots come back after 4 s at most; the notice can no longer open a connection once its deadline has passed. The AC-OP of batch C (R10, Claude.ai and iOS) judged the clients' non-regression: neither sends a `progressToken`, so no cancellation was observed in real use; it is proven by AC-25.
+- Closing the response (operator decision, 2026-10-31, HULL-9 comment 10771): the client's closing of a `tools/call` response, whether served as an SSE stream or as JSON, counts as cancellation. The relay cuts the exchange, sends `notifications/cancelled` to the upstream on the BR-108 slot of the cancelled call (ceded to the notice, not a new slot, hence never refused at saturation), with a hard deadline of 2 s for the notice, audits "cancelled" and never replays the call (BR-117). In the worst case, where the cut has no effect on a blocked name resolution, the slots come back after 4 s at most; the notice can no longer open a connection once its deadline has passed. The AC-OP of batch C (R10, Claude.ai and iOS) judged the clients' non-regression: neither sends a `progressToken`, so no cancellation was observed in real use; it is proven by AC-25.
 
 ### BR-121 · The relay announces only tools and refuses what the upstream asks of the client
 
@@ -399,7 +399,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 - The relay announces no client capability to the upstream (no `sampling`, `elicitation`, `roots`).
 - The `instructions` and the `serverInfo` of the upstream `initialize` (free text) are never returned to the client: the relay serves its own.
 - Resources linked in a tool's result (`resource_link`, embedded resource) are content and are relayed as such; the relay does not follow them.
-- Ceiling per exchange (operator decision, 2026-10-31, #9 comment 10771): at most 16 error responses per exchange to the requests that the upstream addresses to the client, in order, from a single thread; beyond that, the requests are counted in the exchange's audit entry (field `count`) without a response. Nothing is relayed to the client.
+- Ceiling per exchange (operator decision, 2026-10-31, HULL-9 comment 10771): at most 16 error responses per exchange to the requests that the upstream addresses to the client, in order, from a single thread; beyond that, the requests are counted in the exchange's audit entry (field `count`) without a response. Nothing is relayed to the client.
 - Reading of "without `listChanged`" (n7 of review 462): the relay never announces `listChanged` true. The form served is `tools: {listChanged: false}` (§3.3: "false"); an absent field would be equivalent for a client and just as conforming, and the test accepts both forms.
 
 ### BR-122 · Every tool call and every relay refusal is audited, without argument or result
@@ -416,7 +416,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 - One entry at the end of the call; if its writing fails, the result is served all the same and the failure is logged on the error output, as for a refusal (BR-066) (H9).
 - Optional fields, read from the code. Entry of a call (`relay.tool_call`): `connection` and `upstream_name` (absent when no connection is known, "unknown tool"), `version` (absent when no upstream was reached), `stream: true` (response served as a stream, BR-120) and the `reason` column (reason for a failure on the upstream side, for example "session"; absent from the outcome `ok`). Entry of a list omission (`relay.list_omitted`): `reason` carries BR-111's reason, the detail the role, the connection, the outcome and the duration. Entry of a reporting "not before" date (`relay.signal_pause`, BR-128): `pause_s`. Entry of an exchange in which the upstream addressed requests to the client (`relay.upstream_request_refused`, BR-121): `method` (of the first) and `count`. None carries an argument, a result, a token or a header.
 - BR-066's final sweep of the test databases is extended: no argument or result value of the fake upstream in any database.
-- The audit grows by one line per call; its retention belongs to #12 (§12).
+- The audit grows by one line per call; its retention belongs to HULL-12 (§12).
 
 ### BR-123 · The relay consults a policy before announcing and before calling
 
@@ -428,7 +428,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — For each tool at the announcement and at each call, the relay asks the policy with the role, the connection, the upstream name and definition (and the arguments at the call) and neither announces nor calls what it hides or refuses; a policy that raises an error refuses every tool concerned (fail closed).
 
 **Clarifications**
-- As long as #10 has not supplied a policy, the transitional policy announces and calls all the tools of the connections that no sensitive role carries; BR-130 closes the others, before the policy and without an upstream definition.
+- As long as HULL-10 has not supplied a policy, the transitional policy announces and calls all the tools of the connections that no sensitive role carries; BR-130 closes the others, before the policy and without an upstream definition.
 - The policy receives the upstream definition: it is consulted only at stage 2 of BR-113, never without the relay having obtained a token and, at most, a list.
 
 ### BR-124 · A 429 from the upstream sets a "not before" date shared by the connection
@@ -441,8 +441,8 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — When the upstream of a connection answers 429 to an exchange of the relay, the calls of that connection before the `Retry-After` date (otherwise an exponential fallback from 1 s to 60 s, bounded and reset to zero by a success) are refused without exchange with `amont_occupe` carrying the delay; the date holds for all the roles that share the connection and does not act on token renewal.
 
 **Clarifications**
-- Takes over F-006's attribution (§2 Out of Scope: "429 and `Retry-After` on upstream calls, delay shared per connection" → #9); BR-094's date remains that of the renewal endpoint, separate (a 429 from the MCP upstream says nothing about the OAuth endpoint).
-- The date is held in memory: a restart loses it, which costs at most one more 429. **Preventive** rate limiting belongs to #12.
+- Takes over F-006's attribution (§2 Out of Scope: "429 and `Retry-After` on upstream calls, delay shared per connection" → HULL-9); BR-094's date remains that of the renewal endpoint, separate (a 429 from the MCP upstream says nothing about the OAuth endpoint).
+- The date is held in memory: a restart loses it, which costs at most one more 429. **Preventive** rate limiting belongs to HULL-12.
 
 ### BR-125 · An outbound client is built only once per process and per use
 
@@ -467,7 +467,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 **Rule** — The result that an upstream returns to a `tools/call` (success as well as `isError`) reaches the client with no modification other than the replacement with `[masqué]` of every occurrence of the value of the connection's token in its texts; a result that exceeds BR-107's bounds is not truncated but replaced with `reponse_trop_grande`.
 
 **Clarifications**
-- This is the "as is, errors included" half of #1 (l. 468); the other half is BR-116 (H11).
+- This is the "as is, errors included" half of HULL-1 (l. 468); the other half is BR-116 (H11).
 - A URL, including the upstream's, present in the content (the link of a Gitea ticket) is business content and remains.
 - Masking looks only for the exact value of the connection's token; it does not protect against an upstream that would encode the token differently.
 
@@ -522,10 +522,10 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 
 *`behavioral` · `strict` · Candidate state: `verified` — `tests/integration/test_br_130_sensitive_connection.py`.*
 
-**Rule** — As long as #10 has not provided a policy, no tool of a connection placed on at least one sensitive role (sensitive environment, BR-047) is announced or called, on any of the roles that carry it; the sensitivity of the connection is the maximum of that of its placements, re-read from the database on every request.
+**Rule** — As long as HULL-10 has not provided a policy, no tool of a connection placed on at least one sensitive role (sensitive environment, BR-047) is announced or called, on any of the roles that carry it; the sensitivity of the connection is the maximum of that of its placements, re-read from the database on every request.
 
 **Clarifications**
-- A safety guard and not a mode: it disappears when #10 replaces it, and BR-130 is then modified (Q4, H4).
+- A safety guard and not a mode: it disappears when HULL-10 replaces it, and BR-130 is then modified (Q4, H4).
 - Cause: BR-078 allows, with confirmation, a connection placed on both a sensitive role and a non-sensitive role, and BR-079 does not prevent a later marking from creating this sharing. Closing only the sensitive role would let the non-sensitive role serve, with the sensitive connection's token, the writes that the brief's guard closes.
 - A new placement on a sensitive role or the sensitive marking of a placed role takes effect on the next request, warm cache included (BR-112); the list of a non-sensitive role then omits the connection (BR-111, reason "sensible").
 - The guard is decided at stage 1 of BR-113, which alone carries the proof by absence (0 `get_access`, 0 exchange with the upstream; a renewal is a provider call, in the upstream log per BR-002): it requires no upstream definition.
@@ -562,7 +562,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 - [x] **AC-18** (BR-115) — a call from A carrying `connection_id` = identifier of B's connection, and nested arguments (lists, numbers, `null`, Unicode): A's upstream receives the JSON arguments identical value for value, B's upstream 0 requests. Instrument: `test_br_115_arguments.py`.
 - [x] **AC-19** (BR-116) — with markers in the connection's token, the MCP URL, the error body and the upstream's `error_description`, no response produced by the gateway (over the 8 codes provoked one by one) contains any of them; none of the 8 responses returns the "policy" state: a policy refusal is "unknown tool" (BR-113); an upstream status 403, 404 outside a session, 500 or 302 returns `amont_indisponible`. Instrument: `test_br_116_error_hygiene.py` (search for the markers in each response).
 - [x] **AC-20** (BR-126) — an upstream result (success, then `isError: true`) reaches the client identical value for value (text content, image, `resource_link`, `structuredContent`); an occurrence of the connection's token value in its text is returned `[masqué]` and nothing else is modified; a URL in the content stays. Instrument: `test_br_126_result_relay.py`.
-- [x] **AC-21** (BR-117, BR-116) — upstream that reads the request then stays silent until the deadline: `echeance_depassee`; upstream that cuts after the headers, before the deadline: `issue_incertaine`; in both cases exactly 1 request in the upstream log for the call, never 2; upstream that refuses the TCP connection: `amont_indisponible`, 0 requests. The reason is measured over 5 runs (lesson of #36). Instrument: `test_br_117_no_replay.py`.
+- [x] **AC-21** (BR-117, BR-116) — upstream that reads the request then stays silent until the deadline: `echeance_depassee`; upstream that cuts after the headers, before the deadline: `issue_incertaine`; in both cases exactly 1 request in the upstream log for the call, never 2; upstream that refuses the TCP connection: `amont_indisponible`, 0 requests. The reason is measured over 5 runs (lesson of HULL-36). Instrument: `test_br_117_no_replay.py`.
 - [x] **AC-22** (BR-124) — the upstream answers 429 `Retry-After: 5`: the connection's calls for 5 s (injected clock) return `amont_occupe` with that delay, 0 exchanges; without `Retry-After`, fallback 1 s, 2 s, ... capped at 60 s, reset by a success; the date applies to two roles sharing the connection; an OAuth renewal of the same connection is not delayed. Instrument: `test_br_124_upstream_rate_limit.py`.
 
 ### Protocol
@@ -577,7 +577,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 
 ### Isolation bench and regressions
 - [x] **AC-29** (BR-071, BR-015, BR-016, BR-022, BR-013) — `./bench.sh --target v1` plays a **complete** pass: the 16 transposed tests `réussi`, 0 `échoué`, 0 `non jouable`; the controls BR-013, BR-015 (read and write of role A served by the real `gitea-mcp` 1.11.0 on the disposable Gitea instance, write absent from role B's list and refused with no entry in the front's log), BR-022 and BR-016 are played against v1; `evidence/results-v1.json` updated, disposable secrets (BR-010). Instrument: the complete bench pass, report pasted in the batch B PR; an `--only` pass is not conclusive.
-  - **Readings of the v1 target** (post-freeze amendment of 2026-10-31, operator decision; POC targets unchanged; written in `mapping.json` and `results-v1.json`, with a reference to BR-115, BR-109, BR-130 and BR-054; no BR modified): **T06** — the two type variants change the `typ` header of the access token (`rt+jwt` for renewal, `JWT` for identity), one property each (BR-014), and v1 answers 401 (BR-054: the type of a v1 access token is its `typ: at+jwt` header, the POC `token_use` claim does not exist); the other variants are unchanged. **T07/T08** — the variants argument `connection_id`, header `X-Connection-Id` and parameter `?connection_id=` succeed if the call is served on behalf of A and B's upstream receives nothing (no entry in its log; A's upstream receives the argument as an ordinary value, BR-115); the variant "B's tool called from A" stays a refusal without exchange (BR-113). **T09** — judged on v1's real masking, the transitional policy of BR-130: a connection placed on a sensitive role has no tool in role A's `tools/list`, and a `tools/call` of one of its names is refused with no upstream exchange; the "empty log" is judged only on the closed connection's upstream: no entry on behalf of that connection or for the masked tool, the other entries (workarounds through legitimate tools of the role) being recorded in the result without entering the verdict; fine-grained masking per tool belongs to #10, which will tighten this judgment. **T10** — réussi if, after adding a connection, A's already listed tools and the account that serves them are unchanged (BR-109). **BR-015 control** — role B goes through a second `gitea-mcp` launched read-only (`-r`); its write tool is absent from B's list.
+  - **Readings of the v1 target** (post-freeze amendment of 2026-10-31, operator decision; POC targets unchanged; written in `mapping.json` and `results-v1.json`, with a reference to BR-115, BR-109, BR-130 and BR-054; no BR modified): **T06** — the two type variants change the `typ` header of the access token (`rt+jwt` for renewal, `JWT` for identity), one property each (BR-014), and v1 answers 401 (BR-054: the type of a v1 access token is its `typ: at+jwt` header, the POC `token_use` claim does not exist); the other variants are unchanged. **T07/T08** — the variants argument `connection_id`, header `X-Connection-Id` and parameter `?connection_id=` succeed if the call is served on behalf of A and B's upstream receives nothing (no entry in its log; A's upstream receives the argument as an ordinary value, BR-115); the variant "B's tool called from A" stays a refusal without exchange (BR-113). **T09** — judged on v1's real masking, the transitional policy of BR-130: a connection placed on a sensitive role has no tool in role A's `tools/list`, and a `tools/call` of one of its names is refused with no upstream exchange; the "empty log" is judged only on the closed connection's upstream: no entry on behalf of that connection or for the masked tool, the other entries (workarounds through legitimate tools of the role) being recorded in the result without entering the verdict; fine-grained masking per tool belongs to HULL-10, which will tighten this judgment. **T10** — réussi if, after adding a connection, A's already listed tools and the account that serves them are unchanged (BR-109). **BR-015 control** — role B goes through a second `gitea-mcp` launched read-only (`-r`); its write tool is absent from B's list.
 - [x] **AC-30** (BR-067, BR-045, BR-095) — the F-005 and F-006 tests pass; `test_br_067_mcp_endpoint.py` is updated for BR-067 v2 (non-empty list with relay, five versions still served statelessly, 400 `supported`); deletion of a role: upstream sessions closed and caches discarded at the next served request, from any role (all keys checked against the database, BR-112); `connexion revoquer`: no more tools. Instrument: `make gate`, these named tests.
 - [x] **AC-31** (glossary) — `domain-glossary.md` carries the entries **Relay**, **Upstream** and **Public name (of a tool)** with their discarded terms, and the specs and rules do not use the discarded terms. Instrument: `grep -nEi "agrégateur|backend|alias d'outil" features/F-008-relais.md business-rules/BR-1{06..30}.md | grep -v '\*\*AC-31\*\*'` returns no line (the second `grep` discards the sole AC-31 line, which cites the discarded terms to define them: fixed at closure, the first `grep` alone found it itself); manual reread of the glossary entry (clause read by hand).
 
@@ -586,10 +586,10 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 - [x] **AC-34** (BR-130, BR-078, BR-079, BR-123) — connection `gp` placed on a sensitive role S (confirmed, BR-078) and on a non-sensitive role N: the `tools/list` of N and of S announce no tool of `gp`; a direct call to `gp__…` on N returns "unknown tool"; in every case **0 `get_access` and 0 exchanges** with `gp`'s upstream (counters, cold and warm caches); a connection `gd` placed on N alone keeps all its tools; a placement of `gd` on a sensitive role, then the sensitive marking of a role that carries `gd`, remove its tools on each of its roles at the next request, warm cache; `connexion etat` displays "tools closed: placed on a sensitive role"; `connexion placer --confirme-partage` and `sensible marquer` display the announcement "<connection> will no longer have a tool on <non-sensitive roles>" before writing. Instrument: `test_br_130_sensitive_connection.py`.
 
 ### On the production server (operator)
-- [x] **AC-OP** *(validated by the operator: batch B, #9 comments 10637 and 10678, `VERIFY-RELAIS: 4/5 OK`, `sensible: SKIP` for lack of a sensitive role, Claude.ai and Claude iOS; batch C, comment 10778, R10, non-regression of the clients)* (BR-106, BR-107, BR-109, BR-113, BR-123, BR-130) — the operator plays `docs/guides/keys-and-upstreams.md` (to be delivered) **right after the merge of batch B**: launch of `gitea-mcp` 1.11.0 over HTTP in the compose project, on the gateway's network, `GITEA_HOST` toward the real Gitea; `service amont gitea … --type mcp-distant --url-mcp http://<hôte interne>:<port>/mcp --hote-interne-mcp`; placement of a connection on a trial **non-sensitive** role, **the connection being carried by no sensitive role** (BR-130); then `make verify-relais ROLE=<chemin relu>`. Any action toward the production server follows BR-043.
+- [x] **AC-OP** *(validated by the operator: batch B, HULL-9 comments 10637 and 10678, `VERIFY-RELAIS: 4/5 OK`, `sensible: SKIP` for lack of a sensitive role, Claude.ai and Claude iOS; batch C, comment 10778, R10, non-regression of the clients)* (BR-106, BR-107, BR-109, BR-113, BR-123, BR-130) — the operator plays `docs/guides/keys-and-upstreams.md` (to be delivered) **right after the merge of batch B**: launch of `gitea-mcp` 1.11.0 over HTTP in the compose project, on the gateway's network, `GITEA_HOST` toward the real Gitea; `service amont gitea … --type mcp-distant --url-mcp http://<hôte interne>:<port>/mcp --hote-interne-mcp`; placement of a connection on a trial **non-sensitive** role, **the connection being carried by no sensitive role** (BR-130); then `make verify-relais ROLE=<chemin relu>`. Any action toward the production server follows BR-043.
   - **Instrument bounded to the batch**: `make verify-relais ROLE=<chemin relu de `hullgate arbre lister`>` (new target, operator token read from standard input, BR-086), which plays only the F-008 controls and none of F-004 to F-006. It prints one line per control in the exact form `VERIFY-RELAIS <contrôle>: OK` or `VERIFY-RELAIS <contrôle>: ÉCHEC <motif>`, then the banner `VERIFY-RELAIS: n/5 OK` on every path. Controls: `liste` (at least one tool, all prefixed with the prefix of a placed connection, names of at most 64 characters); `appel` (a read tool, **reread from the output of `liste`** and chosen by the operator, returns a result without `isError`); `refus` (a name `zz__inconnu` returns the "unknown tool" error); `sensible` (the sensitive role named by the operator, if there is one, returns an empty list); `sortie` (the operator token read from standard input does not appear in the output, nor any string matching `clo_[A-Za-z0-9_-]{20,}` nor the substring `Bearer `). The value of the **connection's** token and any other secret are not read by the instrument: their absence from the output is not covered (clause read by hand below). Expected banner: `VERIFY-RELAIS: 5/5 OK` (`4/5` and `sensible: SKIP` if the operator has no sensitive role).
-  - **Readings to post, not asserted** (seen once, no known bound): the number of tools and the time of `liste`; the time of the `appel`; the protocol version negotiated with the upstream (audit line); the `gitea-mcp` version; the length of the longest public name; the address (IPv4 or IPv6) reached for the upstream, on a dual-stack Docker host (lesson of #32).
-  - **Read by hand** (clause not covered by the instrument, marked as such): the walkthrough's output contains no connection token value (reading of the pasted output); on the Claude.ai connector, after reconnection, **the role's tools appear**; on Claude iOS, the connector **can be added to a conversation** (the production finding of 2026-10-30); a read call from each of the two clients succeeds. The operator posts, for each client, `réussi / échoué / échoué côté client` and what they saw, without a token (template as #3).
+  - **Readings to post, not asserted** (seen once, no known bound): the number of tools and the time of `liste`; the time of the `appel`; the protocol version negotiated with the upstream (audit line); the `gitea-mcp` version; the length of the longest public name; the address (IPv4 or IPv6) reached for the upstream, on a dual-stack Docker host (lesson of HULL-32).
+  - **Read by hand** (clause not covered by the instrument, marked as such): the walkthrough's output contains no connection token value (reading of the pasted output); on the Claude.ai connector, after reconnection, **the role's tools appear**; on Claude iOS, the connector **can be added to a conversation** (the production finding of 2026-10-30); a read call from each of the two clients succeeds. The operator posts, for each client, `réussi / échoué / échoué côté client` and what they saw, without a token (template as HULL-3).
 
 ## 6. Diagrams
 
@@ -609,7 +609,7 @@ Policy contract (hook of #10, indicative form, exact name at implementation): `d
 flowchart TD
   A[Opérateur : service amont gitea --url-mcp ...] --> B[connexion placer sur un rôle]
   B --> C{Connexion placée sur au moins un rôle sensible ?}
-  C -- oui --> D[Aucun outil sur aucun de ses rôles tant que #10 n'est pas là]
+  C -- oui --> D[Aucun outil sur aucun de ses rôles tant que HULL-10 n'est pas là]
   C -- non --> E[Client Claude : tools/list sur /p/chemin/mcp]
   E --> F[Liste : préfixe__outil des connexions placées actives]
   F --> G[tools/call préfixe__outil]
@@ -685,12 +685,12 @@ No design asset (`drivers.design.type: none`). How the tools are presented in th
 ### Dependencies (prerequisite features)
 
 - **F-005** (access point, authorization order, `--target v1` bench) — `implemented`.
-- **F-006** (`get_access`, `signaler_refus`, placements, tokens, `Outbound`) — `implemented`, deployed and accepted on the production server (HULL-8, #31, #32).
-- **#10** (policy) — downstream: applies on the hook of BR-123; **#11**, **#12**, **#13** — downstream.
+- **F-006** (`get_access`, `signaler_refus`, placements, tokens, `Outbound`) — `implemented`, deployed and accepted on the production server (HULL-8, HULL-31, HULL-32).
+- **HULL-10** (policy) — downstream: applies on the hook of BR-123; **HULL-11**, **HULL-12**, **HULL-13** — downstream.
 - The Gitea MCP server (`gitea-mcp` 1.11.0, stateless HTTP, one Gitea host per process) and, for `mcp-local`, a stdio → HTTP bridge: to be launched by the operator (runbook), outside the gateway image.
-- **#45** (`coverage.sha`, `Makefile`, BR-104) is in progress: the `make verify-relais` target and any `Makefile` change of this batch are rebased on its merge.
-- **#21** (witness of the SDK guard on the bench's v1 target) touches the same `v1` target as AC-29: order settled: #21 after batch B (operator, 2026-10-31).
-- **#3** (behavior of the Claude clients: name length, list refresh) stays open; its unknowns are hypotheses (H5, H13) and AC-OP readings.
+- **HULL-45** (`coverage.sha`, `Makefile`, BR-104) is in progress: the `make verify-relais` target and any `Makefile` change of this batch are rebased on its merge.
+- **HULL-21** (witness of the SDK guard on the bench's v1 target) touches the same `v1` target as AC-29: order settled: HULL-21 after batch B (operator, 2026-10-31).
+- **HULL-3** (behavior of the Claude clients: name length, list refresh) stays open; its unknowns are hypotheses (H5, H13) and AC-OP readings.
 
 ### Technical Constraints
 
@@ -704,14 +704,14 @@ No design asset (`drivers.design.type: none`). How the tools are presented in th
 | Question | Decision | Rationale |
 |----------|----------|-----------|
 | Client-side sessions | Stateless access point; upstream session per (role, connection) (Q1/H1) | F-005 (BR-067) serves statelessly; inbound sessions = table, expiry, token binding, cut-off at revocation: attack surface for 4 or 5 clients |
-| `api-rest` | Deferred; extensible upstream type (Q2/H2) | an adapter framework is a product; Gitea is enough for #13 |
+| `api-rest` | Deferred; extensible upstream type (Q2/H2) | an adapter framework is a product; Gitea is enough for HULL-13 |
 | Plain HTTP | Admitted for the MCP URL alone, toward a named and audited internal host (Q3/H3) | `gitea-mcp` and the bridges listen over HTTP on the Docker network; BR-084 unchanged for OAuth |
-| Before #10 | A connection placed on at least one sensitive role has no tool, on all its roles (Q4/H4, BR-130) | keeps the brief's guard ("writes closed by default on sensitive") even for a shared connection (BR-078) without blocking non-sensitive connections |
-| Public name | Stored table (unique per connection), algorithm only at the first assignment; at most 64 characters, whole name | #1: "a name never varies between two `tools/list`"; API constraint on tool names |
+| Before HULL-10 | A connection placed on at least one sensitive role has no tool, on all its roles (Q4/H4, BR-130) | keeps the brief's guard ("writes closed by default on sensitive") even for a shared connection (BR-078) without blocking non-sensitive connections |
+| Public name | Stored table (unique per connection), algorithm only at the first assignment; at most 64 characters, whole name | HULL-1: "a name never varies between two `tools/list`"; API constraint on tool names |
 | Order of a `tools/call` | Two stages: database alone (stage 1), then token, list, policy, call (stage 2) | the policy requires the upstream definition; refusals that do not need it cost neither token nor network (BR-113) |
 | Invalidation of cache and sessions | Comparison with the database at every request, no message | the CLI is a different process from the server (BR-112) |
-| Authorization of a call | Reread from the database at every request, never deduced from the cache | #1 line 465: the announced list is not an authorization |
-| Errors | `isError` result with a closed code for the gateway, upstream content as is | reconciles #1 lines 468 and 504 |
+| Authorization of a call | Reread from the database at every request, never deduced from the cache | HULL-1 line 465: the announced list is not an authorization |
+| Errors | `isError` result with a closed code for the gateway, upstream content as is | reconciles HULL-1 lines 468 and 504 |
 
 #### Hypotheses made autonomously
 
@@ -723,10 +723,10 @@ Each is applied in this draft; the freeze confirms or corrects them. Q1 to Q4 ar
 | H2 | (Q2) `api-rest` deferred to a 1.1.0 ticket | a | §2 Out of Scope, BR-106 |
 | H3 | (Q3) `http://` admitted for the MCP URL alone, toward the named internal host, all of whose resolved addresses are private (a public address requires https, flag or not), audited | a | BR-106, BR-107 |
 | H4 | (Q4) transitional policy: a connection placed on at least one sensitive role has no tool on any role; the connection's sensitivity is the maximum of its placements | a | BR-130 |
-| H5 | public names of **at most 64 characters, whole name**, `[A-Za-z0-9_-]` (Anthropic API constraint on tool names; not measured on the clients, case included; #3 open) | 64 / strict set | BR-110 |
+| H5 | public names of **at most 64 characters, whole name**, `[A-Za-z0-9_-]` (Anthropic API constraint on tool names; not measured on the clients, case included; HULL-3 open) | 64 / strict set | BR-110 |
 | H6 | v1 bounds: 15 s (handshake, list), 60 s (call), 1 MiB, 500 tools and 10 pages per list, 1,000 names kept, 4 exchanges per connection and 32 in total, cache 300 s, 64 upstream sessions per connection and 15 min of inactivity | values written | BR-107 to BR-112, BR-119 |
 | H7 | `mcp-local` = same path as `mcp-distant`, internal host imposed, provided-token connection imposed (a bridge that does not check the token ignores it) | yes | §3.1, BR-106 |
-| H8 | annotations and schemas relayed unchanged; #10 will decide how far to trust them | yes | BR-109 |
+| H8 | annotations and schemas relayed unchanged; HULL-10 will decide how far to trust them | yes | BR-109 |
 | H9 | the audit keeps neither arguments nor results; one entry at the end of the call; write failure non-blocking | yes | BR-122 |
 | H10 | an upstream 401 is retried once, for an OAuth connection only; a 401 of a provided-token connection follows BR-085 (Q5) | yes | BR-127 |
 | H11 | tool result relayed as is except the token value; gateway errors in a closed list | yes | BR-116 |
@@ -740,14 +740,14 @@ Each is applied in this draft; the freeze confirms or corrects them. Q1 to Q4 ar
 | H19 | 1 MiB bound on the arguments of a `tools/call`, same cap as the read; reading the raw body is out of scope | yes | BR-129 |
 | H20 | cache, sessions and dates live in the server process; the CLI cannot invalidate anything: at every served request, the server checks **all** its session and cache keys against the database; `connexion outils` reads bypassing the cache and has no refresh option | yes | BR-112, BR-119 |
 | H22 | (Q5) a 401 of a provided-token connection keeps BR-085 (`signaler_refus`, `réauthentification requise`); `last_reason` distinguishes "refusal reported: 401 from the MCP server" from an OAuth provider refusal; the `mcp-local` runbook says that an unauthenticated bridge never answers 401. **Confirmed by the operator at the freeze (2026-10-30)** | a | BR-127, §3.2, runbook |
-| H21 | global deadline of 30 s for `tools/list` (13 s of renewal, BR-089 lease included, + 15 s of list + margin), parallel fetches; to be checked against #3 | yes | BR-109 |
+| H21 | global deadline of 30 s for `tools/list` (13 s of renewal, BR-089 lease included, + 15 s of list + margin), parallel fetches; to be checked against HULL-3 | yes | BR-109 |
 | H24 | (operator decision, 2026-10-30, post-freeze) BR-107 names `Host` (normalized host of the record's URL) and `Content-Length` (body size), framing headers imposed by HTTP/1.1, and excludes any other transport header; AC-06 counts them in the list. Cause: B1 of review 448 (a `strict` rule admits no declared gap) | a | BR-107, AC-06 |
 | H23 | (operator decision, 2026-10-30, post-freeze) the closed list of BR-107 adds `Mcp-Method`, `Mcp-Name`, `Mcp-Param-*`, values drawn from the upstream body; an annotated argument that cannot be encoded returns `requete_trop_grande`; AC-05 verifies the 60 s deadline by constant and injected clock (only the 15 s one is really played). Cause: BR-107 / BR-118 contradiction found in batch A (`.cairn/runs/acts/HULL-9-implementation-A-1.md`) | a | BR-107, AC-05 |
 
 ### Data Model Impact
 
 - **Number**: migration 4 already exists (F-006 batch B: `auth_method`, `last_reason`, `key_alert`); F-008 writes **migration 5** (`workflow.md` §Rules: a number is taken at implementation). Wherever this spec says "migration 4" (AC-02, §6.3, §10, §11), read "migration 5".
-- Migration 5, forward (BR-069): `service` gains `upstream_type` (CHECK `mcp-distant` \| `mcp-local`, NULL allowed), `mcp_url`, `mcp_internal`; table `tool_name(connection_id, upstream_name, public_name, created_at)`, key (connection, upstream name), uniqueness constraint on (`connection_id`, `public_name`) and not on `public_name` alone (uniqueness across connections follows from the prefix, BR-076, BR-110; no organisation in the table, #42). No secret: backup and export (without secrets) are unchanged; the table is deleted with its connection (BR-075).
+- Migration 5, forward (BR-069): `service` gains `upstream_type` (CHECK `mcp-distant` \| `mcp-local`, NULL allowed), `mcp_url`, `mcp_internal`; table `tool_name(connection_id, upstream_name, public_name, created_at)`, key (connection, upstream name), uniqueness constraint on (`connection_id`, `public_name`) and not on `public_name` alone (uniqueness across connections follows from the prefix, BR-076, BR-110; no organisation in the table, HULL-42). No secret: backup and export (without secrets) are unchanged; the table is deleted with its connection (BR-075).
 - No call data in the database apart from the audit.
 
 ### Components to Create / Modify
@@ -766,7 +766,7 @@ Each is applied in this draft; the freeze confirms or corrects them. Q1 to Q4 ar
 - `src/hullgate/migrations.py` — migration 4
 - `src/hullgate/outbound.py` — reusable bounds profile (or separation, H12)
 - `poc/isolation-bench/` (`v1` target: upstream, front, `adapter_v1.py`, `run_bench.py`) — relayed controls
-- `Makefile` — `verify-relais` (after #45); `domain-glossary.md`
+- `Makefile` — `verify-relais` (after HULL-45); `domain-glossary.md`
 
 
 #### Implementation deltas — batch A (2026-10-30)
@@ -792,7 +792,7 @@ Each is applied in this draft; the freeze confirms or corrects them. Q1 to Q4 ar
 | Point | Delivered in batch B | Reason / next |
 |---|---|---|
 | Server relay | `hullgate.relay.Relay`, built once per listener with one `Outbound` and one `UpstreamClient` (BR-125); the authorized role and actor pass to the SDK server through the ASGI request state | no client parameter designates the role (BR-109) |
-| Policy | `hullgate.policy`: `decide(rôle, connexion, nom amont, définition, arguments)` returns `Allow`, `Hide` or `Refuse`; transitional policy `TRANSITIONAL`; an exception counts as a refusal | contract of §3.3, name fixed here for #10 |
+| Policy | `hullgate.policy`: `decide(rôle, connexion, nom amont, définition, arguments)` returns `Allow`, `Hide` or `Refuse`; transitional policy `TRANSITIONAL`; an exception counts as a refusal | contract of §3.3, name fixed here for HULL-10 |
 | Relayed result | validated by `mcp_types`, then serialized by the SDK according to the client's version: standard fields pass value for value, a field unknown to the model is removed by the SDK | SDK MCP entry (ADR-004); BR-126 |
 | Upstream JSON-RPC error on a `tools/call` | `amont_indisponible` (reason "JSON-RPC error <code>", the upstream's message never repeated) | BR-116 (JSON-RPC failure) |
 | 401 on `tools/list` | same chain as the call: report, retry once (OAuth), "not before" date of BR-128 | BR-127 says "a call"; the list has no other safe handling |
@@ -813,7 +813,7 @@ Each is applied in this draft; the freeze confirms or corrects them. Q1 to Q4 ar
 | Cancellation | the client closing the connection sets a cancellation (`Cancel`): disconnect watcher on the ASGI `receive` and cancellation of the processing by the SDK; cut of the upstream socket, then `notifications/cancelled` sent on the cancelled call's BR-108 slot, handed to the sending thread (2 s) and returned afterwards (review 470, B1: never lost at 4/32); a cancelled call's thread keeps its slot among the relay's 96 until it ends (m2); audit outcome `annule`, code returned `issue_incertaine` (never read) | BR-120 says "a call's stream": cancellation also applies to a `tools/call` served as JSON, whose response is the stream; cut measured at 4 to 30 ms (5 runs × 2 modes) |
 | Audit | field `stream: true` on the entry of a call served as a stream | batch C AC-OP reading (does the client send a `progressToken`?); neither argument, nor result, nor token (BR-122) |
 | Upstream → client requests (review 462, m4) | at most 16 error responses per exchange, in order, from a single thread; one audit entry per exchange (`method` of the first, `count`) | BR-121 "audited" held per exchange; beyond 16, a request from a failing upstream stays unanswered (BR-107, BR-108: bounds) |
-| `service lister` | line "upstream: <type> <host> [internal host]" or "upstream MCP not declared" under each service | runbook R5; batch B AC-OP reading (#9) |
+| `service lister` | line "upstream: <type> <host> [internal host]" or "upstream MCP not declared" under each service | runbook R5; batch B AC-OP reading (HULL-9) |
 | `gitea-mcp` 1.11.0 | no known tool to emit progress (binary: library types only) | batch C AC-OP judges the non-regression of the clients (runbook R10); progress is proved by AC-25 |
 | Bench (review 462, M1) | reading of the T06 headers only for an adapter that has `header()`; ContextForge unchanged | BR-006; `results.json` not replayed |
 
@@ -885,18 +885,18 @@ BRs not tested directly: none.
 
 - **Isolation (core of batch B)** — the relay is the first gateway code that holds both the role's identity and an upstream token: a role or connection mix-up there opens the isolation. The controls are BR-109, BR-113, BR-115 and the proof by absence of exchange; the review reads these three rules against hostile inputs (forged name, `connection_id` argument, name of another role, pagination cursor).
 - **Window of a call in flight** — a call already sent survives the removal of the placement, the revocation of the connection and that of the inbound token for at most 60 s (BR-113). Accepted: no inbound session to cut (Q1); the bound is the call's deadline.
-- **Between #9 and #10** — for a connection that no sensitive role carries, the relay announces and calls **all** its tools, writes included. Mitigation: BR-130 closes every connection placed on at least one sensitive role, on all its roles (the guard no longer depends on the operator's arrangement); the operator places on a non-sensitive role only connections they accept to see open there (runbook). #13 cannot precede #10.
-- **Diagnosis of sensitive connections** — `connexion outils` refuses a connection placed on a sensitive role (BR-130): the operator cannot list its upstream before #10. Accepted: no need identified before #10.
-- **Unbounded raw body** — F-005 does not bound the reading of an access point request body (BR-129 bounds only the arguments of a `tools/call`, after parsing): an authenticated client can saturate memory with an enormous body. Out of scope of #9 (§Out of Scope), to handle on F-005 or by #12.
+- **Between HULL-9 and HULL-10** — for a connection that no sensitive role carries, the relay announces and calls **all** its tools, writes included. Mitigation: BR-130 closes every connection placed on at least one sensitive role, on all its roles (the guard no longer depends on the operator's arrangement); the operator places on a non-sensitive role only connections they accept to see open there (runbook). HULL-13 cannot precede HULL-10.
+- **Diagnosis of sensitive connections** — `connexion outils` refuses a connection placed on a sensitive role (BR-130): the operator cannot list its upstream before HULL-10. Accepted: no need identified before HULL-10.
+- **Unbounded raw body** — F-005 does not bound the reading of an access point request body (BR-129 bounds only the arguments of a `tools/call`, after parsing): an authenticated client can saturate memory with an enormous body. Out of scope of HULL-9 (§Out of Scope), to handle on F-005 or by HULL-12.
 - **Upstream that loops back to the gateway** — an MCP URL that would designate the gateway itself is not detected (BR-106); the loop is bounded by BR-107 and BR-108.
 - **Concurrency** — a slow upstream occupies its 4 slots (BR-108): the following calls of its connection receive `amont_occupe` without hindering the other connections or the renewal. The figures 4 and 32 are estimates (H6).
-- **Upstream annotations believed by the client** — an upstream that marks a destructive tool `readOnlyHint` can make a client-side confirmation be skipped; this is the trust placed in it by declaring it, unchanged by the gateway (H8). #10 decides to rewrite them.
-- **Switch to streaming (batch C)** — switching from JSON to SSE for some calls can upset a real client (#3: behaviors not measured); mitigation: separate batch, AC-OP replayed, fallback = abandoning the batch.
-- **`list_changed`** — F-005 (§2) sent the `list_changed` notification back to #9; with no inbound session or GET stream (Q1 = a) it is not pushed: a client sees a placement change at its next `tools/list`, and the authorization, for its part, changes immediately (BR-113).
+- **Upstream annotations believed by the client** — an upstream that marks a destructive tool `readOnlyHint` can make a client-side confirmation be skipped; this is the trust placed in it by declaring it, unchanged by the gateway (H8). HULL-10 decides to rewrite them.
+- **Switch to streaming (batch C)** — switching from JSON to SSE for some calls can upset a real client (HULL-3: behaviors not measured); mitigation: separate batch, AC-OP replayed, fallback = abandoning the batch.
+- **`list_changed`** — F-005 (§2) sent the `list_changed` notification back to HULL-9; with no inbound session or GET stream (Q1 = a) it is not pushed: a client sees a placement change at its next `tools/list`, and the authorization, for its part, changes immediately (BR-113).
 - **Cancellation in stateless mode** — explicit cancellation by a client of a generation earlier than 2026-07-28 does not reach the upstream; the call runs until its deadline (Q1).
 - **Report after a second 401** — the "not before" date (BR-128) delays by 60 s to 15 min the reporting of a real token revocation by the upstream: the connection's state stays `active` during that delay and calls return `connexion_a_reautoriser`.
 - **401 retry** — an upstream that would execute then answer 401 would see the tool replayed; unlikely (BR-114 retries only without content), not zero.
-- **Audit growth** — one line per call (BR-122), retention belongs to #12.
+- **Audit growth** — one line per call (BR-122), retention belongs to HULL-12.
 - **Internal host over plain HTTP** — the relay's traffic to `gitea-mcp` (token included) crosses the Docker network in clear: any container on the same network can observe it if it has the capture capability. The project's network carries only the gateway and its upstreams (runbook), the exception is named and audited (Q3).
 - **SDK upgrade** — the entry remains that of `mcp==2.3.0` (ADR-001): any upgrade replays the bench (BR-037); the relay relies on `ServerRequestContext` and the SDK's stream closing, young internals.
 - **Unmeasured hypothesis** — `gitea-mcp` forwards the received OAuth access token as `Authorization: Bearer` to the Gitea API (matrix, path 2); the `appel` line of AC-OP lifts it, a failure shifts the Gitea case to the provided-token connection (BR-085) or to another path.
@@ -924,14 +924,14 @@ Majors:
 - **M6** · axis B · §BR-107 — a token with CR, LF or NUL would allow injecting a header toward the upstream. Sort : corrigé — refusal before sending, `erreur_interne`, audited.
 - **M7** · axis B · §3.2 — no command removes a service's upstream. Sort : corrigé — `service amont --retirer --confirm`, BR-106, AC-03.
 - **M8** · axis B · §BR-113 — a call in flight survives the removal of the placement, the revocation of the connection or of the inbound token for up to 60 s. Sort : accepté — no inbound session to cut (Q1); the bound is the deadline; risk in §12.
-- **M9** · axis E · §2 against F-005 §2 — F-005 sent `list_changed` back to #9; the draft does not push it. Sort : accepté — impossible without an inbound session or GET stream (Q1); risk in §12; the operator decides through Q1.
+- **M9** · axis E · §2 against F-005 §2 — F-005 sent `list_changed` back to HULL-9; the draft does not push it. Sort : accepté — impossible without an inbound session or GET stream (Q1); risk in §12; the operator decides through Q1.
 - **M10** · axis F · §10 — the assignment of the ACs to batches A and B overlapped (BR-117, BR-119). Sort : corrigé — batches rewritten, ACs at library level (batch A) then at access point level (batch B).
 - **M11** · axis E · §12 — the Gitea case assumes that `gitea-mcp` relays the OAuth token as a bearer to the API (matrix, not measured). Sort : corrigé — hypothesis in §12, lifted by the `appel` line of AC-OP, fallback on BR-085.
 
 Minors:
 - **m1** · axis B · §BR-110 — upstream name repeated within the same list. Sort : corrigé — first definition only.
 - **m2** · axis B · §BR-107 — upstream responses in SSE for the handshake and `tools/list` not stated. Sort : corrigé.
-- **m3** · axis E · §9 — calendar collisions with #45 (`Makefile`) and #21 (bench `v1` target). Sort : corrigé — noted in §9 Dependencies.
+- **m3** · axis E · §9 — calendar collisions with HULL-45 (`Makefile`) and HULL-21 (bench `v1` target). Sort : corrigé — noted in §9 Dependencies.
 - **m4** · axis D · §2 — no objective for added latency. Sort : différé — §Out of Scope, AC-OP reading.
 - **m5** · axis C · §3.2 — `connexion outils` (diagnosis) could wait. Sort : rejeté — tool of the AC-OP and of batch A, low cost; it is not a defect.
 - **m6** · axis A · §BR-119 — "at best" vague for the session end. Sort : corrigé — sent without waiting for the response more than 2 s.
@@ -954,7 +954,7 @@ Majors:
 - **M5** · BR-116, BR-117, AC-19, AC-21 — `echeance_depassee` not defined. Sort : corrigé — three phases, three codes (not sent → `amont_indisponible`; sent and deadline reached → `echeance_depassee`; sent and cut before the deadline → `issue_incertaine`); AC-21 names the code per case.
 - **M6** · BR-109, BR-123 against §3.2 — `connexion outils` contacted the upstream of an unplaced or sensitive connection, with no defined token. Sort : corrigé (decision) — restricted to placed connections, `--role` mandatory, token through `get_access(connexion, rôle)`, refusal of a connection placed on a sensitive role (BR-130); AC-35.
 - **M7** · BR-110, AC-11 — ambiguous length of 64. Sort : corrigé — 64 on the whole public name, upstream part truncated to 64 − prefix − 2 − 9, then `_` and 8 hexadecimal digits; AC-11 (prefix of 8, name of 100 → exactly 64); source of the bound in H5.
-- **M8** · §6.3 ER, BR-110, #42 — `public_name` globally unique, against the prefix's per-organisation uniqueness. Sort : corrigé (decision) — (connection, public name) uniqueness in the ER, in the data model and in BR-110; line "per-organisation tightness (#42)" in §Out of Scope.
+- **M8** · §6.3 ER, BR-110, HULL-42 — `public_name` globally unique, against the prefix's per-organisation uniqueness. Sort : corrigé (decision) — (connection, public name) uniqueness in the ER, in the data model and in BR-110; line "per-organisation tightness (HULL-42)" in §Out of Scope.
 - **M9** · BR-120, BR-121 — fate of upstream notifications other than progress not written. Sort : corrigé — only the progress of the call's token is relayed, any other notification is discarded; AC-25.
 - **M10** · AC-OP, `sortie` control — clause without an instrument. Sort : corrigé — expression written (operator token, `clo_[A-Za-z0-9_-]{20,}`, `Bearer `); the connection token's value becomes a clause read by hand, marked.
 - **M11** · BR-110 — 1,000 names never deleted: connection permanently unavailable. Sort : corrigé (decision) — `connexion outils --purger-noms --confirm`, audited; distinct reason "more than 1,000 names" in BR-111; AC-36.
@@ -974,7 +974,7 @@ Minors:
 - **m12** · empty upstream name or one reduced to `_` — corrigé: ignored and audited (BR-110, AC-11).
 - **m13** · "without contacting the upstream" without `get_access` — corrigé: BR-130 and AC-34 count `get_access`.
 - **m14** · N connections: N × 25 s in sequence — corrigé: parallel fetches under BR-108, global list deadline (25 s, raised to 30 s by Pass 3) (BR-109, AC-12, H21).
-- **m15** · `Foo` and `foo` — corrigé: case is an unknown of #3 / H5.
+- **m15** · `Foo` and `foo` — corrigé: case is an unknown of HULL-3 / H5.
 - **m16** · request and cache memory bounds neither settled nor declared — corrigé: BR-129 for the arguments, two lines in §Out of Scope.
 
 Observation on the rework (outside the findings): the cache, the sessions and the dates are in the server process and the CLI is a different process: "emptied by the CLI" (BR-112, BR-119, `--rafraichir`) was not feasible. Sort : corrigé — fingerprint comparison read from the database at every request, `--rafraichir` removed, `connexion outils` bypassing the cache (BR-112, H20, AC-13).
@@ -1006,9 +1006,10 @@ Observation on the rework (outside the findings): the cache, the sessions and th
 | 2026-10-30 | human:sstolz (freeze) | Freeze: `ready-for-dev`. Capabilities: extends MCP access point of a role, Connection library, Outbound OAuth client, Audit log, MCP gateway isolation acceptance run; introduces MCP tool relay, Upstream MCP client. Merge: AI; Split: yes, 3 PRs (batches A, B, C). Q5: option a (H22 confirmed). |
 | 2026-10-30 | human:sstolz (decision) | Post-freeze amendment: BR-107 adds Mcp-Method, Mcp-Name, Mcp-Param-* (values from the upstream body); AC-05 plays 60 s through an injected clock — BR-107/BR-118 contradiction found in batch A |
 | 2026-10-30 | human:sstolz (decision) | Post-freeze amendment: BR-107 admits Host and Content-Length, framing headers imposed by HTTP/1.1 — B1 of review 448 |
-| 2026-10-31 | human:sstolz (decision) | Post-freeze amendment of AC-29: readings of the bench's v1 target for T07/T08 (BR-115), T09 (masking by BR-130), T10 (BR-109) and the BR-015 control (`gitea-mcp` read-only for B); POC targets and BRs unchanged — stop of batch B (`.cairn/runs/acts/HULL-9-implementation-B-1.md`); order #21 after batch B |
+| 2026-10-31 | human:sstolz (decision) | Post-freeze amendment of AC-29: readings of the bench's v1 target for T07/T08 (BR-115), T09 (masking by BR-130), T10 (BR-109) and the BR-015 control (`gitea-mcp` read-only for B); POC targets and BRs unchanged — stop of batch B (`.cairn/runs/acts/HULL-9-implementation-B-1.md`); order HULL-21 after batch B |
 | 2026-10-31 | human:sstolz (decision) | Post-freeze amendment of AC-29, details of the v1 readings: T06 falsifies the type through the `typ` header (`rt+jwt`, `JWT`), 401 expected (BR-054, BR-014); T09 judges the log on the upstream of the sole connection closed by BR-130; BRs unchanged — stop B-3 (`.cairn/runs/acts/HULL-9-implementation-B-3.md`) |
-| 2026-10-31 | human:sstolz (decision) | Clarifications written at extraction, Rule unchanged (#9, comment 10771 and review 449): BR-107, the 1 MiB cap applies to the response body, response headers being bounded by the deadline and by `http.client`; BR-120, closing the response of a `tools/call` (SSE or JSON) amounts to cancellation, notice cut at 2 s; BR-121, at most 16 error responses per exchange |
+| 2026-10-31 | human:sstolz (decision) | Clarifications written at extraction, Rule unchanged (HULL-9, comment 10771 and review 449): BR-107, the 1 MiB cap applies to the response body, response headers being bounded by the deadline and by `http.client`; BR-120, closing the response of a `tools/call` (SSE or JSON) amounts to cancellation, notice cut at 2 s; BR-121, at most 16 error responses per exchange |
 | 2026-10-31 | Claude (implementation, model:claude-sonnet-5-5) | Closure (close-feature): `implemented`; BR-106 to BR-130 extracted (all `verified`), BR-022, BR-045, BR-066 v3, BR-067 v2, BR-071, BR-095 carried; BR-121 reads "without `listChanged`" (n7); BR-122 lists its optional fields; AC-31 instrument fixed (`grep -v` of its own line); ADR-005 `accepted` in §9 |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 1, freeze `10d166e`: S11 guide references, P1 private trial references and F1 private procedure mentions only where applicable. |
 | 2026-11-16 | Codex (implementation-coder, model:gpt-6-astra) | F-022 slice 2, freeze `10d166e` (retouch 2 `7aac9e6`): §3.2 substitutions only; inline rule clarifications without version where applicable. |
+| 2026-11-24 | Claude (implementation, model:claude-opus-5-5) | F-025 §3.8 rewrite pass, freeze `1427c98`: private-forge `#N` written `HULL-N`, citation form only. |

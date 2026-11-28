@@ -3,7 +3,7 @@
 > What the project does today. The rules that hold it live in `business-rules/`,
 > the history of how it got there in `features/index.md`.
 
-**Last sync**: 2026-11-18 · F-024
+**Last sync**: 2026-11-24 · F-025
 **Coverage**: partial
 
 ## core
@@ -35,6 +35,7 @@ How the v1 gateway is built, verified before merge and against the isolation acc
 | **Trusted client address** | Reads the client address through declared proxies; production requires proxy trust and the smoke proves forged headers cannot merge client budgets. | `BR-300`, `BR-301`, `BR-302`, `BR-315` | `F-020` | `F-020` |
 | **Backup and restore check** | Backs up SQLite hot, verifies and rotates backups, and proves a backup restarts the gateway in a disposable container; generic guides cover scheduling, restore checks and in-place restore. | `BR-038`, `BR-039`, `BR-328`, `BR-329` | `F-004` | `F-022` |
 | **MCP gateway isolation acceptance run** | Plays the 16 isolation tests of the review against an MCP gateway in one command (targets ContextForge, POC Go, v1), evidence by the upstream log, replays the checks outside the acceptance run and the core requirements, and renders a go / no-go report, comparative between POCs included; against v1, the full run gives 16 passed out of 16, relay and real `gitea-mcp` included. | `BR-001`, `BR-002`, `BR-003`, `BR-004`, `BR-005`, `BR-006`, `BR-009`, `BR-010`, `BR-011`, `BR-012`, `BR-013`, `BR-014`, `BR-024`, `BR-025`, `BR-026`, `BR-027`, `BR-071` | `F-001` | `F-015` |
+| **Public repository on GitHub** | Publishes the 1.0.0 export as a public MIT repository whose first commit adds only a closed overlay (licence, security policy, contribution rules, CI), checked by a publication check of trees, objects, refs and headers; CI plays the gate on hosted runners without a secret; after the switch it is the working repository, tickets migrate screened and `#N` names a GitHub issue only. | `BR-334`, `BR-335`, `BR-336`, `BR-337`, `BR-338`, `BR-339`, `BR-340`, `BR-341`, `BR-342`, `BR-343`, `BR-344`, `BR-345`, `BR-346`, `BR-347`, `BR-348`, `BR-349`, `BR-350`, `BR-351`, `BR-332` | `F-025` | `F-025` |
 
 ## connections
 

@@ -1,7 +1,7 @@
 # MCP gateway isolation bench (F-001)
 
 Reusable bench to play the isolation acceptance run (16 tests, technical review of 26 October 2026, section 6) against an MCP gateway.
-First use: ContextForge (HULL-2). Reusable against the Go POC (#5) then the v1 by replacing only the adapter (BR-006).
+First use: ContextForge (HULL-2). Reusable against the Go POC (HULL-5) then the v1 by replacing only the adapter (BR-006).
 
 ## Run
 

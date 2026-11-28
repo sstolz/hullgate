@@ -1,4 +1,4 @@
-// Theme switch: dark by default (#18). The choice is a per-viewer convenience kept in
+// Theme switch: dark by default (HULL-18). The choice is a per-viewer convenience kept in
 // localStorage, which may be absent or throw: the console works without it.
 
 export type Theme = 'dark' | 'light';
